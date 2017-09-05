@@ -115,3 +115,8 @@ Create view vw_estudios_en_sabado
 as
 select count(med.matricula), med.nombre_medico from registro reg inner join Medicos med on reg.matricula = med.matricula where datepart(dw,reg.fecha_estudio)=7 group by med.matricula 
 GO
+
+Create view vw_estudios_por_instituto
+as
+select count(reg.id_instituto) as [Total estudio x Instituto], inst.nombre_instituto from registro reg inner join instituto inst on reg.id_instituto = inst.id where (DATEDIFF(dd,reg.fechaestudio,getDate())<14) group by reg.id_instituto 
+GO
