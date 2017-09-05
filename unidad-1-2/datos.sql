@@ -55,3 +55,32 @@ VALUES (310, 'Ricardo', 'Alberti','m'),
 (317, 'Amparo', 'Vinias','f'),
 (318, 'Enrique', 'Somaruga','m'),
 (319, 'Josefina', 'Cirone','f');
+
+--Medico_Especialidad
+INSERT INTO Medico_Especialidad (id_medico, id_especialidad)
+VALUES (319, 27),
+(317, 30),
+(317, 28),
+(319, 5),
+(318, 31),
+(312, 7),
+(312, 11),
+(314, 15),
+(314, 9),
+(311, 20);
+
+--Instituto
+INSERT INTO Instituto (id, nombre_instituto, direccion, estado)
+VALUES (500,'Hospital Britanico De Buenos Aires','Perdriel 74','s'),
+(501,'Hostital Durand','Av Diaz Velez 5044','n'),
+(502,'Hospital Pirovano','Monroe 3555','n'),
+(503,'Sociedad Italiana De Beneficencia','Juramento 2741','s'),
+(504,'Mejores Hospitales Sa','Gallo 1360','s'),
+(505,'Medicina Uba Hospital De Clinicas Fac De','Paraguay 2250','n'),
+(506,'Alicia M Sambuelli','Av Caseros 2061','s'),
+(507,'Carlos G Campos','Comb D L Pozos 1881','s'),
+(508,'Rosa M Bologna','Comb D L Pozos 1881','s'),
+(509,'Centro De Investigaciones Endocrinologicas','Ambrosio Cramer 4601','s');
+
+--Instituto_Estudio
+INSERT INTO 
