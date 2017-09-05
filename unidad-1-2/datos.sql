@@ -83,4 +83,51 @@ VALUES (500,'Hospital Britanico De Buenos Aires','Perdriel 74','s'),
 (509,'Centro De Investigaciones Endocrinologicas','Ambrosio Cramer 4601','s');
 
 --Instituto_Estudio
-INSERT INTO 
+INSERT INTO Instituto_Estudio (id_instituto, id_estudio, precio)
+VALUES (501,1,350),
+(509,4,3650),
+(505,2,455),
+(502,3,789),
+(503,1,800),
+(507,4,1750),
+(508,3,2550),
+(504,2,4000);
+
+--Paciente
+INSERT INTO Paciente (dni, nombre, apellido, sexo, fecha_nacimiento)
+VALUES (38524798, 'Cesar','Rodriguez','m','19860805'),
+(38524798, 'Maria','Zara','f','19881223'),
+(38524798, 'Luis','Diaz','m','19770412'),
+(38524798, 'Micaela','Sanchez','f','19940617'),
+(38524798, 'Matias','Hernandez','m','19651001');
+
+--Obra Social
+INSERT INTO ObraSocial (id, nombre, categoria)
+VALUES (1,'OSDE','pp'),
+(2,'Sancor Salud','pp'),
+(3,'Medicus','pp'),
+(4,'Galeno','pp'),
+(5,'Medife','pp'),
+(6,'Swiss Medical','pp'),
+(7,'OSECAC','os'),
+(8,'Union Personal','os'),
+(9,'IOMA','os'),
+(10,'Luis Pasteur','os'),
+(11,'OSDEPYM','os'),
+(12,'OSMEDICA','os'),
+(13,'Accord Salud','pp');
+
+--Plan
+INSERT INTO Plan (id, id_obra_social, estado)
+VALUES (1,'13','si'),
+(12,'2','no'),
+(10,'5','si'),
+(3,'6','no'),
+(7,'10','si'),
+(5,'11','si'),
+(4,'7','si'),
+(9,'8','no'),
+(2,'1','si');
+
+--Paciente plan
+INSERT INTO Paciente_Plan (),
