@@ -18,16 +18,20 @@ inner join Estudio est on ee.id_estudio = est.id
 inner join Especialidad esp on ee.id_especialidad = esp.id
 GO
 
-CREATE VIEW vw_medico
+CREATE VIEW vw_medicos_activos
 AS
-SELECT m.matricula, m.nombre_medico, m.apellido_medico, m.sexo FROM Medico m
+SELECT m.matricula, m.nombre_medico, m.apellido_medico, m.sexo FROM Medico m where m.estado='activo'
+
 GO
 
-CREATE VIEW vw_medico_especialidad
+CREATE VIEW vw_total_medicos_sin_especialidades
 AS
-SELECT est.nombre_estudio, m.nombre_medico, m.apellido_medico, m.sexo FROM Medico_Especialidad me 
-inner join Medico m on me.id_medico = m.matricula
-inner join Especialidad esp on me.id_especialidad = esp.id
+SELECT count(me.sexo)as total, me.sexo  FROM Medico m 
+Left join Medico_Especialidad me 
+Medico_Especialidad me 
+on me.id_medico = m.matricula
+group by me.sexo
+having me.id_especialidad is null
 GO
 
 CREATE VIEW vw_instituto
@@ -52,7 +56,7 @@ AS
 SELECT p.dni, p.nombre, p.apellido, p.sexo, p.fecha_nacimiento FROM Paciente p
 GO
 
-CREATE VIEW vw_plan
+CREATE VIEW vw_planes
 AS
 SELECT p.id, os.nombre, os.categoria, p.estado FROM Plan p
 inner join ObraSocial os on p.id_obra_social = os.id
