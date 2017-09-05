@@ -13,47 +13,53 @@ exec sp_unbindrule 'Integrantes.lu'
 
 
 CREATE RULE estado_rule
-			AS 
-			@estado in ('activo','inactivo')
-			GO
+as
+@estado in ('activo','inactivo')
+go
+
 CREATE RULE dni_rule
-			AS 
-			@dni like '%[0-9]%' 
-			go
+as 
+@dni like '%[0-9]%' 
+go
+
 CREATE RULE sigla_rule
-			AS 
-			@sigla not like '%[0-9]%' 
-			go
+as
+@sigla not like '%[0-9]%' 
+go
+
 CREATE RULE precio_rule
-			AS 
-			@precio > 0 or  @precio <= 5000
-			GO
+as 
+@precio > 0 or  @precio <= 5000
+go
+
 CREATE RULE sexo_rule
-			AS 
-			@sexo in ('f','m')
-			GO
+as
+@sexo in ('f','m')
+go
+
 CREATE RULE fechaEstudio_rule
-			AS
-			@fechaEstudio >= dateadd(mm, -1, getdate()) and @fechaEstudio <= dateadd(mm, 1, getdate()) 
-			go
+as
+@fechaEstudio >= dateadd(mm, -1, getdate()) and @fechaEstudio <= dateadd(mm, 1, getdate()) 
+go
 
 /**
  *	tipos de datos
  **/
 
 --Se crea el tipo de dato id
-sp_addtype 'id', 'smallint' , 'not null'
+sp_addtype 'id', 'smallint' , 'not null';
+go
 
 -- Se crea el tipo de dato estado
-sp_addtype 'estado', 'char (10)' , 'not null'
-
+sp_addtype 'estado', 'char (10)' , 'not null';
+go
 -- Se crea el tipo de dato sigla
-sp_addtype 'sigla', 'varchar(8)', 'not null'
+sp_addtype 'sigla', 'varchar(8)', 'not null';
+go
 
 -- Se crea el tipo de dato dni
-sp_addtype 'dni', 'varchar(8)', 'not null'
-
-
+sp_addtype 'dni', 'varchar(8)', 'not null';
+go
 
 -- Especialidad
 create table Especialidad 
