@@ -117,13 +117,13 @@ create table ObraSocial
 GO
 
 -- Plan
-/* [IMPORTANTE] El numero del plan no tiene que ser menor o igual a 12? */
 create table Plan 
 (
 	id smallint not null primary key,
 	id_obra_social smallint not null,
 	estado char, check (estado in ('si', 'no')),
 	constraint fk_obrasocial_id foreign key (id_obra_social) references ObraSocial(id)
+	check (id >=1 and id <= 12);
 )
 GO
 
