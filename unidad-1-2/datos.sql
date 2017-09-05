@@ -42,3 +42,16 @@ VALUES (1, 'Resonancia magnética'), (2, 'Ecograma'), (3, 'Colonoscopia'), (4, '
 -- Especialidad_Estudio
 INSERT INTO Especialidad_Estudio (id_estudio, id_especialidad)
 VALUES (1, 21), (2, 3), (3, 4), (4, 21);
+
+--Medicos
+INSERT INTO Medicos (matricula, nombre_medico, apellido_medico, sexo)
+VALUES (310, 'Ricardo', 'Alberti','m'),
+(311, 'Juan', 'Sosa','m'),
+(312, 'Sol', 'Nuñez','f'),
+(313, 'Patricia', 'Fernandez','f'),
+(314, 'Cristian', 'Garcia','m'),
+(315, 'Fernando', 'Martinez','m'),
+(316, 'Maria', 'Lopez','f'),
+(317, 'Amparo', 'Vinias','f'),
+(318, 'Enrique', 'Somaruga','m'),
+(319, 'Josefina', 'Cirone','f');
