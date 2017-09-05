@@ -104,3 +104,8 @@ CREATE VIEW vw_estudios_en_tres_meses
 AS
 select est.nombre_estudio from Registro reg inner join Estudio est on reg.id_estudio = est.id where reg.fecha_estudio >= DATEADD(MM, -3, GETDATE())
 GO
+
+Create view vw_estudios_a_prepagas
+as
+select est.nombre_estudio from ObraSocial os inner join plan p on os.id = p.id_obra_social inner join Plan_Estudio plest on plest.id_plan = p.id inner join Registro reg on plest.id_estudio = reg.id_estudio inner join Estudio est on plest.id_estudio = est.id
+where os.categoria='pp' and DATEDIFF(dd,reg.fechaestudio,getDate())<45
