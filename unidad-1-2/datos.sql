@@ -144,3 +144,10 @@ VALUES (1, 1, ),
 (12, 2, 30),
 (3, 4, 10),
 (10, 3, 80)
+
+-- Registro
+INSERT INTO Registro (id, id_estudio, id_instituto, matricula_medico, dni_paciente, fecha_estudio)
+VALUES (1, 1, 500, 310, 38524799, 2017-05-29), 
+(2, 1, 520, 319, 38524797, 2017-05-15),
+(3, 2, 530, 312, 38524798, 2017-06-18),
+(4, 4, 520, 315, 38524794, 2017-07-02)
