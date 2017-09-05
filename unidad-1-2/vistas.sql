@@ -62,6 +62,15 @@ SELECT p.id, os.nombre, os.categoria, p.estado FROM Plan p
 inner join ObraSocial os on p.id_obra_social = os.id
 GO
 
+CREATE VIEW vw_planes_sin_cobertura 
+AS
+SELECT os.nombre, p.id FROM Plan_Estudio pe
+right join Plan p on pe.id_plan = p.id
+left join Estudio e on pe.id_estudio = e.id
+inner join ObraSocial os on p.id_obra_social = os.id
+where pe.id_estudio is null
+GO
+
 CREATE VIEW vw_paciente_plan
 AS
 SELECT p.dni, p.nombre, p.apellido, p.sexo, p.fecha_nacimiento, pl.id, pl.id_obra_social, pl.estado FROM Paciente_Plan pp
