@@ -35,3 +35,7 @@ VALUES (1, 'Alergología'),
 (30, 'Toxicología'),
 (31, 'Urología');
 
+-- Estudio
+INSERT INTO Estudio (id, nombre_estudio)
+VALUES (1, 'Resonancia magnética'), (2, 'Ecograma'), (3, 'Colonoscopia'), (4, 'Tomografía');
+	
