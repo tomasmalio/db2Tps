@@ -1,6 +1,7 @@
 /**
  *	DATOS
  **/
+ -- Especialidad
 INSERT INTO Especialidad (id, nombre_especialidad)
 VALUES (1, 'Alergología'),
 (2, 'Anestesiología y reanimación'),
@@ -32,4 +33,5 @@ VALUES (1, 'Alergología'),
 (28, 'Rehabilitación'),
 (29, 'Reumatología'),
 (30, 'Toxicología'),
-(30, 'Urología');
+(31, 'Urología');
+
