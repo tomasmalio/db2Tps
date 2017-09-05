@@ -98,3 +98,9 @@ inner join Instituto i on r.id_instituto = i.id
 inner join Medico m on r.matricula_medico = m.matricula
 inner join Paciente p on r.dni_paciente = p.dni
 GO
+
+
+CREATE VIEW vw_estudios_en_tres_meses
+AS
+select est.nombre_estudio from Registro reg inner join Estudio est on reg.id_estudio = est.id where reg.fecha_estudio >= DATEADD(MM, -3, GETDATE())
+GO
