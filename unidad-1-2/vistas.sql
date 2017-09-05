@@ -109,3 +109,9 @@ Create view vw_estudios_a_prepagas
 as
 select est.nombre_estudio from ObraSocial os inner join plan p on os.id = p.id_obra_social inner join Plan_Estudio plest on plest.id_plan = p.id inner join Registro reg on plest.id_estudio = reg.id_estudio inner join Estudio est on plest.id_estudio = est.id
 where os.categoria='pp' and DATEDIFF(dd,reg.fecha_estudio,getDate())<45
+
+GO
+Create view vw_estudios_en_sabado
+as
+select count(med.matricula), med.nombre_medico from registro reg inner join Medicos med on reg.matricula = med.matricula where datepart(dw,reg.fecha_estudio)=7 group by med.matricula 
+GO
