@@ -22,6 +22,25 @@ delete Integrantes where lu = 1004370
 
 select * from sys.database_permissions
 
+
+/**
+ *	tipos de datos
+ **/
+
+--Se crea el tipo de dato id
+sp_addtype 'id', 'smallint' , 'not null'
+
+-- Se crea el tipo de dato estado
+sp_addtype 'estado', 'char (10)' , 'not null'
+
+-- Se crea el tipo de dato sigla
+sp_addtype 'sigla', 'varchar(8)', 'not null'
+
+-- Se crea el tipo de dato dni
+sp_addtype 'dni', 'varchar(8)', 'not null'
+
+
+
 -- Especialidad
 create table Especialidad 
 ( 
@@ -56,6 +75,7 @@ create table Medico
 	nombre_medico varchar(50) not null,
 	apellido_medico varchar(50) not null,
 	sexo char, 
+	estado estado,
 	check (sexo in ('m','f'))
 )
 GO
