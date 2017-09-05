@@ -36,8 +36,8 @@ VALUES (1, 'Alergología'),
 (31, 'Urología');
 
 -- Estudio
-INSERT INTO Estudio (id, nombre_estudio)
-VALUES (1, 'Resonancia magnética'), (2, 'Ecograma'), (3, 'Colonoscopia'), (4, 'Tomografía');
+INSERT INTO Estudio (id, nombre_estudio,estado)
+VALUES (1, 'Resonancia magnética','activo'), (2, 'Ecograma','activo'), (3, 'Colonoscopia','activo'), (4, 'Tomografía','activo');
 	
 -- Especialidad_Estudio
 INSERT INTO Especialidad_Estudio (id_estudio, id_especialidad)
