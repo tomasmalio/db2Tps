@@ -43,7 +43,7 @@ VALUES (1, 'Resonancia magnética'), (2, 'Ecograma'), (3, 'Colonoscopia'), (4, '
 INSERT INTO Especialidad_Estudio (id_estudio, id_especialidad)
 VALUES (1, 21), (2, 3), (3, 4), (4, 21);
 
---Medicos
+-- Medicos
 INSERT INTO Medicos (matricula, nombre_medico, apellido_medico, sexo)
 VALUES (310, 'Ricardo', 'Alberti','m'),
 (311, 'Juan', 'Sosa','m'),
@@ -56,7 +56,7 @@ VALUES (310, 'Ricardo', 'Alberti','m'),
 (318, 'Enrique', 'Somaruga','m'),
 (319, 'Josefina', 'Cirone','f');
 
---Medico_Especialidad
+-- Medico_Especialidad
 INSERT INTO Medico_Especialidad (id_medico, id_especialidad)
 VALUES (319, 27),
 (317, 30),
@@ -69,7 +69,7 @@ VALUES (319, 27),
 (314, 9),
 (311, 20);
 
---Instituto
+-- Instituto
 INSERT INTO Instituto (id, nombre_instituto, direccion, estado)
 VALUES (500,'Hospital Britanico De Buenos Aires','Perdriel 74','s'),
 (501,'Hostital Durand','Av Diaz Velez 5044','n'),
@@ -82,7 +82,7 @@ VALUES (500,'Hospital Britanico De Buenos Aires','Perdriel 74','s'),
 (508,'Rosa M Bologna','Comb D L Pozos 1881','s'),
 (509,'Centro De Investigaciones Endocrinologicas','Ambrosio Cramer 4601','s');
 
---Instituto_Estudio
+-- Instituto_Estudio
 INSERT INTO Instituto_Estudio (id_instituto, id_estudio, precio)
 VALUES (501,1,350),
 (509,4,3650),
@@ -93,15 +93,15 @@ VALUES (501,1,350),
 (508,3,2550),
 (504,2,4000);
 
---Paciente
+-- Paciente
 INSERT INTO Paciente (dni, nombre, apellido, sexo, fecha_nacimiento)
 VALUES (38524798, 'Cesar','Rodriguez','m','19860805'),
-(38524798, 'Maria','Zara','f','19881223'),
-(38524798, 'Luis','Diaz','m','19770412'),
-(38524798, 'Micaela','Sanchez','f','19940617'),
-(38524798, 'Matias','Hernandez','m','19651001');
+(38524797, 'Maria','Zara','f','19881223'),
+(38524796, 'Luis','Diaz','m','19770412'),
+(38524795, 'Micaela','Sanchez','f','19940617'),
+(38524794, 'Matias','Hernandez','m','19651001');
 
---Obra Social
+-- Obra Social
 INSERT INTO ObraSocial (id, nombre, categoria)
 VALUES (1,'OSDE','pp'),
 (2,'Sancor Salud','pp'),
@@ -117,7 +117,7 @@ VALUES (1,'OSDE','pp'),
 (12,'OSMEDICA','os'),
 (13,'Accord Salud','pp');
 
---Plan
+-- Plan
 INSERT INTO Plan (id, id_obra_social, estado)
 VALUES (1,'13','si'),
 (12,'2','no'),
@@ -129,5 +129,11 @@ VALUES (1,'13','si'),
 (9,'8','no'),
 (2,'1','si');
 
---Paciente plan
-INSERT INTO Paciente_Plan (),
+-- Paciente plan
+INSERT INTO Paciente_Plan (dni_paciente, id_plan)
+VALUES (38524798, 1),
+(38524797, 3),
+(38524796, 12),
+(38524795, 5),
+(38524794, 2)
+
