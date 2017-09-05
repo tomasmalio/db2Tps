@@ -137,3 +137,10 @@ VALUES (38524798, 1),
 (38524795, 5),
 (38524794, 2)
 
+-- Plan Estudio
+INSERT INTO Plan_Estudio (id_plan, id_estudio, cobertura)
+VALUES (1, 1, ),
+(2, 1, 50),
+(12, 2, 30),
+(3, 4, 10),
+(10, 3, 80)
