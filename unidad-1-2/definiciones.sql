@@ -11,17 +11,31 @@ exec sp_bindrule 'range_rule_legajo','Integrantes.lu'
 
 exec sp_unbindrule 'Integrantes.lu'
 
-select * from sys.tables
 
-select * from Integrantes
-
-insert into Integrantes values(1004370, 'pepe', 'nasa')
-
-delete Integrantes where lu = 1004370
-
-
-select * from sys.database_permissions
-
+CREATE RULE estado_rule
+			AS 
+			@estado in ('activo','inactivo')
+			GO
+CREATE RULE dni_rule
+			AS 
+			@dni like '%[0-9]%' 
+			go
+CREATE RULE sigla_rule
+			AS 
+			@sigla not like '%[0-9]%' 
+			go
+CREATE RULE precio_rule
+			AS 
+			@precio > 0 or  @precio <= 5000
+			GO
+CREATE RULE sexo_rule
+			AS 
+			@sexo in ('f','m')
+			GO
+CREATE RULE fechaEstudio_rule
+			AS
+			@fechaEstudio >= dateadd(mm, -1, getdate()) and @fechaEstudio <= dateadd(mm, 1, getdate()) 
+			go
 
 /**
  *	tipos de datos
@@ -53,9 +67,12 @@ GO
 create table Estudio 
 ( 
 	id smallint not null primary key, 
-	nombre_estudio varchar(50) not null
+	nombre_estudio varchar(50) not null,
+	estado estado,
+	constraint Estudio_PK primary key (id)
 )
 GO
+sp_bindrule 'estado_rule', 'Estudio.estado' 
 
 -- Tabla generada por la relación Especialidad - Estudio 
 create table Especialidad_Estudio 
@@ -79,6 +96,7 @@ create table Medico
 	check (sexo in ('m','f'))
 )
 GO
+sp_bindrule 'estado_rule', 'Medico.estado' 
 
 -- Tabla generada por la relación Medico - Especialidad 
 create table Medico_Especialidad
