@@ -112,7 +112,7 @@ create table ObraSocial
 (
 	id smallint not null primary key,
 	nombre varchar(50) not null,
-	categoria char,
+	categoria char(2),
 	check (categoria in ('os', 'pp'))
 )
 GO
@@ -122,7 +122,7 @@ create table Planes
 (
 	id smallint not null primary key,
 	id_obra_social smallint not null,
-	estado char, check (estado in ('si', 'no')),
+	estado char(2), check (estado in ('si', 'no')),
 	constraint fk_obrasocial_id foreign key (id_obra_social) references ObraSocial(id),
 	check (id >=1 and id <= 12)
 )
