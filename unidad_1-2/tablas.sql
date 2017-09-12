@@ -76,7 +76,7 @@ create table Instituto
 	id smallint not null primary key,
 	nombre_instituto varchar(50) not null,
 	direccion varchar(50) not null,
-	estados char, check (estados in ('si', 'no'))
+	estados char(4), check (estados in ('si', 'no'))
 )
 GO
 
