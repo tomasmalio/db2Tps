@@ -136,8 +136,7 @@ group by m.matricula,m.nombre,m.apellido
 
 --12. Crear una vista vw_historias_de_estudios que proyecte: 
 
-los datos del paciente, el estudio realizado, el instituto, matricula y nombre del medico 
-solicitante, fecha del estudio, obra social que factura el estudio, y observaciones. 
+-- los datos del paciente, el estudio realizado, el instituto, matricula y nombre del medico solicitante, fecha del estudio, obra social que factura el estudio, y observaciones. 
 
 create view vw_historias_de_estudios
 as
@@ -149,7 +148,7 @@ inner join institutos i on i.idinstituto=h.idinstituto
 inner join ooss o on o.sigla=h.sigla
 
 --13. Crear una vista vw_pagos_pacientes que proyecte: 
-nombre y dni del paciente, el estudio realizado, la fecha y el monto a pagar. 
+-- nombre y dni del paciente, el estudio realizado, la fecha y el monto a pagar. 
 
 create view vw_pagos_pacientes
 as
@@ -161,8 +160,7 @@ inner join institutos i on i.idinstituto=h.idinstituto
 
 --14. Crear una vista vw_ooss_pacientes que proyecte: 
 
-nombre de todos las obras con el nombre y estado de todos sus planes, 
-detallando dni, nombre y apellido de los afiliados a los distintos planes. 
+-- nombre de todos las obras con el nombre y estado de todos sus planes, detallando dni, nombre y apellido de los afiliados a los distintos planes. 
 
 create view vw_ooss_pacientes
 as
@@ -199,8 +197,7 @@ AS
 		(SELECT idEstudio FROM Coberturas)
 
 --17. Crear una vista vw_tabla_de_precios que proyecte: 
-nombre del estudio, obra social, plan, instituto, porcentaje cubierto, precio del estudio 
-y neto a facturar a la obra social y al paciente. 
+--nombre del estudio, obra social, plan, instituto, porcentaje cubierto, precio del estudio y neto a facturar a la obra social y al paciente. 
 
 create VIEW vw_tabla_de_precios
 AS
@@ -223,8 +220,7 @@ select DATEdiff (year,p.nacimiento ,getdate()) as edad
 from pacientes p
 
 
-19. Crear una vista vw_estudios_en_tres_meses que proyecte: 
-los estudios realizados en los últimos tres meses 
+-- 19. Crear una vista vw_estudios_en_tres_meses que proyecte: los estudios realizados en los últimos tres meses 
 
 
 create view vw_estudios_en_tres_meses
@@ -241,8 +237,7 @@ AS
 	WHERE DATEDIFF(M, H.Fecha, GETDATE()) <= 3
 
 
-20. Crear una vista vw_estudios_a_prepagas que proyecte: 
-los estudios realizados a las prepagas en los últimos 45 días. 
+-- 20. Crear una vista vw_estudios_a_prepagas que proyecte: los estudios realizados a las prepagas en los últimos 45 días. 
 
 create view vw_estudios_a_prepagas
 as
@@ -250,9 +245,7 @@ as
 	from estudios es inner join historias h on h.idestudio=es.idestudio
 	where DATEDIFF(d, H.Fecha, GETDATE()) <= 45
 
-21. Crear una vista vw_estudios_por_mes que agrupe: 
-por mes la cantidad de estudios realizados a los pacientes en el último año 
-diferenciándolos por sexo y estudio realizado. 
+-- 21. Crear una vista vw_estudios_por_mes que agrupe: por mes la cantidad de estudios realizados a los pacientes en el último año diferenciándolos por sexo y estudio realizado. 
 
 create VIEW vw_estudios_por_mes
 AS
@@ -264,9 +257,7 @@ AS
 	GROUP BY E.Estudio, P.Sexo, DATEPART(MM, H.Fecha)
 
 
-22. Crear una vista vw_estudios_por_instituto que agrupe: 
-
-por semana la cantidad de estudios que realizó cada instituto en los últimos 14 días. 
+-- 22. Crear una vista vw_estudios_por_instituto que agrupe: por semana la cantidad de estudios que realizó cada instituto en los últimos 14 días. 
 
 create view vw_estudios_por_instituto
 as
@@ -294,13 +285,13 @@ AS
 --NO REALIZAR
 
 
-25. Modificar la vista vw_pacientes definida en el punto 5: 
+-- 25. Modificar la vista vw_pacientes definida en el punto 5: 
 
 --5. Crear una vista vw_pacientes que proyecte:
 --dni, nombre, apellido, sexo y fecha de nacimiento de los pacientes, obra social a la que
 --pertenece, plan y nº de afiliado y categoría de ésta. (utilizar join 
 
-si no tiene ingresado el nº de afiliado debe proyectar: 'a determinar'. 
+-- si no tiene ingresado el nº de afiliado debe proyectar: 'a determinar'. 
 
 create view vw_pacientes_5
 as
