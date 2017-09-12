@@ -43,8 +43,8 @@ VALUES (1, 'Resonancia magnética','activo'), (2, 'Ecograma','activo'), (3, 'Col
 INSERT INTO Especialidad_Estudio (id_estudio, id_especialidad)
 VALUES (1, 21), (2, 3), (3, 4), (4, 21);
 
--- Medicos
-INSERT INTO Medicos (matricula, nombre_medico, apellido_medico, sexo, estado)
+-- Medico
+INSERT INTO Medico (matricula, nombre_medico, apellido_medico, sexo, estado)
 VALUES (310, 'Ricardo', 'Alberti','m','activo'),
 (311, 'Juan', 'Sosa','m','activo'),
 (312, 'Sol', 'Nuñez','f','activo'),
@@ -70,7 +70,7 @@ VALUES (319, 27),
 (311, 20);
 
 -- Instituto
-INSERT INTO Instituto (id, nombre_instituto, direccion, estado)
+INSERT INTO Instituto (id, nombre_instituto, direccion, estados)
 VALUES (500,'Hospital Britanico De Buenos Aires','Perdriel 74','s'),
 (501,'Hostital Durand','Av Diaz Velez 5044','n'),
 (502,'Hospital Pirovano','Monroe 3555','n'),
@@ -95,11 +95,11 @@ VALUES (501,1,350),
 
 -- Paciente
 INSERT INTO Paciente (dni, nombre, apellido, sexo, fecha_nacimiento)
-VALUES (38524798, 'Cesar','Rodriguez','m','19860805'),
-(38524797, 'Maria','Zara','f','19881223'),
-(38524796, 'Luis','Diaz','m','19770412'),
-(38524795, 'Micaela','Sanchez','f','19940617'),
-(38524794, 'Matias','Hernandez','m','19651001');
+VALUES (38524798, 'Cesar','Rodriguez','m','1986-08-05'),
+(38524797, 'Maria','Zara','f','1988-12-23'),
+(38524796, 'Luis','Diaz','m','1977-04-12'),
+(38524795, 'Micaela','Sanchez','f','1994-06-17'),
+(38524794, 'Matias','Hernandez','m','1965-10-01');
 
 -- Obra Social
 INSERT INTO ObraSocial (id, nombre, categoria)
@@ -118,7 +118,7 @@ VALUES (1,'OSDE','pp'),
 (13,'Accord Salud','pp');
 
 -- Plan
-INSERT INTO Plan (id, id_obra_social, estado)
+INSERT INTO Planes (id, id_obra_social, estado)
 VALUES (1,'13','si'),
 (12,'2','no'),
 (10,'5','si'),
@@ -139,7 +139,7 @@ VALUES (38524798, 1),
 
 -- Plan Estudio
 INSERT INTO Plan_Estudio (id_plan, id_estudio, cobertura)
-VALUES (1, 1, ),
+VALUES (1, 1, 50),
 (2, 1, 50),
 (12, 2, 30),
 (3, 4, 10),
@@ -147,7 +147,7 @@ VALUES (1, 1, ),
 
 -- Registro
 INSERT INTO Registro (id, id_estudio, id_instituto, matricula_medico, dni_paciente, fecha_estudio)
-VALUES (1, 1, 500, 310, 38524799, 2017-05-29), 
-(2, 1, 520, 319, 38524797, 2017-05-15),
-(3, 2, 530, 312, 38524798, 2017-06-18),
-(4, 4, 520, 315, 38524794, 2017-07-02)
+VALUES (1, 1, 500, 310, 38524799, '2017-05-29'), 
+(2, 1, 520, 319, 38524797, '2017-05-15'),
+(3, 2, 530, 312, 38524798, '2017-06-18'),
+(4, 4, 520, 315, 38524794, '2017-07-02')

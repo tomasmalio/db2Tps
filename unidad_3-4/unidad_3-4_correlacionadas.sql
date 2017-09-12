@@ -1,13 +1,10 @@
-
-
 --1. Crear una vista vw_estudios que proyecte:
 --nombre y el estado ( activo = si o no ) de los estudios.
-create view vw_estudios
+create view vw_estudio
 as
-select estudio, activo from estudios
+select nombre_estudio, estado from Estudio;
 
-select * from vw_estudios
-
+select * from vw_estudio;
 
 --2. Crear una vista vw_ooss que proyecte:
 --nombre y categoría (obra social o prepaga) de las obras sociales.

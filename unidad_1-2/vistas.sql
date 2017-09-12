@@ -1,6 +1,47 @@
 /**
  *	VISTAS
  **/
+ -- 2.1 
+CREATE VIEW vw_planes
+AS
+SELECT p.id, os.nombre, os.categoria, p.estado FROM Planes p
+inner join ObraSocial os on p.id_obra_social = os.id
+GO
+
+-- 2.2 
+CREATE VIEW vw_medicos_activos
+AS
+SELECT m.matricula, m.nombre_medico, m.apellido_medico, m.sexo FROM Medico m where m.estado='activo'
+GO
+
+-- 2.3
+CREATE VIEW vw_pacientes
+AS
+SELECT p.dni, p.nombre, p.apellido, p.sexo, p.fecha_nacimiento FROM Paciente p
+GO
+
+-- 2.4 vw_pacientes_sin_cobertura
+CREATE VIEW vw_pacientes_sin_cobertura
+AS
+SELECT p.dni, p.nombre, p.apellido, p.sexo, p.fecha_nacimiento FROM Paciente p
+	LEFT JOIN Paciente_Plan pp ON pp.dni_paciente = p.dni
+	WHERE pp.id_plan is NULL
+GO
+
+-- 2.5 vw_total_medicos_sin_especialidades
+CREATE VIEW vw_total_medicos_sin_especialidades
+AS
+SELECT count(m.sexo) as total, m.sexo FROM Medico m 
+	Left join Medico_Especialidad me on me.id_medico = m.matricula
+	where me.id_especialidad is null
+	group by m.sexo
+GO
+
+--
+
+
+
+
 CREATE VIEW vw_especialidad
 AS
 SELECT e.id, e.nombre_especialidad FROM Especialidad e
@@ -18,20 +59,14 @@ inner join Estudio est on ee.id_estudio = est.id
 inner join Especialidad esp on ee.id_especialidad = esp.id
 GO
 
-CREATE VIEW vw_medicos_activos
-AS
-SELECT m.matricula, m.nombre_medico, m.apellido_medico, m.sexo FROM Medico m where m.estado='activo'
 
-GO
 
 CREATE VIEW vw_total_medicos_sin_especialidades
 AS
-SELECT count(me.sexo)as total, me.sexo  FROM Medico m 
-Left join Medico_Especialidad me 
-Medico_Especialidad me 
-on me.id_medico = m.matricula
-group by me.sexo
-having me.id_especialidad is null
+SELECT count(m.sexo) as total, m.sexo FROM Medico m 
+	Left join Medico_Especialidad me on me.id_medico = m.matricula
+	where me.id_especialidad is null
+	group by m.sexo
 GO
 
 CREATE VIEW vw_instituto
@@ -56,16 +91,12 @@ AS
 SELECT p.dni, p.nombre, p.apellido, p.sexo, p.fecha_nacimiento FROM Paciente p
 GO
 
-CREATE VIEW vw_planes
-AS
-SELECT p.id, os.nombre, os.categoria, p.estado FROM Plan p
-inner join ObraSocial os on p.id_obra_social = os.id
-GO
+
 
 CREATE VIEW vw_planes_sin_cobertura 
 AS
 SELECT os.nombre, p.id FROM Plan_Estudio pe
-right join Plan p on pe.id_plan = p.id
+right join Planes p on pe.id_plan = p.id
 left join Estudio e on pe.id_estudio = e.id
 inner join ObraSocial os on p.id_obra_social = os.id
 where pe.id_estudio is null
@@ -75,15 +106,17 @@ CREATE VIEW vw_paciente_plan
 AS
 SELECT p.dni, p.nombre, p.apellido, p.sexo, p.fecha_nacimiento, pl.id, pl.id_obra_social, pl.estado FROM Paciente_Plan pp
 inner join Paciente p on pp.dni_paciente = p.dni
-inner join Plan pl on pp.id_plan = pl.id
+inner join Planes pl on pp.id_plan = pl.id
 GO
 
+/**
 CREATE VIEW vw_plan_estudio
 AS
-SELECT pl.id, pl.id_obra_social, pl.estado, e.id, e.nombre_estudio, pe.cobertura FROM Plan_Estudio pe
-inner join Plan p on pe.id_plan = p.id
+SELECT p.id, p.id_obra_social, p.estado, e.id, e.nombre_estudio, pe.cobertura FROM Plan_Estudio pe
+inner join Planes p on pe.id_plan = p.id
 inner join Estudio e on pe.id_estudio = e.id
 GO
+
 
 CREATE VIEW vw_registro
 AS
@@ -98,7 +131,7 @@ inner join Instituto i on r.id_instituto = i.id
 inner join Medico m on r.matricula_medico = m.matricula
 inner join Paciente p on r.dni_paciente = p.dni
 GO
-
+**/
 
 CREATE VIEW vw_estudios_en_tres_meses
 AS

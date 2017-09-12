@@ -31,7 +31,8 @@ GO
 create table Estudio 
 ( 
 	id smallint not null primary key, 
-	nombre_estudio varchar(50) not null
+	nombre_estudio varchar(50) not null,
+	estado estado,
 )
 GO
 
@@ -64,7 +65,7 @@ create table Medico_Especialidad
 	id_medico smallint not null,
 	id_especialidad smallint not null,
 	constraint fk_medico_matricula foreign key (id_medico) references Medico(matricula),
-	constraint fk_especialidad_id foreign key (id_especialidad) references Especialidad(id),
+	constraint fk_especialidad_id_especialidad foreign key (id_especialidad) references Especialidad(id),
 	constraint pk_medico_especialidad primary key NONCLUSTERED (id_medico, id_especialidad)
 )
 GO
@@ -75,7 +76,7 @@ create table Instituto
 	id smallint not null primary key,
 	nombre_instituto varchar(50) not null,
 	direccion varchar(50) not null,
-	estado char, check (estado in ('si', 'no'))
+	estados char, check (estados in ('si', 'no'))
 )
 GO
 
@@ -87,7 +88,7 @@ create table Instituto_Estudio
 	precio decimal(10,2) not null,
 	check (precio <= 5000),
 	constraint fk_instituto_id foreign key (id_instituto) references Instituto(id),
-	constraint fk_estudio_id foreign key (id_estudio) references Estudio(id),
+	constraint fk_estudio_id_estudio foreign key (id_estudio) references Estudio(id),
 	constraint pk_instituto_estudio primary key NONCLUSTERED (id_instituto, id_estudio)
 )
 GO
@@ -100,7 +101,7 @@ create table Paciente
 	apellido varchar(50) not null,
 	sexo char, 
 	fecha_nacimiento date,
-	check ((datediff(yyyy, fecha_nacimiento, GETDATE()) > 21) && (datediff(yyyy, fecha_nacimiento, GETDATE()) < 80)),
+	check (abs(datediff(yy, fecha_nacimiento, GETDATE())) BETWEEN 21 AND 80),
 	check (sexo in ('m','f')),
 	check (dni like '%[^0-9]%'),
 )
@@ -117,13 +118,13 @@ create table ObraSocial
 GO
 
 -- Plan
-create table Plan 
+create table Planes
 (
 	id smallint not null primary key,
 	id_obra_social smallint not null,
 	estado char, check (estado in ('si', 'no')),
-	constraint fk_obrasocial_id foreign key (id_obra_social) references ObraSocial(id)
-	check (id >=1 and id <= 12);
+	constraint fk_obrasocial_id foreign key (id_obra_social) references ObraSocial(id),
+	check (id >=1 and id <= 12)
 )
 GO
 
@@ -133,7 +134,7 @@ create table Paciente_Plan
 	dni_paciente varchar(8) not null,
 	id_plan smallint not null,
 	constraint fk_paciente_dni foreign key (dni_paciente) references Paciente(dni),
-	constraint fk_plan_id foreign key (id_plan) references Plan(id),
+	constraint fk_plan_id foreign key (id_plan) references Planes(id),
 	constraint pk_paciente_plan primary key NONCLUSTERED (dni_paciente, id_plan)
 )
 GO
@@ -144,8 +145,8 @@ create table Plan_Estudio
 	id_plan smallint not null,
 	id_estudio smallint not null,
 	cobertura decimal(3,0) not null,
-	constraint fk_plan_dni foreign key (id_plan) references Plan(id),
-	constraint fk_estudio_id foreign key (id_estudio) references Estudio(id),
+	constraint fk_plan_dni foreign key (id_plan) references Planes(id),
+	constraint fk_estudio_id_est foreign key (id_estudio) references Estudio(id),
 	constraint pk_plan_estudio primary key NONCLUSTERED (id_plan, id_estudio)
 )
 GO
@@ -159,9 +160,9 @@ create table Registro
 	matricula_medico smallint not null,
 	dni_paciente varchar(8) not null,
 	fecha_estudio date,
-	check ((datediff(mm, fecha_estudio, GETDATE()) > 30) && datename(dd, 1, GETDATE())),
-	constraint fk_estudio_id foreign key (id_estudio) references Estudio(id),
-	constraint fk_instituto_id foreign key (id_instituto) references Instituto(id),
-	constraint fk_medico_matricula foreign key (matricula_medico) references Medico(matricula),
+	check (abs(datediff(dd, fecha_estudio, GETDATE())) >= 31),
+	constraint fk_estudio_id_estu foreign key (id_estudio) references Estudio(id),
+	constraint fk_instituto_id_instituto foreign key (id_instituto) references Instituto(id),
+	constraint fk_medico_matricula_medico foreign key (matricula_medico) references Medico(matricula),
 )
 GO
