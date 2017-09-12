@@ -119,15 +119,15 @@ VALUES (1,'OSDE','pp'),
 
 -- Plan
 INSERT INTO Planes (id, id_obra_social, estado)
-VALUES (1,'13','si'),
-(12,'2','no'),
-(10,'5','si'),
-(3,'6','no'),
-(7,'10','si'),
-(5,'11','si'),
-(4,'7','si'),
-(9,'8','no'),
-(2,'1','si');
+VALUES (1, 13,'si'),
+(12, 2,'no'),
+(10, 5,'si'),
+(3, 6,'no'),
+(7, 10,'si'),
+(5, 11,'si'),
+(4, 7,'si'),
+(9, 8,'no'),
+(2, 1,'si');
 
 -- Paciente plan
 INSERT INTO Paciente_Plan (dni_paciente, id_plan)
