@@ -71,16 +71,16 @@ VALUES (319, 27),
 
 -- Instituto
 INSERT INTO Instituto (id, nombre_instituto, direccion, estados)
-VALUES (500,'Hospital Britanico De Buenos Aires','Perdriel 74','s'),
-(501,'Hostital Durand','Av Diaz Velez 5044','n'),
-(502,'Hospital Pirovano','Monroe 3555','n'),
-(503,'Sociedad Italiana De Beneficencia','Juramento 2741','s'),
-(504,'Mejores Hospitales Sa','Gallo 1360','s'),
-(505,'Medicina Uba Hospital De Clinicas Fac De','Paraguay 2250','n'),
-(506,'Alicia M Sambuelli','Av Caseros 2061','s'),
-(507,'Carlos G Campos','Comb D L Pozos 1881','s'),
-(508,'Rosa M Bologna','Comb D L Pozos 1881','s'),
-(509,'Centro De Investigaciones Endocrinologicas','Ambrosio Cramer 4601','s');
+VALUES (500,'Hospital Britanico De Buenos Aires','Perdriel 74','si'),
+(501,'Hostital Durand','Av Diaz Velez 5044','no'),
+(502,'Hospital Pirovano','Monroe 3555','no'),
+(503,'Sociedad Italiana De Beneficencia','Juramento 2741','si'),
+(504,'Mejores Hospitales Sa','Gallo 1360','si'),
+(505,'Medicina Uba Hospital De Clinicas Fac De','Paraguay 2250','no'),
+(506,'Alicia M Sambuelli','Av Caseros 2061','si'),
+(507,'Carlos G Campos','Comb D L Pozos 1881','si'),
+(508,'Rosa M Bologna','Comb D L Pozos 1881','si'),
+(509,'Centro De Investigaciones Endocrinologicas','Ambrosio Cramer 4601','si');
 
 -- Instituto_Estudio
 INSERT INTO Instituto_Estudio (id_instituto, id_estudio, precio)
