@@ -99,11 +99,11 @@ create table Paciente
 	dni varchar(8) not null primary key,
 	nombre varchar(50) not null,
 	apellido varchar(50) not null,
-	sexo char, 
+	sexo char(1), 
 	fecha_nacimiento date,
 	check (abs(datediff(yy, fecha_nacimiento, GETDATE())) BETWEEN 21 AND 80),
 	check (sexo in ('m','f')),
-	check (dni like '%[^0-9]%'),
+	check (dni like '%[0-9]%'),
 )
 GO
 
