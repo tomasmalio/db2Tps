@@ -75,6 +75,22 @@ SELECT os.nombre, os.categoria, pla.id, pla.estado, p.dni, p.nombre, p.apellido 
 	LEFT JOIN Paciente p ON p.dni = pp.dni_paciente
 GO
 
+-- 2.10
+CREATE VIEW 
+
+-- 2.11
+CREATE VIEW vw_planes_sin_cobertura 
+AS
+SELECT os.nombre, p.id FROM Plan_Estudio pe
+right join Planes p on pe.id_plan = p.id
+left join Estudio e on pe.id_estudio = e.id
+inner join ObraSocial os on p.id_obra_social = os.id
+where pe.id_estudio is null
+GO
+
+
+
+
 
 CREATE VIEW vw_especialidad
 AS
@@ -127,14 +143,6 @@ GO
 
 
 
-CREATE VIEW vw_planes_sin_cobertura 
-AS
-SELECT os.nombre, p.id FROM Plan_Estudio pe
-right join Planes p on pe.id_plan = p.id
-left join Estudio e on pe.id_estudio = e.id
-inner join ObraSocial os on p.id_obra_social = os.id
-where pe.id_estudio is null
-GO
 
 CREATE VIEW vw_paciente_plan
 AS
