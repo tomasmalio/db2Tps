@@ -90,7 +90,16 @@ inner join ObraSocial os on p.id_obra_social = os.id
 where pe.id_estudio is null
 GO
 
-
+-- 2.12
+CREATE VIEW vw_tabla_de_precios
+AS
+SELECT e.nombre_estudio, os.nombre, i.nombre_instituto, ie.precio, pe.cobertura, pe.id_plan AS idPlan 
+FROM 
+	LEFT JOIN Estudio e ON e.id = 
+	LEFT JOIN ObraSocial os ON os.id = 
+	LEFT JOIN Instituto i ON i.id = 
+	LEFT JOIN Instituto_Estudio ie ON ie.id_instituto = i.id
+	LEFT JOIN Plan_Estudio pe ON pe.id_estudio = e.id
 
 
 
