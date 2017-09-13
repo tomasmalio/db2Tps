@@ -121,8 +121,28 @@ GO
 
 
 -- 2.16
+Create view vw_estudios_por_instituto
+as
+select count(reg.id_instituto) as [Total estudio x Instituto], inst.nombre_instituto from registro reg inner join instituto inst on reg.id_instituto = inst.id where (DATEDIFF(dd,reg.fechaestudio,getDate())<14) group by reg.id_instituto 
+GO
+
+-- 2.17
+Create view vw_estudios_en_sabado
+as
+select count(med.matricula), med.nombre_medico from registro reg inner join Medicos med on reg.matricula = med.matricula where datepart(dw,reg.fecha_estudio)=7 group by med.matricula 
+GO
+
+-- 2.18
+CREATE VIEW vw_paciente
+AS
+SELECT p.dni, p.nombre, p.apellido, p.sexo, p.fecha_nacimiento FROM Paciente p
+GO
+
+-- 2.19
 
 
+
+/**
 CREATE VIEW vw_especialidad
 AS
 SELECT e.id, e.nombre_especialidad FROM Especialidad e
@@ -173,8 +193,6 @@ SELECT p.dni, p.nombre, p.apellido, p.sexo, p.fecha_nacimiento FROM Paciente p
 GO
 
 
-
-
 CREATE VIEW vw_paciente_plan
 AS
 SELECT p.dni, p.nombre, p.apellido, p.sexo, p.fecha_nacimiento, pl.id, pl.id_obra_social, pl.estado FROM Paciente_Plan pp
@@ -182,7 +200,7 @@ inner join Paciente p on pp.dni_paciente = p.dni
 inner join Planes pl on pp.id_plan = pl.id
 GO
 
-/**
+
 CREATE VIEW vw_plan_estudio
 AS
 SELECT p.id, p.id_obra_social, p.estado, e.id, e.nombre_estudio, pe.cobertura FROM Plan_Estudio pe
@@ -204,7 +222,7 @@ inner join Instituto i on r.id_instituto = i.id
 inner join Medico m on r.matricula_medico = m.matricula
 inner join Paciente p on r.dni_paciente = p.dni
 GO
-**/
+
 
 CREATE VIEW vw_estudios_en_tres_meses
 AS
@@ -226,3 +244,4 @@ Create view vw_estudios_por_instituto
 as
 select count(reg.id_instituto) as [Total estudio x Instituto], inst.nombre_instituto from registro reg inner join instituto inst on reg.id_instituto = inst.id where (DATEDIFF(dd,reg.fechaestudio,getDate())<14) group by reg.id_instituto 
 GO
+**/
