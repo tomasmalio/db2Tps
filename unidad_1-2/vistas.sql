@@ -69,12 +69,11 @@ FROM Registro r
 -- 2.9
 CREATE VIEW vw_ooss_pacientes
 AS
-SELECT  FROM ObraSocial os
-	LEFT JOIN Paciente_Plan pp ON pp.id_plan = os.id
+SELECT os.nombre, os.categoria, pla.id, pla.estado, p.dni, p.nombre, p.apellido FROM ObraSocial os
+	LEFT JOIN Planes pla ON pla.id_obra_social = os.id
+	LEFT JOIN Paciente_Plan pp ON pp.id_plan = pla.id
 	LEFT JOIN Paciente p ON p.dni = pp.dni_paciente
-
-
-
+GO
 
 
 CREATE VIEW vw_especialidad
