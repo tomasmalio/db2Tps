@@ -53,7 +53,7 @@ create table Medico
 	matricula smallint not null primary key, 
 	nombre_medico varchar(50) not null,
 	apellido_medico varchar(50) not null,
-	sexo char,
+	sexo char(1),
 	estado estado,
 	check (sexo in ('m','f'))
 )
