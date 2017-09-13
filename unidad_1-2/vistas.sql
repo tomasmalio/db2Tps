@@ -37,7 +37,26 @@ SELECT count(m.sexo) as total, m.sexo FROM Medico m
 	group by m.sexo
 GO
 
---
+-- 2.6
+CREATE VIEW vw_afiliados_con_una_cobertura
+AS
+SELECT * FROM Pacientes p
+	LEFT JOIN Paciente_Plan pp on pp.dni_paciente = p.dni
+	WHERE pp.id_plan IS NOT NULL
+GO
+
+
+-- 2.7
+CREATE VIEW vw_cantidad_estudios_por_medico
+AS
+SELECT COUNT(r.id) AS cantidadDeEstudios, m.matricula, m.nombre_medico FROM Medico m
+	LEFT JOIN Registro r on r.matricula_medico = m.matricula
+GO
+
+-- 2.8
+CREATE VIEW vw_historias_de_estudios
+
+
 
 
 
