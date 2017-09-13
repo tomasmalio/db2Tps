@@ -57,7 +57,7 @@ GO
 CREATE VIEW vw_historias_de_estudios
 AS
 SELECT p.dni, p.nombre, p.apellido, p.sexo, p.fecha_nacimiento, 
-e.nombre_estudio, e.nombre_especialidad, e.estado, 
+e.nombre_estudio, esp.nombre_especialidad, e.estado, 
 i.nombre_instituto,
 m.matricula, m.nombre_medico
 FROM Registro r
@@ -65,11 +65,13 @@ FROM Registro r
 	RIGHT JOIN Estudio e ON e.id = r.id_estudio
 	RIGHT JOIN Instituto i ON i.id = r.id_instituto
 	RIGHT JOIN Medico m ON m.matricula = r.matricula_medico
+	RIGHT JOIN Medico_Especialidad me ON me.id_medico = m.matricula
+	RIGHT JOIN Especialidad esp ON esp.id = me.id_especialidad
 
 -- 2.9
 CREATE VIEW vw_ooss_pacientes
 AS
-SELECT os.nombre, os.categoria, pla.id, pla.estado, p.dni, p.nombre, p.apellido FROM ObraSocial os
+SELECT os.nombre AS ooss, os.categoria, pla.id, pla.estado, p.dni, p.nombre, p.apellido FROM ObraSocial os
 	LEFT JOIN Planes pla ON pla.id_obra_social = os.id
 	LEFT JOIN Paciente_Plan pp ON pp.id_plan = pla.id
 	LEFT JOIN Paciente p ON p.dni = pp.dni_paciente
@@ -93,7 +95,7 @@ inner join ObraSocial os on p.id_obra_social = os.id
 where pe.id_estudio is null
 GO
 
--- 2.12
+-- 2.12 FALTA
 CREATE VIEW vw_tabla_de_precios
 AS
 SELECT e.nombre_estudio, os.nombre, i.nombre_instituto, ie.precio, pe.cobertura, pe.id_plan AS idPlan 
@@ -117,13 +119,16 @@ select est.nombre_estudio from ObraSocial os inner join Planes p on os.id = p.id
 where os.categoria='pp' and DATEDIFF(dd,reg.fecha_estudio,getDate())<45
 GO
 
--- 2.15
+-- 2.15 FALTA
 
 
--- 2.16
-Create view vw_estudios_por_instituto
-as
-select count(reg.id_instituto) as [Total estudio x Instituto], inst.nombre_instituto from registro reg inner join instituto inst on reg.id_instituto = inst.id where (DATEDIFF(dd,reg.fechaestudio,getDate())<14) group by reg.id_instituto 
+-- 2.16 MAL
+CREATE VIEW vw_estudios_por_instituto
+AS
+	SELECT count(reg.id_instituto) as [Total estudio x Instituto], inst.nombre_instituto 
+	FROM Registro reg 
+	INNER JOIN Instituto inst ON reg.id_instituto = inst.id 
+	WHERE (DATEDIFF(dd, reg.fecha_estudio, getDate()) < 14) group by reg.id_instituto 
 GO
 
 -- 2.17
