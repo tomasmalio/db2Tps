@@ -77,8 +77,11 @@ GO
 
 -- 2.10
 CREATE VIEW vw_estudios_sin_cobertura
-AS
-SELECT * FROM 
+as
+  select * from estudio est left join [db5099n_03].[dbo].[Plan_Estudio] plest
+  on est.id = plest.id_estudio where est.id is null
+GO
+
 
 -- 2.11
 CREATE VIEW vw_planes_sin_cobertura 
