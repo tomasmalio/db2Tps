@@ -40,7 +40,7 @@ GO
 -- 2.6
 CREATE VIEW vw_afiliados_con_una_cobertura
 AS
-SELECT * FROM Pacientes p
+SELECT * FROM Paciente p
 	LEFT JOIN Paciente_Plan pp on pp.dni_paciente = p.dni
 	WHERE pp.id_plan IS NOT NULL
 GO
@@ -55,7 +55,10 @@ GO
 
 -- 2.8
 CREATE VIEW vw_historias_de_estudios
-
+AS
+SELECT * FROM Registro r
+	LEFT JOIN Paciente p ON p.dni = r.dni_paciente
+	WHERE 
 
 
 
