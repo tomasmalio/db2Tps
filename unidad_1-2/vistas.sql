@@ -76,7 +76,9 @@ SELECT os.nombre, os.categoria, pla.id, pla.estado, p.dni, p.nombre, p.apellido 
 GO
 
 -- 2.10
-CREATE VIEW 
+CREATE VIEW vw_estudios_sin_cobertura
+AS
+SELECT * FROM 
 
 -- 2.11
 CREATE VIEW vw_planes_sin_cobertura 
