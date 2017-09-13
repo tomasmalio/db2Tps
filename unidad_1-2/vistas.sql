@@ -50,7 +50,7 @@ GO
 CREATE VIEW vw_cantidad_estudios_por_medico
 AS
 SELECT COUNT(r.id) AS cantidadDeEstudios, m.matricula, m.nombre_medico FROM Medico m
-	LEFT JOIN Registro r on r.matricula_medico = m.matricula
+	left JOIN Registro r on r.matricula_medico = m.matricula group by m.matricula,m.nombre_medico 
 GO
 
 -- 2.8
