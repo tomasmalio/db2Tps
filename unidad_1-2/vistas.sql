@@ -60,12 +60,18 @@ SELECT p.dni, p.nombre, p.apellido, p.sexo, p.fecha_nacimiento,
 e.nombre_estudio, e.nombre_especialidad, e.estado, 
 i.nombre_instituto,
 m.matricula, m.nombre_medico
-
 FROM Registro r
 	LEFT JOIN Paciente p ON p.dni = r.dni_paciente
 	RIGHT JOIN Estudio e ON e.id = r.id_estudio
 	RIGHT JOIN Instituto i ON i.id = r.id_instituto
 	RIGHT JOIN Medico m ON m.matricula = r.matricula_medico
+
+-- 2.9
+CREATE VIEW vw_ooss_pacientes
+AS
+SELECT  FROM ObraSocial os
+	LEFT JOIN Paciente_Plan pp ON pp.id_plan = os.id
+	LEFT JOIN Paciente p ON p.dni = pp.dni_paciente
 
 
 
