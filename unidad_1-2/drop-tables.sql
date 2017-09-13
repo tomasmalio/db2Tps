@@ -1,0 +1,13 @@
+DROP TABLE Medico_Especialidad;
+DROP TABLE Especialidad_Estudio;
+DROP TABLE Instituto_Estudio;
+DROP TABLE Paciente_Plan;
+DROP TABLE Plan_Estudio;
+DROP TABLE Registro;
+DROP TABLE Especialidad;
+DROP TABLE Estudio;
+DROP TABLE Medico;
+DROP TABLE Instituto;
+DROP TABLE Paciente;
+DROP TABLE ObraSocial;
+DROP TABLE Planes;
