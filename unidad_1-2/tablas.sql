@@ -157,12 +157,14 @@ create table Registro
 	id smallint not null primary key,
 	id_estudio smallint not null,
 	id_instituto smallint not null,
+	id_obra_social smallint not null,
 	matricula_medico smallint not null,
 	dni_paciente varchar(8) not null,
 	fecha_estudio date,
 	check (abs(datediff(dd, fecha_estudio, GETDATE())) >= 31),
 	constraint fk_estudio_id_estu foreign key (id_estudio) references Estudio(id),
 	constraint fk_instituto_id_instituto foreign key (id_instituto) references Instituto(id),
+	constraint fk_obrasocial_id_obrasocial foreign key (id_obra_social) references ObraSocial(id),
 	constraint fk_medico_matricula_medico foreign key (matricula_medico) references Medico(matricula),
 )
 GO
