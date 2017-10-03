@@ -102,8 +102,8 @@ ON Registro
 FOR INSERT
 AS
 declare @matricula int, @idEstudio int
-set @matricula= (select matricula from inserted)
-set @idEstudio=(select idEstudio from inserted)
+set @matricula= (select matricula_medido from inserted)
+set @idEstudio=(select id_estudio from inserted)
 
 if not exists (select * 
 		from Medico_Especialidad a inner join Especialidad_Estudio b on 
