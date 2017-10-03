@@ -98,7 +98,7 @@ go
 --Que controle que un médico no indique un estudio a un paciente que no sea afín con la especialidad del médico.
 
 CREATE TRIGGER EstudioEspecilidadMedica
-ON historias
+ON Registro
 FOR INSERT
 AS
 declare @matricula int, @idEstudio int
@@ -106,8 +106,8 @@ set @matricula= (select matricula from inserted)
 set @idEstudio=(select idEstudio from inserted)
 
 if not exists (select * 
-		from espemedi a inner join estuespe b on 
-		a.idespecialidad=b.idespecialidad 
+		from Medico_Especialidad a inner join Especialidad_Estudio b on 
+		a.id_especialidad=b.id_especialidad 
 		where
 		a.matricula = @matricula and idEstudio = @idEstudio )
 	begin
