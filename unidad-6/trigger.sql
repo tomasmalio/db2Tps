@@ -49,43 +49,43 @@ BEGIN
 END
 GO
 
---4.15. Crear un Trigger: (Corregir)
+--4.15. Crear un Trigger:
 --Que muestre el valor anterior y el nuevo valor de cada columna que se actualizó en la tabla pacientes. 
 
-CREATE TRIGGER ValoresActualizados
-ON pacientes
+CREATE TRIGGER tr_valores_actualizados
+ON Paciente
 FOR UPDATE
-as
-declare @dni_ant dni,@dni_nuevo dni
-declare @nombre_ant varchar(20), @nombre_nuevo varchar(20)
-declare @apellido_ant varchar(25), @apellido_nuevo varchar(25)
+AS
+declare @dni_ant varchar(8), @dni_nuevo varchar(8)
+declare @nombre_ant varchar(50), @nombre_nuevo varchar(50)
+declare @apellido_ant varchar(50), @apellido_nuevo varchar(50)
 declare @sexo_ant char (1),@sexo_nuevo char (1)
-declare @f_nac_ant datetime,@f_nac_nuevo datetime
-if ((select count(*) from deleted)=1)
-	begin
-		set @dni_ant=(select dni from deleted)
-		set @nombre_ant=(select nombre from deleted)
-		set @apellido_ant=(select apellido from deleted)
-		set @sexo_ant=(select sexo from deleted)
-		set @f_nac_ant=(select nacimiento from deleted)
-		set @dni_nuevo=(select dni from inserted)
-		set @nombre_nuevo=(select nombre from inserted)
-		set @apellido_nuevo=(select apellido from inserted)
-		set @sexo_nuevo=(select sexo from inserted)
-		set @f_nac_nuevo=(select nacimiento from inserted)
-
-	if (@dni_ant <> @dni_nuevo)
-	print 'DNI anterior: '+ @dni_ant +' DNI nuevo '+ @dni_nuevo 
-	if (@nombre_ant <> @nombre_nuevo)
-	print 'NOMBRE anterior: ' + @nombre_ant + ' NOMBRE nuevo: '+@nombre_nuevo
-	if (@apellido_ant <> @apellido_nuevo)
-	print 'APELLIDO anterior: '+ @apellido_ant +' APELLIDO nuevo: '+@apellido_nuevo
-	if (@sexo_ant <> @sexo_nuevo)
-	print 'SEXO anterior: '+ @sexo_ant + ' SEXO nuevo: '+ @sexo_nuevo
-	if (@f_nac_ant <> @f_nac_nuevo)
-	print 'FECHA NACIMIENTO anterior: '+ @f_nac_ant + ' FECHA NACIMIENTO nuevo: '+ @f_nac_nuevo
-end
-go
+declare @fecha_nac_ant date,@fecha_nac_nuevo date
+IF ((SELECT COUNT(*) FROM deleted)=1)
+	BEGIN
+		SET @dni_ant=(SELECT dni FROM deleted)
+		SET @nombre_ant=(SELECT nombre FROM deleted)
+		SET @apellido_ant=(SELECT apellido FROM deleted)
+		SET @sexo_ant=(SELECT sexo FROM deleted)
+		SET @f_nac_ant=(SELECT fecha_nacimiento FROM deleted)
+		SET @dni_nuevo=(SELECT dni FROM inserted)
+		SET @nombre_nuevo=(SELECT nombre FROM inserted)
+		SET @apellido_nuevo=(SELECT apellido FROM inserted)
+		SET @sexo_nuevo=(SELECT sexo FROM inserted)
+		SET @f_nac_nuevo=(SELECT fecha_nacimiento FROM inserted)
+	
+	IF (@dni_ant <> @dni_nuevo)
+	PRINT 'DNI anterior: '+ @dni_ant +' DNI nuevo '+ @dni_nuevo 
+	IF (@nombre_ant <> @nombre_nuevo)
+	PRINT 'NOMBRE anterior: ' + @nombre_ant + ' NOMBRE nuevo: '+@nombre_nuevo
+	IF (@apellido_ant <> @apellido_nuevo)
+	PRINT 'APELLIDO anterior: '+ @apellido_ant +' APELLIDO nuevo: '+@apellido_nuevo
+	IF (@sexo_ant <> @sexo_nuevo)
+	PRINT 'SEXO anterior: '+ @sexo_ant + ' SEXO nuevo: '+ @sexo_nuevo
+	IF (@f_nac_ant <> @f_nac_nuevo)
+	PRINT 'FECHA NACIMIENTO anterior: '+ @f_nac_ant + ' FECHA NACIMIENTO nuevo: '+ @f_nac_nuevo
+END
+GO
 
 --4.16. Crear un Trigger:
 --Que controle que un médico no indique un estudio a un paciente que no sea afín con la especialidad del médico.
@@ -108,24 +108,19 @@ if not exists (select *
 		print 'El estudio indicado, no corresponde a la Especialidad del Medico que lo solicito'
 	end
 
---4.17. Crear un Trigger: (Corregir)
+--4.17. Crear un Trigger:
 --Que controle que todas las historias que correspondan al estudio que hace referencia en ese instituto, se encuentran
 --pagadas para poder permitir que se modifique el precio del estudio.
 
-CREATE TRIGGER tr_registros_pagados
-ON precios
-FOR update
-as
-if ((select count (*) from deleted)=1 )
-begin
-	if exists (select * from inserted i inner join historias h on
- 	i.idEstudio=h.idEstudio and i.idInstituto=h.idInstituto and 
-	h.pagado='si')
-		begin
-			rollback transaction 
-			print 'El estudio al que se hace referencia no '
-			print 'fue pagado por la totalidad de los pacientes del Instituto '	
-			print 'Por tal motivo, su precio no puede ser actualizado'
-	end
-end
+CREATE TRIGGER tr_modificar_precio_estudio
+ON Instituto_Estudio
+INSTEAD OF UPDATE
+AS
+BEGIN
+	IF EXISTS (SELECT id_estudio FROM Registro WHERE pagado = 'No' AND id_estudio = (SELECT id_estudio FROM Inserted))
+		PRINT 'No puede modificar el precio porque hay estudios impagos'
+	ELSE
+		UPDATE Instituto_Estudio SET precio = (SELECT precio FROM Inserted) 
+		WHERE id_estudio = (SELECT id_estudio FROM Inserted) AND id_instituto = (SELECT id_insituto FROM Inserted)	
+END
 GO
