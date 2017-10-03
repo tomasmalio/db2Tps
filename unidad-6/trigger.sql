@@ -97,7 +97,7 @@ go
 --4.16. Crear un Trigger:
 --Que controle que un médico no indique un estudio a un paciente que no sea afín con la especialidad del médico.
 
-CREATE TRIGGER EstudioEspecilidadMedica
+CREATE TRIGGER tr_medico_especialidad_estudio
 ON Registro
 FOR INSERT
 AS
