@@ -94,7 +94,7 @@ if ((select count(*) from deleted)=1)
 end
 go
 
---4.16. Crear un Trigger: (Corregir)
+--4.16. Crear un Trigger:
 --Que controle que un médico no indique un estudio a un paciente que no sea afín con la especialidad del médico.
 
 CREATE TRIGGER EstudioEspecilidadMedica
@@ -109,7 +109,7 @@ if not exists (select *
 		from Medico_Especialidad a inner join Especialidad_Estudio b on 
 		a.id_especialidad=b.id_especialidad 
 		where
-		a.matricula = @matricula and idEstudio = @idEstudio )
+		a.id_medico = @matricula and b.id_estudio = @idEstudio )
 	begin
 		rollback transaction
 		print 'El estudio indicado, no corresponde a la Especialidad del Medico que lo solicito'
