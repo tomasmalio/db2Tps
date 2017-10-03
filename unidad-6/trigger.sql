@@ -31,7 +31,7 @@ CREATE TRIGGER tr_eliminar_medicos
 DELETE FROM Medico
 WHERE nombre_medico = 'Juan'
 
---4.14. Crear un Trigger: (Corregir) 
+--4.14. Crear un Trigger:
 /*Que determine el número de plan correspondiente al plan de la obra social cada vez que se
 registre uno nuevo en la Base de Datos. El número de plan se calcula en forma correlativa a los
 ya existentes para esa obra social, comenzando con 1 (uno) el primer plan que se ingrese a
@@ -39,22 +39,15 @@ cada obra social o prepaga.*/
 
 CREATE TRIGGER tr_nro_planes
 ON Planes
-INSTEAD OF INSERT 
+INSTEAD OF INSERT
 AS
-declare @sigla sigla
-declare @nombre varchar (30)
-declare @activo bit
-set @sigla=(select sigla from inserted)
-set @nombre=(select nombre from inserted)
-set @activo=(select activo from inserted)
-if (exists (select * from ooss where sigla=@sigla) and not exists 
-	(select * from planes where nombre=@nombre))
-	begin
-		declare @nro smallint
-		set @nro = isnull ((select max (nroplan) from planes where sigla=@sigla),0)+1
-		insert planes values (@sigla,@nro,@nombre,@activo)
-	end
-go
+BEGIN
+	DECLARE @nuevoNroPlan INT
+	SET @nuevoNroPlan = (SELECT MAX(id) FROM Planes WHERE id_obra_social = (SELECT id_obra_social FROM Inserted)) + 1
+	INSERT INTO Planes (id, id_obra_social, estado)
+						(SELECT @nuevoNroPlan, id_obra_social, estado FROM Inserted)
+END
+GO
 
 --4.15. Crear un Trigger: (Corregir)
 --Que muestre el valor anterior y el nuevo valor de cada columna que se actualizó en la tabla pacientes. 
@@ -101,7 +94,7 @@ CREATE TRIGGER tr_medico_especialidad_estudio
 ON Registro
 FOR INSERT
 AS
-declare @matricula int, @idEstudio int
+declare @matricula INT, @idEstudio INT
 set @matricula= (select matricula_medido from inserted)
 set @idEstudio=(select id_estudio from inserted)
 
