@@ -59,7 +59,7 @@ CREATE procedure pr_Estudios
   @mes int,
   @año int
 AS
-  SELECT a.*, e.estudio, h.fecha, h.idInstituto, h.matricula
+  SELECT p.*, e.nombre_estudio, r.fecha_estudio, r.id_instituto, r.matricula_medico
     FROM (Registro r inner JOIN Paciente p ON r.dni_paciente = p.dni)
       inner JOIN Estudio e ON r.id_estudio = e.id
   WHERE datepart(mm, r.fecha_estudio) = @mes AND datepart(yyyy, r.fecha_estudio) = @año
