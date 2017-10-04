@@ -66,6 +66,17 @@ AS
 INPUT: nombre de la especialidad y sexo (default null).
 Proyectar los datos de los médicos activos que cumplan con la condición. Si no se especifica sexo, listar ambos.*/
 
+CREATE procedure pr_medicos
+  @especialidad varchar(50),
+  @sexo varchar(1) = null
+AS
+  SELECT m.*, e.nombre_especialidad
+    FROM (Medico m INNER JOIN Medico_Especialidad me ON m.matricula = em.id_medico)
+      INNER JOIN Especialidad e ON e.id = em.id_especialidad
+  WHERE e.nombre_especialidad = @especialidad 
+    AND m.sexo = isnull(@sexo, sexo) 
+    AND m.estado = 'activo'
+
 
 /*4.5. Crear un procedimiento que proyecte los estudios que están cubiertos por una determinada obra social.
 INPUT: nombre de la obra social, nombre del plan ( default null ).
