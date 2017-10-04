@@ -22,15 +22,12 @@ AS
 			INSERT INTO Estudio (id, nombre_estudio,estado) VALUES @id_estudio, @nombEstudio
 		end
 
-	
 	SELECT @id_estudio = e.id FROM Instituto i WHERE i.nombre_instituto = @nombEstudio
 	if (@id_instituto isnull)
 		begin
 			SET @id_instituto isnull ((SELECT MAX(i.id) FROM Instituto ), 0) + 1
 			INSERT INTO Estudio (id, nombre_estudio,estado) VALUES @id_estudio, @nombEstudio
 		end
-
-
 
 	if exists (SELECT 1 FROM Instituto_Estudio ie WHERE ie.id_estudio = @id_estudio AND ie.id_instituto = @id_instituto)
 		begin
@@ -60,8 +57,8 @@ CREATE procedure pr_Estudios
   @año int
 AS
   SELECT p.*, e.nombre_estudio, r.fecha_estudio, r.id_instituto, r.matricula_medico
-    FROM (Registro r inner JOIN Paciente p ON r.dni_paciente = p.dni)
-      inner JOIN Estudio e ON r.id_estudio = e.id
+    FROM (Registro r INNER JOIN Paciente p ON r.dni_paciente = p.dni)
+      INNER JOIN Estudio e ON r.id_estudio = e.id
   WHERE datepart(mm, r.fecha_estudio) = @mes AND datepart(yyyy, r.fecha_estudio) = @año
 
 
