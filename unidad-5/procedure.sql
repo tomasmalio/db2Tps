@@ -16,36 +16,38 @@ AS
 	DECLARE @id_estudio int, @id_instituto int 
 	
 	SELECT @id_estudio = e.id FROM Estudio e WHERE e.nombre_estudio = @nombEstudio
-	if (@id_estudio isnull)
-		begin
+	IF (@id_estudio isnull)
+		BEGIN
 			SET @id_estudio isnull ((SELECT MAX(e.id) FROM Estudio), 0) + 1
 			INSERT INTO Estudio (id, nombre_estudio,estado) VALUES @id_estudio, @nombEstudio
-		end
+		END
 
 	SELECT @id_estudio = e.id FROM Instituto i WHERE i.nombre_instituto = @nombEstudio
-	if (@id_instituto isnull)
-		begin
+	IF (@id_instituto isnull)
+		BEGIN
 			SET @id_instituto isnull ((SELECT MAX(i.id) FROM Instituto ), 0) + 1
 			INSERT INTO Estudio (id, nombre_estudio,estado) VALUES @id_estudio, @nombEstudio
-		end
+		END
 
-	if exists (SELECT 1 FROM Instituto_Estudio ie WHERE ie.id_estudio = @id_estudio AND ie.id_instituto = @id_instituto)
-		begin
+	IF EXISTS (SELECT 1 FROM Instituto_Estudio ie WHERE ie.id_estudio = @id_estudio AND ie.id_instituto = @id_instituto)
+		BEGIN
 			UPDATE Instituto_Estudio SET precio = @precio
 			WHERE id_estudio = @id_estudio AND id_instituto = @id_instituto
-		end
-	else
-		begin
+		END
+	ELSE
+		BEGIN
 			INSERT INTO Instituto_Estudio (id_instituto, id_estudio, precio) 
 			VALUES (@id_instituto, @id_estudio, @precio)
-		end
-	return
+		END
+	RETURN
 GO
 
 /*4.2. Crear un procedimiento para ingresar datos del afiliado.
 INPUT: dni del paciente, sigla de la obra social, nro del plan, nro de afiliado.
 Si ya existe la tupla en Afiliados debe actualizar el nro de plan y el nro de afiliado.
 Si no existe debe crearla.*/
+
+--Sigla de la obra social???
 
 
 /*4.3. Crear un procedimiento para que proyecte los estudios realizados en un determinado mes.
@@ -83,6 +85,7 @@ INPUT: nombre de la obra social, nombre del plan ( default null ).
 Proyectar los estudios y la cobertura que poseen (estudio y porcentaje cubierto.
 Si no se ingresa plan, se deben listar todos los planes de la obra social.*/
 
+--Nombre de plan???
 
 /*4.6. Crear un procedimiento que proyecte cantidad de estudios realizados agrupados por obra social, nombre del plan y matricula del médico.
 INPUT: nombre de la obra social, nombre del plan, matrícula del médico.
@@ -90,17 +93,27 @@ INPUT: nombre de la obra social, nombre del plan, matrícula del médico.
 Proyectar la cantidad de estudios realizados.
 Si no se indica alguno de los parámetros se deben discriminar todas las ocurrencias.*/
 
+--Nombre de plan???
 
-/*4.7. Crear un procedimiento que proyecte dni, fecha de nacimiento, nombre y apellido de los pacientes que correspondan a los n (valor solicitado) pacientes más viejos cuyo apellido cumpla con determinado patrón de caracteres.
+/*4.7. Crear un procedimiento que proyecte dni, fecha de nacimiento, nombre y apellido de los pacientes que correspondan a 
+los n (valor solicitado) pacientes más viejos cuyo apellido cumpla con determinado patrón de caracteres.
 INPUT: cantidad (valor n), patrón caracteres (default null).
 Proyectar los pacientes que cumplan con la condición.
 (Ejemplo: los 10 pacientes más viejos cuyo apellido finalice con ‘ez’ o los 8 que comiencen con la letra ‘A’*/
 
+CREATE procedure pr_pacientes
+  @n int,
+  @patron varchar(20) = null
+AS
+  SELECT p.nombre, p.apellido, p.dni, p.fecha_nacimiento FROM Paciente p
+  WHERE @n >= (SELECT COUNT(1) FROM Paciente p1 WHERE p1.fecha_nacimiento <= p.fecha_nacimiento)
+    AND apellido LIKE isnull(@patron, apellido)
 
 /*4.8. Crear un procedimiento que devuelva el precio total a liquidar a un determinado instituto.
 INPUT: nombre del instituto, periodo a liquidar.
 OUTPUT: precio neto.
 Devuelve el neto a liquidar al instituto para ese período en una variable.*/
+
 
 /*4.9. Crear un procedimiento que devuelva el monto a abonar de un paciente moroso.
 INPUT: dni del paciente, estudio realizado, fecha de realización, punitorio (mensual).
@@ -120,3 +133,13 @@ INPUT / OUTPUT: dos enteros.
 Ingresar período a consultar (mes y año )
 Retornar cantidad de pacientes que se realizaron uno o más estudios y cantidad de médicos solicitantes de los mismos, en dos variables.*/
 
+CREATE procedure pr_pacientes_medicos
+	@mes int,
+	@año int,
+	@pacientes int output,
+	@medicos int output
+AS
+SET @pacientes= (SELECT COUNT(DISTINCT dni_paciente) FROM Registro 
+		WHERE datepart(yy,fecha_estudio)=@año AND datepart (mm,fecha_estudio)=@mes)
+SET @medicos= (SELECT COUNT(DISTINCT matricula_medico) FROM Registro 
+	       WHERE datepart(yy,fecha)=@año AND datepart (mm,fecha)=@mes)
