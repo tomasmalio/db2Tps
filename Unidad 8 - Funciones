@@ -2,6 +2,15 @@
 INPUT: fecha de nacimiento.
 OUTPUT: edad expresada en años cumplidos.*/
 
+CREATE FUNCTION fn_paciente_edad (@fecha_nac datetime)
+RETURNS INT
+AS 
+BEGIN
+  declare @fecha_actual = getdate(), @edad= datediff(yy, @fecha_nac, @fecha_actual)/365.25
+  RETURN @edad
+END
+ 
+
 /*4.19. Definir las siguientes funciones para obtener:
 INPUT: nombre del estudio.
 OUTPUT: mayor precio del estudio.
