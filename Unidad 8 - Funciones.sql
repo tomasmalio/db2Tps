@@ -39,7 +39,8 @@ BEGIN
   RETURN @precio
 END
 
-/*4.20. Definir una función que devuelva losninstitutos más utilizados por especialidad.
+
+/*4.20. Definir una función que devuelva los n institutos más utilizados por especialidad.
 INPUT: nombre de la especialidad, cantidad máxima de institutos.
 OUTPUT: Tabla de institutos (n primeros ).*/
 
