@@ -3,10 +3,10 @@ INPUT: fecha de nacimiento.
 OUTPUT: edad expresada en años cumplidos.*/
 
 CREATE FUNCTION fn_paciente_edad (@fecha_nac datetime)
-RETURNS INT
+RETURNS int
 AS 
 BEGIN
-  declare @fecha_actual = getdate(), @edad= datediff(yy, @fecha_nac, @fecha_actual)/365.25
+  declare @fecha_actual datetime = getdate(), @edad int = datediff(dd, @fecha_nac, @fecha_actual)/365.25
   RETURN @edad
 END
  
@@ -17,6 +17,27 @@ OUTPUT: mayor precio del estudio.
 menor precio del estudio.
 precio promedio del estudio.*/
 
+CREATE FUNCTION fn_precio_menor (@instituto varchar(50))
+RETURNS float
+AS
+BEGIN
+  declare @precio = SELECT min(ie.precio) FROM Instituto_Estudio ie 
+  INNER JOIN Instituto i
+  ON ie.id_instituto = i.id
+  WHERE i.nombre_instituto = @instituto
+  RETURN @precio
+END
+
+CREATE FUNCTION fn_precio_promedio (@instituto varchar(50))
+RETURNS float
+AS
+BEGIN
+  declare @precio = SELECT avg(ie.precio) FROM Instituto_Estudio ie 
+  INNER JOIN Instituto i
+  ON ie.id_instituto = i.id
+  WHERE i.nombre_instituto = @instituto
+  RETURN @precio
+END
 
 /*4.20. Definir una función que devuelva losninstitutos más utilizados por especialidad.
 INPUT: nombre de la especialidad, cantidad máxima de institutos.
