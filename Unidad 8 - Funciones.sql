@@ -128,14 +128,20 @@ BEGIN
       SET @cont = @cont + 1 
       END 
   END 
-RETURN(@convertido)
+RETURN @convertido
 END
 
 
-/*4.24. Definir una función que devuelva las obras sociales que cubren un determinado estudio en todos los planes que tiene y que se realizan en algún instituto registrado en la base.
+/*4.24. Definir una función que devuelva las obras sociales que cubren un determinado estudio en todos los planes que tiene
+y que se realizan en algún instituto registrado en la base.
 INPUT: nombre del estudio.
 OUTPUT: Tabla que proyecta la obra social y la categoría.*/
 
+CREATE FUNCTION fn_obra_social (@estudio varchar(50))
+RETURN TABLE
+AS
+BEGIN
+  RETURN (SELECT os.nombre, os.categoria FROM 
 
 /*4.25. Definir una función que proyecte un descuento adicional a los afiliados de una obra social, del 5% a los estudios de cardiología y del 7% a los de gastroenterología, para aquellos que no tienen cubierto el 100% del estudio.
 INPUT: sigla de la obra social.
