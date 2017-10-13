@@ -104,6 +104,33 @@ END
 INPUT: string inicial.
 OUTPUT: stringconvertido.*/
 
+CREATE FUNCTION fn_mayusculas_minusculas (@cadena varchar(50))
+RETURNS varchar(100)
+AS
+BEGIN
+  declare @convertido varchar(100) 
+  declare @caracter varchar(1) 
+  declare @cont int 
+  SET @cont = 2 
+  SET @convertido = upper(substring(@cadena,1,1)) 
+  WHILE (@cont < len(@cadena)+1) 
+  BEGIN 
+    upper(substring(@cadena,@cont+1,1)) 
+    SET @caracter = substring(@cadena,@cont,1) 
+    IF @caracter = ' ' 
+    BEGIN 
+      SET @convertido = @convertido + ' ' + 
+      SET @cont = @cont + 2 
+    END 
+    ELSE 
+      BEGIN 
+      SET @convertido = @convertido + lower(@caracter) 
+      SET @cont = @cont + 1 
+      END 
+  END 
+RETURN(@convertido)
+END
+
 
 /*4.24. Definir una función que devuelva las obras sociales que cubren un determinado estudio en todos los planes que tiene y que se realizan en algún instituto registrado en la base.
 INPUT: nombre del estudio.
