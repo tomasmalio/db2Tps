@@ -54,7 +54,7 @@ BEGIN
   INNER JOIN Instituto i
   ON i.id = ie.id_instituto
   WHERE e.nombre_especialidad = @espec
-  GROUP BY i.nombre_instituto
+  GROUP BY i.nombre_instituto, cantidad
   HAVING COUNT (i.nombre_instituto) <= @cant)
 END
 
@@ -64,7 +64,19 @@ partir de una cantidad mínima que se especifique y dentro de un determinado per
 INPUT: cantidad mínima, fecha desde, fecha hasta.
 OUTPUT: Tabla que proyecte el paciente, el estudio y la cantidad.*/
 
-CREATE FUNCTION fn_paciente_estudios (@)
+CREATE FUNCTION fn_paciente_estudios (@min int, @desde datetime, @hasta datetime)
+RETURNS
+AS
+BEGIN
+  RETURN (SELECT p.nombre, e.nombre_estudio, COUNT(*) AS cantidad FROM Registro r
+  INNER JOIN Paciente p
+  ON r.dni_paciente = p.dni
+  INNER JOIN Estudio e
+  ON e.id = r.id_estudio
+  WHERE r.fecha_estudio BETWEEN @desde AND @hasta
+  GROUP BY p.nombre, e.nombre_estudio
+  HAVING COUNT (*) >= @min
+END
 
 
 /*4.22. Definir una función que devuelva los médicos que ordenaron repetir un mismo estudio a un mismo paciente en los últimos días.
