@@ -44,7 +44,7 @@ END
 INPUT: nombre de la especialidad, cantidad máxima de institutos.
 OUTPUT: Tabla de institutos (n primeros ).*/
 
-CREATE FUNCTION fn_institutos_especialidad (@espec varchar(50), @cant)
+CREATE FUNCTION fn_institutos_especialidad (@espec varchar(50), @cant int)
 RETURNS @especialidades TABLE
 AS
 BEGIN
@@ -59,9 +59,12 @@ BEGIN
 END
 
 
-/*4.21. Definir una función que devuelva los estudios y la cantidad de veces que se repitieron para un mismo paciente a partir de una cantidad mínima que se especifique y dentro de un determinado período de tiempo.
+/*4.21. Definir una función que devuelva los estudios y la cantidad de veces que se repitieron para un mismo paciente a 
+partir de una cantidad mínima que se especifique y dentro de un determinado período de tiempo.
 INPUT: cantidad mínima, fecha desde, fecha hasta.
 OUTPUT: Tabla que proyecte el paciente, el estudio y la cantidad.*/
+
+CREATE FUNCTION fn_paciente_estudios (@)
 
 
 /*4.22. Definir una función que devuelva los médicos que ordenaron repetir un mismo estudio a un mismo paciente en los últimos días.
