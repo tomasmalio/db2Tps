@@ -44,6 +44,20 @@ END
 INPUT: nombre de la especialidad, cantidad máxima de institutos.
 OUTPUT: Tabla de institutos (n primeros ).*/
 
+CREATE FUNCTION fn_institutos_especialidad (@espec varchar(50), @cant)
+RETURNS @especialidades TABLE
+AS
+BEGIN
+  RETURN (SELECT i.nombre_instituto, COUNT(*) AS cantidad FROM Instituto_Estudio ie
+  INNER JOIN Especialidad e
+  ON ie.id_estudio = e.id
+  INNER JOIN Instituto i
+  ON i.id = ie.id_instituto
+  WHERE e.nombre_especialidad = @espec
+  GROUP BY i.nombre_instituto
+  HAVING COUNT (i.nombre_instituto) <= @cant)
+END
+
 
 /*4.21. Definir una función que devuelva los estudios y la cantidad de veces que se repitieron para un mismo paciente a partir de una cantidad mínima que se especifique y dentro de un determinado período de tiempo.
 INPUT: cantidad mínima, fecha desde, fecha hasta.
