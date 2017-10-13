@@ -45,7 +45,7 @@ INPUT: nombre de la especialidad, cantidad máxima de institutos.
 OUTPUT: Tabla de institutos (n primeros ).*/
 
 CREATE FUNCTION fn_institutos_especialidad (@espec varchar(50), @cant int)
-RETURNS @especialidades TABLE
+RETURNS TABLE
 AS
 BEGIN
   RETURN (SELECT i.nombre_instituto, COUNT(*) AS cantidad FROM Instituto_Estudio ie
@@ -65,7 +65,7 @@ INPUT: cantidad mínima, fecha desde, fecha hasta.
 OUTPUT: Tabla que proyecte el paciente, el estudio y la cantidad.*/
 
 CREATE FUNCTION fn_paciente_estudios (@min int, @desde datetime, @hasta datetime)
-RETURNS
+RETURNS TABLE
 AS
 BEGIN
   RETURN (SELECT p.nombre, e.nombre_estudio, COUNT(*) AS cantidad FROM Registro r
@@ -75,7 +75,7 @@ BEGIN
   ON e.id = r.id_estudio
   WHERE r.fecha_estudio BETWEEN @desde AND @hasta
   GROUP BY p.nombre, e.nombre_estudio
-  HAVING COUNT (*) >= @min
+  HAVING COUNT (*) >= @min)
 END
 
 
@@ -83,7 +83,23 @@ END
 INPUT: cantidad de días.
 OUTPUT: Tabla que proyecte el estudio repetido, nombre y fechas de realización, identificación del paciente y del médico.*/
 
-
+CREATE FUNCTION fn_medico_paciente (@dias int)
+RETURNS TABLE
+AS
+BEGIN
+  RETURN (SELECT e.nombre_estudio, r.fecha_estudio, p.dni, m.nombre_medico FROM Registro r
+  INNER JOIN Estudio e
+  ON r.id_estudio = e.id
+  INNER JOIN Paciente p
+  ON p.dni = r.dni_paciente
+  INNER JOIN Medico m
+  ON m.matricula = r.matricula_medico
+  WHERE fecha_estudio > DATEADD (dd, @dias, getdate())
+  GROUP BY e.nombre_estudio, r.fecha_estudio, p.dni, m.nombre_medico
+  HAVING COUNT(*) > 1)
+END
+          
+          
 /*4.23. Definir una función que devuelva una cadena de caracteres en letras minúsculas con la letra inicial de cada palabra en mayúscula.
 INPUT: string inicial.
 OUTPUT: stringconvertido.*/
