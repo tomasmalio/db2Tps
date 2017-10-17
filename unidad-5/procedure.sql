@@ -113,7 +113,7 @@ Si no se ingresa plan, se deben listar todos los planes de la obra social.*/
 
 CREATE PROCEDURE EstudiosCubiertos
 	@ooss varchar(20) = '%',
-	@NOMBRE varchar(20)= NULL
+	@nombre_plan varchar(20)= NULL
 AS
 	if @NOMBRE IS NULL
 		BEGIN
@@ -123,11 +123,11 @@ AS
 		END
 	else
 		BEGIN
-			SELECT o.sigla, o.nombre, p.nroplan, p.nombre, c.cobertura 
+			SELECT o.sigla, o.nombre, p.id, p.nombre_plan, c.cobertura 
 			FROM ObraSocial o 
-			INNER JOIN Planes p on o.id = p.id_obra_social
-			INNER JOIN coberturas c on p.sigla = c.sigla and p.nroplan = c.nroplan 		
-			WHERE o.sigla = @ooss and p.nombre_plan = @NOMBRE
+			INNER JOIN Planes p ON o.id = p.id_obra_social
+			INNER JOIN Plan_Estudio pe ON pe.id_plan = p.id		
+			WHERE o.sigla = @ooss and p.nombre_plan = @nombre_plan
 		END
 GO
 
