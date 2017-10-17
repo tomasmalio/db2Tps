@@ -141,7 +141,13 @@ CREATE FUNCTION fn_obra_social (@estudio varchar(50))
 RETURN TABLE
 AS
 BEGIN
-  RETURN (SELECT os.nombre, os.categoria FROM 
+  RETURN (SELECT os.nombre, os.categoria FROM ObraSocial os
+  INNER JOIN Plan p ON os.id = p.id_obra_social
+  INNER JOIN Plan_Estudio ON pe.id_plan = p.id
+  INNER JOIN Estudio e ON e.id = pe.id_estudio
+  WHERE EXISTS (SELECT * FROM estudio WHERE nombre_estudio = @estudio)
+END
+          
 
 /*4.25. Definir una función que proyecte un descuento adicional a los afiliados de una obra social, del 5% a los estudios de cardiología y del 7% a los de gastroenterología, para aquellos que no tienen cubierto el 100% del estudio.
 INPUT: sigla de la obra social.
