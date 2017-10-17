@@ -113,6 +113,7 @@ create table ObraSocial
 	id smallint not null primary key,
 	nombre varchar(50) not null,
 	categoria char(2),
+	sigla sigla not null,
 	check (categoria in ('os', 'pp'))
 )
 GO
