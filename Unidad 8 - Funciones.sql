@@ -145,12 +145,34 @@ BEGIN
   INNER JOIN Plan p ON os.id = p.id_obra_social
   INNER JOIN Plan_Estudio ON pe.id_plan = p.id
   INNER JOIN Estudio e ON e.id = pe.id_estudio
-  WHERE EXISTS (SELECT * FROM estudio WHERE nombre_estudio = @estudio)
+  WHERE EXISTS (SELECT * FROM Estudio WHERE nombre_estudio = @estudio))
 END
           
 
-/*4.25. Definir una función que proyecte un descuento adicional a los afiliados de una obra social, del 5% a los estudios de cardiología y del 7% a los de gastroenterología, para aquellos que no tienen cubierto el 100% del estudio.
+/*4.25. Definir una función que proyecte un descuento adicional a los afiliados de una obra social, del 5% a los estudios
+de cardiología y del 7% a los de gastroenterología, para aquellos que no tienen cubierto el 100% del estudio.
 INPUT: sigla de la obra social.
 OUTPUT: Tabla que proyecte los datos del paciente, del estudio y el monto neto del descuento.*/
           
---sigla???
+CREATE FUNCTION fn_descuento (@sigla sigla)
+RETURN TABLE
+AS
+BEGIN
+  DECLARE @descuento float
+  RETURN (SELECT p.nombre, p.apellido, p.dni, e.nombre_estudio FROM Paciente p
+  INNER JOIN Paciente_Plan pp ON p.dni = pp.dni_paciente
+  INNER JOIN Plan_Estudio pe ON pe.id_plan = pp.id_plan
+  INNER JOIN Estudio ON e.id = pe.id_estudio
+  INNER JOIN Especialidad_Estudio ee ON ee.id_estudio = e.id
+  INNER JOIN Especialidad esp ON esp.id = ee._id_especialidad
+  INNER JOIN Instituto_Estudio ie ON ie.id_estudio = e.id
+  INNER JOIN Planes pl ON pl.id = pe.id_plan
+  INNER JOIN ObraSocial os ON os.id = pl.id_obra_social
+  WHERE os.sigle = @sigla AND pe.cobertura < 100
+  CASE
+    WHEN esp.nombre_especialidad = 'Cardiología'
+          THEN @descuento = ie.precio * 0.07
+    WHEN esp.nombre_especialidad = 'Gastroenterología'
+          THEN @descuento = ie.precio * 0.05)
+END
+GO
