@@ -152,4 +152,5 @@ END
 /*4.25. Definir una función que proyecte un descuento adicional a los afiliados de una obra social, del 5% a los estudios de cardiología y del 7% a los de gastroenterología, para aquellos que no tienen cubierto el 100% del estudio.
 INPUT: sigla de la obra social.
 OUTPUT: Tabla que proyecte los datos del paciente, del estudio y el monto neto del descuento.*/
-
+          
+--sigla???
