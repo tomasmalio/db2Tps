@@ -127,6 +127,15 @@ INPUT / OUTPUT: entero.
 Ingresar la cantidad de combinaciones posibles de juntas entre médicos ( 2 a 6 ) que se pueden generar con los médicos activos de la Base de Datos.
 Retorna la Combinatoria (m médicos tomados de a n ) = m! / n! (m-n)! en una variable.*/
 
+CREATE procedure pr_cantidad_posible_junta_medicas
+	@combinatoria_cantidad int,
+	@combinatoria_medicos int output
+AS
+
+
+
+
+
 
 /*4.11. Crear un procedimiento que devuelva la cantidad de pacientes y médicos que efectuaron estudios en un determinado período.
 INPUT / OUTPUT: dos enteros.
