@@ -47,8 +47,34 @@ INPUT: dni del paciente, sigla de la obra social, nro del plan, nro de afiliado.
 Si ya existe la tupla en Afiliados debe actualizar el nro de plan y el nro de afiliado.
 Si no existe debe crearla.*/
 
---Sigla de la obra social???
+CREATE PROCEDURE ingresarAfiliado
+  @dni dni, 
+  @sigla sigla,
+  @nroPlan int,
+AS
+	declare @plan int
+	SELECT @plan = pa.id 
+	FROM Planes pa 
+	INNER JOIN ObraSocial o ON o.id = pa.id_obra_social
+	WHERE o.sigla = @sigla
 
+if @plan = @nroPlan
+  BEGIN
+	  if exists (SELECT dni FROM Paciente WHERE dni = @dni)
+	    BEGIN
+			UPDATE Paciente_Plan
+			SET id_plan = @nroPlan, dni_paciente = @dni
+			WHERE dni_paciente = @dni
+	    END
+	  ELSE
+	    BEGIN
+			if exists (SELECT dni from Paciente where dni = @dni)
+		        BEGIN
+			    	INSERT INTO Paciente_Plan values (@dni, @nroPlan)
+				END
+	    END
+  END
+GO
 
 /*4.3. Crear un procedimiento para que proyecte los estudios realizados en un determinado mes.
 INPUT: mes y año.
