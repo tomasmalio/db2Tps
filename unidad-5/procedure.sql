@@ -111,7 +111,27 @@ INPUT: nombre de la obra social, nombre del plan ( default null ).
 Proyectar los estudios y la cobertura que poseen (estudio y porcentaje cubierto.
 Si no se ingresa plan, se deben listar todos los planes de la obra social.*/
 
---Nombre de plan???
+CREATE PROCEDURE EstudiosCubiertos
+	@ooss varchar(20) = '%',
+	@NOMBRE varchar(20)= NULL
+AS
+	if @NOMBRE IS NULL
+		BEGIN
+			SELECT o.sigla, o.nombre, p.nroplan, p.nombre 
+			FROM ObraSocial o INNER JOIN Planes p on o.id = p.id_obra_social 
+			WHERE o.sigla = @ooss		
+		END
+	else
+		BEGIN
+			SELECT o.sigla, o.nombre, p.nroplan, p.nombre, c.cobertura 
+			FROM ObraSocial o 
+			INNER JOIN Planes p on o.id = p.id_obra_social
+			INNER JOIN coberturas c on p.sigla = c.sigla and p.nroplan = c.nroplan 		
+			WHERE o.sigla = @ooss and p.nombre_plan = @NOMBRE
+		END
+GO
+
+
 
 /*4.6. Crear un procedimiento que proyecte cantidad de estudios realizados agrupados por obra social, nombre del plan y matricula del médico.
 INPUT: nombre de la obra social, nombre del plan, matrícula del médico.

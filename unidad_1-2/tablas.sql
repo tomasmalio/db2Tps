@@ -124,6 +124,7 @@ create table Planes
 	id smallint not null primary key,
 	id_obra_social smallint not null,
 	estado char(2), check (estado in ('si', 'no')),
+	nombre_plan varchar(50) not null,
 	constraint fk_obrasocial_id foreign key (id_obra_social) references ObraSocial(id),
 	check (id >=1 and id <= 12)
 )
