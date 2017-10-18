@@ -14,6 +14,8 @@ sp_addtype 'sigla', 'varchar(8)', 'not null'
 -- Se crea el tipo de dato dni
 sp_addtype 'dni', 'varchar(8)', 'not null'
 
+-- Se crea el tipo de dato pagado
+sp_addtype 'pagado', 'int(1)', 'not null'
 
 /**
  *	TABLAS
@@ -163,6 +165,7 @@ create table Registro
 	matricula_medico smallint not null,
 	dni_paciente varchar(8) not null,
 	fecha_estudio date,
+	pagado pagado,
 	check (abs(datediff(dd, fecha_estudio, GETDATE())) >= 31),
 	constraint fk_estudio_id_estu foreign key (id_estudio) references Estudio(id),
 	constraint fk_instituto_id_instituto foreign key (id_instituto) references Instituto(id),

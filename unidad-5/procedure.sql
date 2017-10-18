@@ -196,6 +196,34 @@ OUTPUT: precio neto.
 Obtener punitorio diario y precio a abonar.
 Devuelve precio + punitorio en una variable.*/
 
+CREATE PROCEDURE DevuelveMontoMoroso
+	@dni dni,
+	@estudio varchar (30),
+	@fecha datetime,
+	@interes int,
+	@neto varchar (60) output
+
+AS
+	declare @precio float,@idEstudio id,@precioNeto float,@InteresPunitorio int
+	set @idEstudio = (SELECT e.id FROM Estudio e WHERE @estudio = e.nombre_estudio)
+
+--Busca si el Paciente se hizo el estudio indicado
+if exists (SELECT * FROM Registro r WHERE r.dni_paciente = @dni AND r.id_estudio = @idEstudio AND r.fecha_estudio = @fecha and pagado=0)
+	set @precio = (SELECT precio from precios where idEstudio=@idEstudio)
+else 
+begin
+	print 'El paciente no se hizo el estudio indicado' 
+	return
+end
+set @InteresPunitorio= @interes/30
+set @precioNeto=@precio+((@precio*@InteresPunitorio/100)*(datepart(dy, getdate())-datepart(dy,@fecha)))
+set @neto='Precio neto:'+ convert(varchar(8),@precioNeto)+' Punitorio diario:'+convert(varchar(8),@InteresPunitorio)+'%'
+go
+
+DECLARE @total varchar (60)
+EXEC DevuelveMontoMoroso '1','estudio 2','2004-10-02 20:55:07.920',30, @total output
+PRINT @total
+GO
 
 
 /*4.10. Crear un procedimiento que devuelva la cantidad posible de juntas médicas que puedan crearse combinando los médicos existentes.
