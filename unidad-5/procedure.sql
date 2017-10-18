@@ -227,11 +227,10 @@ CREATE PROCEDURE JuntasMedicas
 as
 	declare @medicos int,@m int, @n int, @resta int, @diferencia_medicos int
 	set @medicos = (select count (*) FROM Medico m where m.estado = 1)
---print 'La Cantidad de Medicos activos es de: ' + convert(varchar(12),@medicos)
-set @m=1
-set @n=1
-set @resta=1
-set @diferencia_medicos = @medicos-@entero
+	set @m=1
+	set @n=1
+	set @resta=1
+	set @diferencia_medicos = @medicos-@entero
 IF (@entero <= @medicos)
 	BEGIN
 		while (@medicos>1)
