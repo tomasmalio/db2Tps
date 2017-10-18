@@ -207,39 +207,54 @@ AS
 	declare @precio float,@idEstudio id,@precioNeto float,@InteresPunitorio int
 	set @idEstudio = (SELECT e.id FROM Estudio e WHERE @estudio = e.nombre_estudio)
 
---Busca si el Paciente se hizo el estudio indicado
-if exists (SELECT * FROM Registro r WHERE r.dni_paciente = @dni AND r.id_estudio = @idEstudio AND r.fecha_estudio = @fecha and pagado=0)
-	set @precio = (SELECT precio from precios where idEstudio=@idEstudio)
-else 
-begin
-	print 'El paciente no se hizo el estudio indicado' 
-	return
-end
+IF EXISTS (SELECT * FROM Registro r WHERE r.dni_paciente = @dni AND r.id_estudio = @idEstudio AND r.fecha_estudio = @fecha and r.pagado = 0)
+	set @precio = (SELECT precio from Instituto_Estudio ie where ie.id_estudio = @idEstudio)
+
 set @InteresPunitorio= @interes/30
 set @precioNeto=@precio+((@precio*@InteresPunitorio/100)*(datepart(dy, getdate())-datepart(dy,@fecha)))
 set @neto='Precio neto:'+ convert(varchar(8),@precioNeto)+' Punitorio diario:'+convert(varchar(8),@InteresPunitorio)+'%'
-go
-
-DECLARE @total varchar (60)
-EXEC DevuelveMontoMoroso '1','estudio 2','2004-10-02 20:55:07.920',30, @total output
-PRINT @total
 GO
-
 
 /*4.10. Crear un procedimiento que devuelva la cantidad posible de juntas médicas que puedan crearse combinando los médicos existentes.
 INPUT / OUTPUT: entero.
 Ingresar la cantidad de combinaciones posibles de juntas entre médicos ( 2 a 6 ) que se pueden generar con los médicos activos de la Base de Datos.
 Retorna la Combinatoria (m médicos tomados de a n ) = m! / n! (m-n)! en una variable.*/
 
-CREATE procedure pr_cantidad_posible_junta_medicas
-	@combinatoria_cantidad int,
-	@combinatoria_medicos int output
-AS
 
+CREATE PROCEDURE JuntasMedicas
+	@entero int,
+	@combinatoria int output
+as
+	declare @medicos int,@m int, @n int, @resta int, @diferencia_medicos int
+	set @medicos = (select count (*) FROM Medico m where m.estado = 1)
+--print 'La Cantidad de Medicos activos es de: ' + convert(varchar(12),@medicos)
+set @m=1
+set @n=1
+set @resta=1
+set @diferencia_medicos = @medicos-@entero
+IF (@entero <= @medicos)
+	BEGIN
+		while (@medicos>1)
+		begin
+		set @m=@m*@medicos
+		set @medicos=@medicos-1
+		end
 
+		while (@entero>1)
+		begin
+		set @n=@n*@entero
+		set @entero=@entero-1
+		end
+		
+		while (@diferencia_medicos >1)
+		begin
+		set @resta=@resta*@diferencia_medicos
+		set @diferencia_medicos=@diferencia_medicos-1
+		end
 
-
-
+		set @combinatoria=@m/(@n *@resta )
+	END
+GO
 
 /*4.11. Crear un procedimiento que devuelva la cantidad de pacientes y médicos que efectuaron estudios en un determinado período.
 INPUT / OUTPUT: dos enteros.
