@@ -175,12 +175,27 @@ INPUT: nombre del instituto, periodo a liquidar.
 OUTPUT: precio neto.
 Devuelve el neto a liquidar al instituto para ese período en una variable.*/
 
+CREATE PROCEDURE VerInstitutos
+  @instituto varchar(20),
+  @mes int,
+  @año int,
+  @precioNeto decimal(6, 2) output
+as
+	SELECT @precioNeto = sum(p.precio * c.cobertura / 100)
+	FROM Registro r 
+	INNER JOIN Instituto_Estudio ie on r.idEstudio = ie.idEstudio and r.idInstituto = ie.idInstituto
+    INNER JOIN Paciente_Plan pp on r.dni_paciente = pp.dni_paciente
+	INNER JOIN Plan_Estudio pe on pe.id_plan = pp.id_plan AND r.id_estudio = pe.id_estudio
+	INNER JOIN Instituto i on r.id_instituto = i.id
+	WHERE i.nombre_instituto = @instituto AND datepart(mm, r.fecha_estudio) = @mes AND datepart(yyyy, r.fecha_estudio) = @año
+GO
 
 /*4.9. Crear un procedimiento que devuelva el monto a abonar de un paciente moroso.
 INPUT: dni del paciente, estudio realizado, fecha de realización, punitorio (mensual).
 OUTPUT: precio neto.
 Obtener punitorio diario y precio a abonar.
 Devuelve precio + punitorio en una variable.*/
+
 
 
 /*4.10. Crear un procedimiento que devuelva la cantidad posible de juntas médicas que puedan crearse combinando los médicos existentes.
