@@ -139,7 +139,22 @@ INPUT: nombre de la obra social, nombre del plan, matrícula del médico.
 Proyectar la cantidad de estudios realizados.
 Si no se indica alguno de los parámetros se deben discriminar todas las ocurrencias.*/
 
---Nombre de plan???
+CREATE PROCEDURE VerEstudios
+  @nombreooss varchar(20) = null,
+  @nroPlan int = null,
+  @matricula int = null
+AS
+	SELECT os.nombre, a.nroplan, h.matricula, count(1) estudios
+	FROM (Registro r 
+	INNER JOIN Paciente p ON r.dni_paciente = p.dni
+    INNER JOIN ObraSocial os ON p.id_obra_social = os.id
+    INNER JOIN Paciente_Plan pp ON pp.dni_paciente = p.dni
+  	WHERE os.nombre = isnull(@nombreooss, os.nombre)
+    AND pp.id_plan = isnull(@nroPlan, pp.id_plan)
+    AND r.matricula_medico = isnull(@matricula, r.matricula_medico)
+	GROUP BY os.nombre, pp.id_plan, r.matricula_medico
+GO
+
 
 /*4.7. Crear un procedimiento que proyecte dni, fecha de nacimiento, nombre y apellido de los pacientes que correspondan a 
 los n (valor solicitado) pacientes más viejos cuyo apellido cumpla con determinado patrón de caracteres.
