@@ -14,7 +14,6 @@ CREATE PROCEDURE pr_IngresarPrecio
 	@precio money not null,
 AS
 	DECLARE @id_estudio int, @id_instituto int 
-	
 	SELECT @id_estudio = e.id FROM Estudio e WHERE e.nombre_estudio = @nombEstudio
 	IF (@id_estudio isnull)
 		BEGIN
@@ -47,7 +46,7 @@ INPUT: dni del paciente, sigla de la obra social, nro del plan, nro de afiliado.
 Si ya existe la tupla en Afiliados debe actualizar el nro de plan y el nro de afiliado.
 Si no existe debe crearla.*/
 
-CREATE PROCEDURE ingresarAfiliado
+CREATE PROCEDURE pr_ingresarAfiliado
   @dni dni, 
   @sigla sigla,
   @nroPlan int,
@@ -57,7 +56,6 @@ AS
 	FROM Planes pa 
 	INNER JOIN ObraSocial o ON o.id = pa.id_obra_social
 	WHERE o.sigla = @sigla
-
 if @plan = @nroPlan
   BEGIN
 	  if exists (SELECT dni FROM Paciente WHERE dni = @dni)
@@ -111,7 +109,7 @@ INPUT: nombre de la obra social, nombre del plan ( default null ).
 Proyectar los estudios y la cobertura que poseen (estudio y porcentaje cubierto.
 Si no se ingresa plan, se deben listar todos los planes de la obra social.*/
 
-CREATE PROCEDURE EstudiosCubiertos
+CREATE PROCEDURE pr_EstudiosCubiertos
 	@ooss varchar(20) = '%',
 	@nombre_plan varchar(20)= NULL
 AS
@@ -130,7 +128,6 @@ AS
 			WHERE o.sigla = @ooss and p.nombre_plan = @nombre_plan
 		END
 GO
-
 
 
 /*4.6. Crear un procedimiento que proyecte cantidad de estudios realizados agrupados por obra social, nombre del plan y matricula del médico.
@@ -175,7 +172,7 @@ INPUT: nombre del instituto, periodo a liquidar.
 OUTPUT: precio neto.
 Devuelve el neto a liquidar al instituto para ese período en una variable.*/
 
-CREATE PROCEDURE VerInstitutos
+CREATE PROCEDURE pr_VerInstitutos
   @instituto varchar(20),
   @mes int,
   @año int,
@@ -196,7 +193,7 @@ OUTPUT: precio neto.
 Obtener punitorio diario y precio a abonar.
 Devuelve precio + punitorio en una variable.*/
 
-CREATE PROCEDURE DevuelveMontoMoroso
+CREATE PROCEDURE pr_DevuelveMontoMoroso
 	@dni dni,
 	@estudio varchar (30),
 	@fecha datetime,
@@ -209,10 +206,9 @@ AS
 
 IF EXISTS (SELECT * FROM Registro r WHERE r.dni_paciente = @dni AND r.id_estudio = @idEstudio AND r.fecha_estudio = @fecha and r.pagado = 0)
 	set @precio = (SELECT precio from Instituto_Estudio ie where ie.id_estudio = @idEstudio)
-
-set @InteresPunitorio= @interes/30
-set @precioNeto=@precio+((@precio*@InteresPunitorio/100)*(datepart(dy, getdate())-datepart(dy,@fecha)))
-set @neto='Precio neto:'+ convert(varchar(8),@precioNeto)+' Punitorio diario:'+convert(varchar(8),@InteresPunitorio)+'%'
+	set @InteresPunitorio= @interes/30
+	set @precioNeto=@precio+((@precio*@InteresPunitorio/100)*(datepart(dy, getdate())-datepart(dy,@fecha)))
+	set @neto='Precio neto:'+ convert(varchar(8),@precioNeto)+' Punitorio diario:'+convert(varchar(8),@InteresPunitorio)+'%'
 GO
 
 /*4.10. Crear un procedimiento que devuelva la cantidad posible de juntas médicas que puedan crearse combinando los médicos existentes.
@@ -221,7 +217,7 @@ Ingresar la cantidad de combinaciones posibles de juntas entre médicos ( 2 a 6 
 Retorna la Combinatoria (m médicos tomados de a n ) = m! / n! (m-n)! en una variable.*/
 
 
-CREATE PROCEDURE JuntasMedicas
+CREATE PROCEDURE pr_JuntasMedicas
 	@entero int,
 	@combinatoria int output
 as
@@ -238,19 +234,16 @@ IF (@entero <= @medicos)
 		set @m=@m*@medicos
 		set @medicos=@medicos-1
 		end
-
 		while (@entero>1)
 		begin
 		set @n=@n*@entero
 		set @entero=@entero-1
 		end
-		
 		while (@diferencia_medicos >1)
 		begin
 		set @resta=@resta*@diferencia_medicos
 		set @diferencia_medicos=@diferencia_medicos-1
 		end
-
 		set @combinatoria=@m/(@n *@resta )
 	END
 GO
