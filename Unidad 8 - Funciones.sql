@@ -159,7 +159,13 @@ RETURN TABLE
 AS
 BEGIN
   DECLARE @descuento float
-  RETURN (SELECT p.nombre, p.apellido, p.dni, e.nombre_estudio FROM Paciente p
+  RETURN (SELECT p.nombre, p.apellido, p.dni, e.nombre_estudio,
+  CASE
+    WHEN esp.nombre_especialidad = 'Cardiología'
+          THEN @descuento = ie.precio * 0.07
+    WHEN esp.nombre_especialidad = 'Gastroenterología'
+          THEN @descuento = ie.precio * 0.05)        
+  FROM Paciente p
   INNER JOIN Paciente_Plan pp ON p.dni = pp.dni_paciente
   INNER JOIN Plan_Estudio pe ON pe.id_plan = pp.id_plan
   INNER JOIN Estudio ON e.id = pe.id_estudio
@@ -169,10 +175,5 @@ BEGIN
   INNER JOIN Planes pl ON pl.id = pe.id_plan
   INNER JOIN ObraSocial os ON os.id = pl.id_obra_social
   WHERE os.sigle = @sigla AND pe.cobertura < 100
-  CASE
-    WHEN esp.nombre_especialidad = 'Cardiología'
-          THEN @descuento = ie.precio * 0.07
-    WHEN esp.nombre_especialidad = 'Gastroenterología'
-          THEN @descuento = ie.precio * 0.05)
 END
 GO
