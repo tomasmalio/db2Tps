@@ -86,6 +86,16 @@ BEGIN
 		END
 END
 GO
+/**
+	No se como seguirlo
+**/
+
+/**
+	5. Rol
+	Crear el rol ro###### y asignarles los siguientes privilegios
+		No permitir eliminaciones en la tabla partidos.
+		Poder actualizar únicamente los resultados de los partidos (goles) y la fecha del partido.
+**/
 
 
 
