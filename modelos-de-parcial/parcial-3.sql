@@ -96,3 +96,13 @@ AS
 	) AS res
 	WHERE res.numeroDeColumna = @valor_uno OR res.numeroDeColumna = @valor_dos
 GO
+
+/**
+	5. Procedimiento
+	Definir un procedimiento ps###### que:
+		Reciba una categoría y el nombre de un club.
+		Devuelva la cantidad de partidos como local y la cantidad de partidos como visitante en los cualesvparticipó el club en esa categoría.
+		Ambos resultados deben ser retornados en parámetros de salida.
+		Ejecutar el procedimiento y mostrar el resultado.
+**/
+
