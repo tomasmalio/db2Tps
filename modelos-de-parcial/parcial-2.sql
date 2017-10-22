@@ -46,6 +46,9 @@ GO
 
 EXEC pr1037546_02 'LOS ANDES', '%PABLO%'
 GO
+/**
+	No funciona cuando lo llamas, tira vacio y cuando lo haces por separado si anda
+**/
 
 /**
 	3. Vista
@@ -54,7 +57,9 @@ GO
 		Debe ser resuelta utilizando un join externo.
 **/
 CREATE VIEW vw1037546_02
-	SELECT DISTINCT (c.Nombre), c.Nrozona, c.Id_Club
+	SELECT DISTINCT (c.Nombre), c.Nrozona
 	FROM Clubes c
 	LEFT JOIN Partidos ps ON ps.Nrofecha = (SELECT MAX(p.Nrofecha) FROM Partidos p) AND ((ps.Id_ClubL <> c.Id_Club) AND (ps.Id_ClubV <> c.Id_Club))
-
+/**
+	No funciona, trae equipos que están en esa fecha
+**/
