@@ -53,3 +53,21 @@ GO
 /**
 	Verificar si esta bien
 **/
+
+/**
+	3. Vista
+	Definir una vista vw###### que:
+		Proyecte el nombre y la zona de los clubes que no ganaron en la última fecha de los partidos jugados.
+		Debe ser resuelta utilizando un join externo.
+**/
+CREATE VIEW vw1037546_03 
+AS
+	SELECT DISTINCT(c.Nombre), c.Nrozona
+	FROM Clubes c
+	LEFT JOIN Partidos pl ON ((pl.Id_ClubL = c.Id_Club AND pl.GolesL < pl.GolesV) OR (pl.Id_ClubV = c.Id_Club AND pl.GolesV < pl.GolesL))
+	WHERE 
+		pl.Nrofecha = (SELECT MAX(u.Nrofecha) FROM Partidos u) 
+GO
+
+
+		

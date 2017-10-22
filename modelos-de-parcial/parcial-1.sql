@@ -4,7 +4,7 @@
 		Reciba el nombre de un jugador.
 		Retorne el nombre y apellido en columnas separadas.
 **/
-CREATE FUNCTION fn1037546 (@nombreJugador varchar(30))
+CREATE FUNCTION fn1037546_01 (@nombreJugador varchar(30))
 RETURNS TABLE
 AS
 	RETURN (
@@ -22,7 +22,7 @@ GO
 		Retorne en dos parámetros de salida la cantidad de goles obtenidos como local y la cantidad de goles como visitante del club correspondiente.
 		Ejecutar el procedimiento y mostrar el resultado.
 **/
-CREATE PROCEDURE pr1037546
+CREATE PROCEDURE pr1037546_01
 	@nombreDelClub char(30) = '%'
 AS
 	SELECT (SELECT SUM(pl.GolesL) FROM Partidos pl WHERE pl.Id_ClubL = c.Id_Club) AS golesDeLocal, (SELECT SUM(pv.GolesV) FROM Partidos pv WHERE pv.Id_ClubV = c.Id_Club) AS golesDeVisitante
@@ -30,7 +30,7 @@ AS
 	WHERE c.Nombre = @nombreDelClub
 GO
 
-EXEC pr1037546 'BOCA-J. HERNANDEZ'
+EXEC pr1037546_01 'BOCA-J. HERNANDEZ'
 GO
 
 /**
@@ -38,7 +38,7 @@ GO
 	Definir un trigger tr###### que se accione cuando se ingresan clubes.
 		Debe determinar el Id_Club del mismo siendo el menor número entero  mayor a cero disponible en la tabla.
 **/
-CREATE TRIGGER tr1037546
+CREATE TRIGGER tr1037546_01
 ON Clubes
 INSTEAD OF INSERT 
 AS
@@ -57,12 +57,12 @@ GO
 		Proyecte el nombre de los jugadores de la categoría 84 pertenecientes a los clubes que ganaron y perdieron la misma cantidad de partidos en dicha categoría.
 		Debe ser resuelta utilizando correlación.
 **/
-
-CREATE VIEW vw1037546
+CREATE VIEW vw1037546_01
+AS
 	SELECT j.Nombre
 	FROM Jugadores j
 	WHERE j.Categoria = 84 
 	AND (SELECT COUNT(*) FROM PosCate184 posG WHERE (posG.Ganados - posG.Perdidos) > 1 
 	AND posG.Id_Club = j.Id_Club) = (SELECT COUNT(*) FROM PosCate184 posP WHERE (posP.Perdidos - posP.Ganados) > 1 AND posP.Id_Club = j.Id_Club) > 1
-
+GO
 
