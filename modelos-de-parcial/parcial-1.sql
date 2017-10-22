@@ -1,9 +1,4 @@
 /**
-	nombre del servidor: db2tps.database.windows.net
-	usuario: jugadores
-	password: Jugadb@2017
-**/
-/**
 	1. Función
 	Definir una función fn###### que:
 		Reciba el nombre de un jugador.
