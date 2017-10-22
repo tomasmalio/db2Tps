@@ -97,12 +97,35 @@ AS
 	WHERE res.numeroDeColumna = @valor_uno OR res.numeroDeColumna = @valor_dos
 GO
 
+EXEC pr1037546_03 '1', '84', 1, 5;
+GO
+
 /**
 	5. Procedimiento
 	Definir un procedimiento ps###### que:
 		Reciba una categoría y el nombre de un club.
-		Devuelva la cantidad de partidos como local y la cantidad de partidos como visitante en los cualesvparticipó el club en esa categoría.
+		Devuelva la cantidad de partidos como local y la cantidad de partidos como visitante en los cuales participó el club en esa categoría.
 		Ambos resultados deben ser retornados en parámetros de salida.
 		Ejecutar el procedimiento y mostrar el resultado.
 **/
+CREATE PROCEDURE ps1037546_03
+	@numeroDeCategoria tinyint,
+	@nombreDelClub char(30)
+AS
+	SELECT resLocal.partidosComoLocal AS 'Partidos como Local', resVisitante.partidosComoVisitante AS 'Partidos como Visitante'
+	FROM (
+		SELECT COUNT(*) AS partidosComoLocal
+		FROM Clubes c
+		INNER JOIN Partidos pl ON (pl.Id_ClubL = c.Id_Club AND pl.Categoria = @numeroDeCategoria)
+		WHERE c.Nombre = @nombreDelClub
+	) AS resLocal,
+	(
+		SELECT COUNT(*) AS partidosComoVisitante
+		FROM Clubes c
+		INNER JOIN Partidos pv ON (pv.Id_ClubV = c.Id_Club AND pv.Categoria = @numeroDeCategoria)
+		WHERE c.Nombre = @nombreDelClub
+	) AS resVisitante
+GO
 
+EXEC ps1037546_03 84, 'LOS ANDES'
+GO
