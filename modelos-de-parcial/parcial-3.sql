@@ -50,3 +50,6 @@ BEGIN
 	INSERT INTO Clubes (Id_Club, Nombre, Nrozona) VALUES (SELECT Id_Club, Nombre, @nuevaZona FROM Inserted)
 END
 GO
+/**
+	Verificar si esta bien
+**/
