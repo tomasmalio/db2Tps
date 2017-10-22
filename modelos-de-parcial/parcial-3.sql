@@ -69,5 +69,30 @@ AS
 		pl.Nrofecha = (SELECT MAX(u.Nrofecha) FROM Partidos u) 
 GO
 
-
-		
+/**
+	4. Procedimiento
+	Definir una vista pr###### que:
+		Reciba en parámetros diferentes:
+			* el nombre de zona de los clubes
+			* una categoría
+			* dos valores enteros distintos entre 1 y 10.
+		Devuelva el nombre del club, y el nombre y la fecha de nacimiento de los jugadores más jóvenes que
+		correspondan a los valores ingresados en los parámetros
+		Por ejemplo el 2ª y el 5ª jugador más joven de los clubes de la zona 2 en la categoría 84.
+**/
+CREATE PROCEDURE pr1037546_03
+	@numeroDeZona tinyint,
+	@numeroDeCategoria tinyint,
+	@valor_uno int,
+	@valor_dos int
+AS
+	SELECT res.clubNombre, res.jugadorNombre, res.jugadorFechaNac
+	FROM (
+		SELECT (ROW_NUMBER() OVER (ORDER BY j.Fecha_Nac DESC)) AS numeroDeColumna, c.Nombre AS clubNombre, j.Nombre AS jugadorNombre, j.Fecha_Nac AS jugadorFechaNac
+		FROM Jugadores j
+		INNER JOIN Clubes c ON c.Id_Club = j.Id_Club
+		WHERE j.Categoria = @numeroDeCategoria
+			AND c.Nrozona = @numeroDeZona
+	) AS res
+	WHERE res.numeroDeColumna = @valor_uno OR res.numeroDeColumna = @valor_dos
+GO
