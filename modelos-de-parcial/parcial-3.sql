@@ -24,7 +24,6 @@ AS
 	)
 GO
 
-
 /**
 	2. Trigger
 	Definir un trigger tr###### que se accione cuando se ingresan clubes.
