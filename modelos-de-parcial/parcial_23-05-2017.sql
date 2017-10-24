@@ -32,3 +32,31 @@ SELECT * FROM vw1037546_23052017
 	* Reciba el número de zona (1 o 2)
 	* Retorne el paramentro de output el nombre del club de la zona correspondiente que tenga la menor cantidad de jugadores en la categoria especficada
 **/
+CREATE PROCEDURE pr1037546_23052917
+	@numeroDeCategoria int,
+	@numeroDeZona int
+AS
+	SELECT MIN(res.Cantidad)
+	FROM Clubes c, (
+						SELECT COUNT(*) AS Cantidad, j.Id_Club
+						FROM Jugadores j
+						WHERE j.Categoria = 84
+						GROUP BY j.Id_Club
+					) res
+	WHERE c.Nrozona = 1 AND c.Id_Club = res.Id_Club
+GO
+
+
+
+
+SELECT *
+FROM Clubes c, (
+				SELECT MIN(res.Cantidad), res.Id_Club
+				FROM (
+											SELECT COUNT(*) AS Cantidad, j.Id_Club
+											FROM Jugadores j
+											WHERE j.Categoria = 84
+											GROUP BY j.Id_Club
+										) res
+				) resultado
+WHERE resultad.Id_Club = c.Id_Club AND c.Nrozona = 1
