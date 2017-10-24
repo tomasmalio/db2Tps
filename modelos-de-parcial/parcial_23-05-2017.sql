@@ -5,7 +5,7 @@
 		La consulta debe ser correlacionada
 **/
 
-SELECT *
+SELECT datediff(dd, jViejo.Fecha_Nac, jJoven.Fecha_Nac) AS diferencia
 FROM Clubes c, 
 	(
 		SELECT TOP 
@@ -16,7 +16,7 @@ FROM Clubes c,
 	) jViejo,
 	(
 		SELECT * 
-		FROM Jugadores j5
+		FROM jugadorores j5
 		WHERE j4.Categoria = 85
 			AND j4.Id_Club = c.Id_Club
 		ORDER BY j4.Fecha_Nac DESC
