@@ -158,8 +158,9 @@ WHERE j.Id_Club = ANY (
 												)
 					)
 
------CUALQUIER OPERADOR-----
-
+/**
+	CUALQUIER OPERADOR
+**/
 /**
 	3.12 Determinar el Club y la cantidad de jugadores de los clubes que ganaron más partidos que los que perdieron.
 **/
