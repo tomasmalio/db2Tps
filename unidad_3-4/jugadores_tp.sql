@@ -202,19 +202,37 @@ ORDER BY j.Id_Club
 
 --inner join clubes c on c.Id_Club=j.Id_Club
 
--- 3.15 Listar equipo y zona de la categoría 85 que hayan empatado entre la 5o y 7o fecha.
+/**
+	3.15 Listar equipo y zona de la categoría 85 que hayan empatado entre la 5o y 7o fecha.
+**/
+SELECT cl.nombre ClubLocal, cv.nombre ClubVisitante, p1.nrozona
+FROM (
+		Partidos p1 
+		INNER JOIN Clubes cl ON cl.Id_Club = p1.Id_ClubL
+	)
+	INNER JOIN Clubes cv ON cv.Id_Club = p1.Id_ClubV
+	WHERE EXISTS (
+					SELECT * 
+					FROM Partidos p 
+					WHERE (p.golesV = p.golesL) 
+						AND (p.categoria = 85) 
+						AND (p.nrofecha BETWEEN 5 AND 7)
+						AND (p1.Id_Partido = p.Id_Partido)
+				)
 
-select cl.nombre ClubLocal, cv.nombre ClubVisitante, p1.nrozona
-from (partidos p1 inner join clubes cl on cl.Id_Club=p1.Id_ClubL)inner join clubes cv on cv.Id_Club=p1.Id_ClubV
-where EXISTS(select * from partidos p where (p.golesV=p.golesL)and(p.categoria=85)and(p.nrofecha between 5 and 7)
-	and(p1.Id_Partido=p.Id_Partido))
-
-
--- 3.16 Listar los equipos de la zona 1 que marcaron goles en las 5 primeras fechas jugando de visitante.
-
-select *
-from (select * from clubes c where c.nrozona=1) cz1
-where cz1.Id_Club=any(select p.Id_ClubV from partidos p where ((golesV>0)and(p.nrofecha between 1 and 5)))
+/** 
+	3.16 Listar los equipos de la zona 1 que marcaron goles en las 5 primeras fechas jugando de visitante.
+**/
+SELECT *
+FROM (
+		SELECT *
+		FROM Clubes c 
+		WHERE c.nrozona = 1
+	) cz1
+WHERE cz1.Id_Club = ANY (
+							SELECT p.Id_ClubV 
+							FROM partidos p 
+							WHERE ((golesV > 0) AND (p.nrofecha BETWEEN 1 AND 5)))
 
 -- 3.17 Listar los equipos de la categoría 85 que no hayan ganado de local en la primera fecha.
 
