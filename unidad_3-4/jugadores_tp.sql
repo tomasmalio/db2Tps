@@ -1,24 +1,35 @@
-Select * From Clubes
+/**
+	3.1 Listar los partidos jugados como local o visitante por el Club Los Andes. (correlacionar) 
+	Proyectar: NroFecha, p.NroZona, Categoria, Local, Visitante, GolesL, GolesV.
+**/
+SELECT p.NroFecha, p.NroZona, p.Categoria, p.Id_ClubL, p.Id_ClubV, p.GolesL, p.GolesV 
+FROM Partidos p, Clubes c
+WHERE EXISTS (
+				SELECT * 
+				FROM (
+						SELECT Id_Club 
+						FROM clubes clb 
+						WHERE (clb.Nombre LIKE 'Los Andes')
+					) andes
+				WHERE ((andes.id_club = p.Id_ClubL) AND (p.Id_ClubV = c.Id_Club)) 
+					OR andes.id_club = p.Id_ClubV 
+					AND (p.Id_ClubL = c.Id_Club)
+			) 
 
--- 3.1 Listar los partidos jugados como local o visitante por el Club Los Andes. (correlacionar) Proyectar: NroFecha, p.NroZona, Categoria, Local, Visitante, GolesL, GolesV.
-
-Select	p.NroFecha, p.NroZona, p.Categoria, p.Id_ClubL, p.Id_ClubV, p.GolesL, p.GolesV 
-From	Partidos p, Clubes c
-Where	exists (select * from (
-                              select Id_Club 
-							  from clubes clb 
-							  where (clb.Nombre like 'Los Andes'
-							  )) andes
-		        where ((andes.id_club=p.Id_ClubL)and(p.Id_ClubV=c.Id_Club)) 
-				or andes.id_club=p.Id_ClubV and (p.Id_ClubL=c.Id_Club)) 
-
--- 3.2 Determinar los jugadores más viejos de cada club ordenados por Club. Proyectar: Jugador, Fecha_Nac, Club.
-
-select	j.nrodoc Nro_Documento, j.nombre Nombre_del_Jugador, j.Fecha_Nac, c.nombre Club 	
-from	jugadores j inner join clubes c on c.Id_Club=j.Id_Club
-where	EXISTS	(select * from (select min(j.Fecha_Nac) Mas_Viejos, j.Id_Club from jugadores j group by j.Id_Club) jv 
-		where (jv.Mas_Viejos=j.Fecha_Nac) and (jv.Id_Club=j.Id_Club))
-
+/**
+	3.2 Determinar los jugadores más viejos de cada club ordenados por Club. 
+	Proyectar: Jugador, Fecha_Nac, Club.
+**/
+SELECT j.nrodoc Nro_Documento, j.nombre Nombre_del_Jugador, j.Fecha_Nac, c.nombre Club 	
+FROM Jugadores j 
+INNER JOIN Clubes c on c.Id_Club = j.Id_Club
+WHERE EXISTS 
+	(
+		SELECT * FROM (
+						SELECT MIN(j.Fecha_Nac) Mas_Viejos, j.Id_Club FROM Jugadores j GROUP BY j.Id_Club
+					) jv 
+		WHERE (jv.Mas_Viejos = j.Fecha_Nac) AND (jv.Id_Club = j.Id_Club)
+	)
 -- 3.3 Determinar los clubes con menos de 40 jugadores. (por correlación y agrupamiento).
 
 select *
