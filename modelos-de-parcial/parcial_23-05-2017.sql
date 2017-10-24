@@ -60,3 +60,13 @@ FROM Clubes c, (
 										) res
 				) resultado
 WHERE resultad.Id_Club = c.Id_Club AND c.Nrozona = 1
+
+
+
+/**
+	3. Trigger
+	Crear un trigger tr###### que se accione cunado se elimina un jugador:
+	* No se elimina, sino que se asigna al club que tenga la menor cantidad de jugadores en la categoria  y pertenezca a la zona correspondiente al jugador
+	* No debe permitir la acción correspondiente al club con la menor cantidad de jugadores en la categoria de la zona respectiva
+	
+**/

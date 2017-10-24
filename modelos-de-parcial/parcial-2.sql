@@ -71,14 +71,14 @@ CREATE VIEW vw1037546_02
 		y domingo a los de la categoría 85 del año en curso.
 **/
 CREATE TRIGGER tr1037546_02
-ON Partidos p
+ON Partidos
 INSTEAD OF UPDATE
 AS
-IF UPDATE (p.FechaPartido)
+IF UPDATE (FechaPartido)
 	BEGIN
-		IF ((DATENAME(DW, p.FechaPartido) = 'Saturday' AND p.Categoria = 84) OR (DATENAME(DW, p.FechaPartido) = 'Sunday' AND p.Categoria = 85))
+		IF ((DATENAME(DW, FechaPartido) = 'Saturday' AND Categoria = 84) OR (DATENAME(DW, FechaPartido) = 'Sunday' AND Categoria = 85))
 			BEGIN
-				UPDATE Partidos SET FechaPartido = p.FechaPartido WHERE Id_Partido = p.Id_Partido
+				UPDATE Partidos SET FechaPartido = FechaPartido WHERE Id_Partido = Id_Partido
 			END
 		ELSE
 			BEGIN
