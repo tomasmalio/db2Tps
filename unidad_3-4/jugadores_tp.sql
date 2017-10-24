@@ -81,7 +81,8 @@ WHERE EXISTS (
 						SELECT g.Id_Club 
 						FROM General g 
 						WHERE g.ganados < 3
-					) tp where tp.Id_Club = j.Id_Club
+					) tp 
+				WHERE tp.Id_Club = j.Id_Club
 			)
 ORDER BY c.nombre, j.nombre 
 
