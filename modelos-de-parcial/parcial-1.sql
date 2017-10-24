@@ -46,7 +46,7 @@ AS
 BEGIN
 	DECLARE @nuevoIdClub INT
 	SET @nuevoIdClub = (SELECT MAX(c.Id_Club) FROM Clubes c) + 1
-	INSERT INTO Clubes (Id_Club, Nombre, Nrozona) VALUES (SELECT @nuevoIdClub, Nombre, Nrozona FROM Inserted)
+	INSERT INTO Clubes (Id_Club, Nombre, Nrozona) (SELECT @nuevoIdClub, Nombre, Nrozona FROM Inserted)
 END 
 GO
 
