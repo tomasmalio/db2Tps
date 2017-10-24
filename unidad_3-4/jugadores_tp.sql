@@ -270,24 +270,49 @@ GROUP BY c.Id_Club, j.categoria, c.nombre
 **/
 SELECT * 
 FROM Clubes c
-where NOT EXISTS(select * from partidos p where (p.Id_ClubV=c.Id_Club and p.golesV=p.golesL)or
-		(p.Id_ClubL=c.Id_Club and p.golesL=p.golesV))
+WHERE NOT EXISTS(
+				SELECT * 
+				FROM Partidos p 
+				WHERE (p.Id_ClubV = c.Id_Club AND p.golesV = p.golesL) 
+					OR (p.Id_ClubL = c.Id_Club AND p.golesL = p.golesV))
 
 -- 3.20 Listar todos los equipos que finalizaron ganando 2 a 0.
 
-select *
-from clubes c
-where 	(c.Id_Club=any(select p.Id_ClubL from partidos p where (p.golesL-p.golesV)=2))or
-	(c.Id_Club=any(select p.Id_ClubV from partidos p where (p.golesV-p.golesL)=2))
+SELECT *
+FROM Clubes c
+WHERE (c.Id_Club = ANY (
+						SELECT p.Id_ClubL 
+						FROM Partidos p 
+						WHERE (p.golesL - p.golesV) = 2)
+						) OR (c.Id_Club = ANY (
+												SELECT p.Id_ClubV 
+												FROM Partidos p 
+												WHERE (p.golesV-p.golesL) = 2)
+												)
 
 -- 3.21	Identificar a los equipos que participaron en el partido que hubo mayor diferencia de goles
 
-select * from clubes c
-where EXISTS
-(
-       (c.Id_Club=any(select p.Id_ClubL from partidos p where (p.golesL-p.golesV)=(select max(p1.golesL-p1.golesV)from partidos p1 )))or
-	(c.Id_Club=any(select p.Id_ClubV from partidos p where (p.golesV-p.golesL)=(select max(p1.golesL-p1.golesV)from partidos p1 )))
-)
+SELECT * 
+FROM Clubes c
+WHERE EXISTS (
+       			(c.Id_Club = ANY (
+       								SELECT p.Id_ClubL 
+       								FROM Partidos p 
+       								WHERE (p.golesL - p.golesV) = (
+       																SELECT MAX(p1.goles L - p1.golesV)
+       																FROM Partidos p1
+       															)
+       							)
+       			) OR (c.Id_Club = ANY (
+											SELECT p.Id_ClubV 
+											FROM Partidos p 
+											WHERE (p.golesV - p.golesL) = (
+																			SELECT MAX(p1.golesL - p1.golesV)
+																			FROM Partidos p1
+																		)
+									)
+					)
+			)
 
 
 
