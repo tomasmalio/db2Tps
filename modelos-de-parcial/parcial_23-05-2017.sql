@@ -25,3 +25,10 @@ GO
 
 SELECT * FROM vw1037546_23052017
 
+/**
+	2. Procedimiento
+	Crear un Procedimiento pr###### que:
+	* Reciba el valor de una categoria (84 o 85)
+	* Reciba el número de zona (1 o 2)
+	* Retorne el paramentro de output el nombre del club de la zona correspondiente que tenga la menor cantidad de jugadores en la categoria especficada
+**/
