@@ -234,23 +234,42 @@ WHERE cz1.Id_Club = ANY (
 							FROM partidos p 
 							WHERE ((golesV > 0) AND (p.nrofecha BETWEEN 1 AND 5)))
 
--- 3.17 Listar los equipos de la categoría 85 que no hayan ganado de local en la primera fecha.
+/** 
+	3.17 Listar los equipos de la categoría 85 que no hayan ganado de local en la primera fecha.
+**/
+SELECT *
+FROM Clubes c
+WHERE EXISTS ( 
+				SELECT *
+				FROM Partidos p 
+				WHERE p.nrofecha = 1 
+					AND p.categoria = 85 
+					AND (
+							(c.Id_Club = p.Id_ClubL AND golesL <= golesV)
+							OR (c.Id_Club = p.Id_ClubV and golesV <= golesL)
+						)
+			)
 
-select *
-from clubes c
-where EXISTS(select * from partidos p where p.nrofecha=1 and p.categoria=85 and ((c.Id_Club=p.Id_ClubL and golesL<=golesV)or(c.Id_Club=p.Id_ClubV and golesV<=golesL)))
+/** 
+	3.18 Cantidad de Jugadores por categoría de los equipos que no participaron en la primera fecha del campeonato.
+**/
+SELECT COUNT(*) cant_jugadores, j.categoria, c.Id_Club, c.nombre Club
+FROM Clubes c 
+INNER JOIN Jugadores j ON j.Id_Club = c.Id_Club
+WHERE NOT EXISTS (
+					SELECT *
+					FROM Partidos p 
+					WHERE (p.nrofecha = 1) AND (
+												(p.Id_ClubV=c.Id_Club) OR (p.Id_ClubL=c.Id_Club)
+												)
+				)
+GROUP BY c.Id_Club, j.categoria, c.nombre
 
--- 3.18 Cantidad de Jugadores por categoría de los equipos que no participaron en la primera fecha del campeonato.
-
-select count(*) cant_jugadores,j.categoria, c.Id_Club, c.nombre Club
-from clubes c inner join jugadores j on j.Id_Club=c.Id_Club
-where NOT EXISTS(select * from partidos p where (p.nrofecha=1)and ((p.Id_ClubV=c.Id_Club)or(p.Id_ClubL=c.Id_Club)))
-group by c.Id_Club, j.categoria, c.nombre
-
--- 3.19 Listar los equipos que no posean partidos empatados.
-
-select *
-from clubes c
+/** 
+	3.19 Listar los equipos que no posean partidos empatados.
+**/
+SELECT * 
+FROM Clubes c
 where NOT EXISTS(select * from partidos p where (p.Id_ClubV=c.Id_Club and p.golesV=p.golesL)or
 		(p.Id_ClubL=c.Id_Club and p.golesL=p.golesV))
 
