@@ -282,8 +282,9 @@ WHERE NOT EXISTS(
 				WHERE (p.Id_ClubV = c.Id_Club AND p.golesV = p.golesL) 
 					OR (p.Id_ClubL = c.Id_Club AND p.golesL = p.golesV))
 
--- 3.20 Listar todos los equipos que finalizaron ganando 2 a 0.
-
+/**
+	3.20 Listar todos los equipos que finalizaron ganando 2 a 0.
+**/
 SELECT *
 FROM Clubes c
 WHERE (c.Id_Club = ANY (
@@ -296,8 +297,9 @@ WHERE (c.Id_Club = ANY (
 												WHERE (p.golesV-p.golesL) = 2)
 												)
 
--- 3.21	Identificar a los equipos que participaron en el partido que hubo mayor diferencia de goles
-
+/**
+	3.21 Identificar a los equipos que participaron en el partido que hubo mayor diferencia de goles
+**/
 SELECT * 
 FROM Clubes c
 WHERE EXISTS (
@@ -319,7 +321,3 @@ WHERE EXISTS (
 									)
 					)
 			)
-
-
-
-

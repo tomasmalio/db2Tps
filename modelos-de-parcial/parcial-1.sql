@@ -8,7 +8,7 @@ CREATE FUNCTION fn1037546_01 (@nombreJugador varchar(30))
 RETURNS TABLE
 AS
 	RETURN (
-		SELECT substring(j.Nombre, 1, CHARINDEX(', ', j.Nombre) - 1) as nombreDelJugador, substring(j.Nombre, CHARINDEX(', ', j.Nombre)+1, len(j.Nombre)-(CHARINDEX(' ', Nombre)-1)) as apellidoDelJugador
+		SELECT substring(j.Nombre, 1, CHARINDEX(', ', j.Nombre) - 1) as apellidoDelJugador, substring(j.Nombre, CHARINDEX(', ', j.Nombre)+1, len(j.Nombre)-(CHARINDEX(' ', Nombre)-1)) as nombreDelJugador
 		FROM Jugadores j
 		WHERE j.Nombre LIKE @nombreJugador
 	)
@@ -57,6 +57,10 @@ GO
 	Definir una  vista vw###### que:
 		Proyecte el nombre de los jugadores de la categoría 84 pertenecientes a los clubes que ganaron y perdieron la misma cantidad de partidos en dicha categoría.
 		Debe ser resuelta utilizando correlación.
+
+	************************
+	IMPORTANTE: ¿Esta bien?
+	************************
 **/
 CREATE VIEW vw1037546_01
 AS
