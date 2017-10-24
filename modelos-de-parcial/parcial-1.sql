@@ -63,7 +63,16 @@ AS
 	SELECT j.Nombre
 	FROM Jugadores j
 	WHERE j.Categoria = 84 
-	AND (SELECT COUNT(*) FROM PosCate184 posG WHERE (posG.Ganados - posG.Perdidos) > 1 
-	AND posG.Id_Club = j.Id_Club) = (SELECT COUNT(*) FROM PosCate184 posP WHERE (posP.Perdidos - posP.Ganados) > 1 AND posP.Id_Club = j.Id_Club) > 1
+	AND (
+			SELECT COUNT(*) 
+			FROM PosCate184 posG 
+			WHERE (posG.Ganados - posG.Perdidos) > 1 
+				AND posG.Id_Club = j.Id_Club
+		) = (
+			SELECT COUNT(*) 
+			FROM PosCate184 posP 
+			WHERE (posP.Perdidos - posP.Ganados) > 1 
+				AND posP.Id_Club = j.Id_Club
+			)
 GO
 
