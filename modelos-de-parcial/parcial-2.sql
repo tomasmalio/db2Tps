@@ -67,24 +67,24 @@ CREATE VIEW vw1037546_02
 /**
 	4. Trigger
 	Definir un trigger tr###### que se accione cuando se actualice el campo fecha de la tabla partido.
-		Debe permitir que se actualice únicamente si corresponde a un día sábado a los partidos de la categoría 84 y domingo a los de la categoría 85 del año en curso.
+		Debe permitir que se actualice únicamente si corresponde a un día sábado a los partidos de la categoría 84 
+		y domingo a los de la categoría 85 del año en curso.
 **/
 CREATE TRIGGER tr1037546_02
-ON FechaPartido
-AFTER UPDATE
-BEGIN
-	DECLARE @fechaPartido datetime
-	IF (DATENAME(DW, @fechaPartido) == 'Saturday' OR DATENAME(DW, @fechaPartido) == 'Sunday')
-		BEGIN
-			IF (DATENAME(DW, @fechaPartido) == 'Saturday')
-				BEGIN
-
-				END
-			ELSE
-				BEGIN
-				END
-		END
-END
+ON Partidos p
+INSTEAD OF UPDATE
+AS
+IF UPDATE (p.FechaPartido)
+	BEGIN
+		IF ((DATENAME(DW, p.FechaPartido) = 'Saturday' AND p.Categoria = 84) OR (DATENAME(DW, p.FechaPartido) = 'Sunday' AND p.Categoria = 85))
+			BEGIN
+				UPDATE Partidos SET FechaPartido = p.FechaPartido WHERE Id_Partido = p.Id_Partido
+			END
+		ELSE
+			BEGIN
+				PRINT 'No se actualiza'
+			END
+	END
 GO
 /**
 	No se como seguirlo
