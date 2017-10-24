@@ -10,10 +10,11 @@ AS
 	RETURN (
 		SELECT substring(j.Nombre, 1, CHARINDEX(', ', j.Nombre) - 1) as nombreDelJugador, substring(j.Nombre, CHARINDEX(', ', j.Nombre)+1, len(j.Nombre)-(CHARINDEX(' ', Nombre)-1)) as apellidoDelJugador
 		FROM Jugadores j
-		WHERE j.Nombre = @nombreJugador
+		WHERE j.Nombre LIKE @nombreJugador
 	)
 GO
 
+SELECT * FROM fn1037546_01('Rodriguez, Ramiro')
 
 /**
 	2. Procedimiento
