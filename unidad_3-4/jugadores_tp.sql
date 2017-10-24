@@ -25,10 +25,14 @@ FROM Jugadores j
 INNER JOIN Clubes c on c.Id_Club = j.Id_Club
 WHERE EXISTS 
 	(
-		SELECT * FROM (
-						SELECT MIN(j.Fecha_Nac) Mas_Viejos, j.Id_Club FROM Jugadores j GROUP BY j.Id_Club
-					) jv 
-		WHERE (jv.Mas_Viejos = j.Fecha_Nac) AND (jv.Id_Club = j.Id_Club)
+		SELECT * 
+		FROM (
+				SELECT MIN(j.Fecha_Nac) Mas_Viejos, j.Id_Club 
+				FROM Jugadores j 
+				GROUP BY j.Id_Club
+			) jv 
+		WHERE (jv.Mas_Viejos = j.Fecha_Nac) 
+			AND (jv.Id_Club = j.Id_Club)
 	)
 
 /** 
