@@ -30,97 +30,177 @@ WHERE EXISTS
 					) jv 
 		WHERE (jv.Mas_Viejos = j.Fecha_Nac) AND (jv.Id_Club = j.Id_Club)
 	)
--- 3.3 Determinar los clubes con menos de 40 jugadores. (por correlación y agrupamiento).
 
-select *
-from clubes c
-where c.Id_club=any(select cant.Id_Club 
-			from (select count(j.Id_Club) cant, j.Id_CLub from jugadores j group by j.Id_Club)cant
-			where cant.cant<40)
+/** 
+	3.3 Determinar los clubes con menos de 40 jugadores. (por correlación y agrupamiento).
+**/
+SELECT *
+FROM clubes c
+WHERE c.Id_club = ANY (
+						SELECT cant.Id_Club 
+						FROM (
+								SELECT COUNT(j.Id_Club) cant, j.Id_CLub FROM jugadores j GROUP BY j.Id_Club
+							) cant
+						WHERE cant.cant < 40
+					)
 
----EXISTS---
+/**
+	EXISTS
+**/
+/**
+	3.4 Determinar el club donde juegue el jugador FLORES SERGIO.
 
--- 3.4 Determinar el club donde juegue el jugador FLORES SERGIO.--Asi se hace?
-select 	c.nombre Club 
-from 	clubes c
-where	EXISTS (select * from (select j.Id_Club from jugadores j where j.nombre like 'FLORES, SERGIO')fs
-	       where fs.Id_Club=c.Id_Club)
+	************************
+	IMPORTANTE: ¿Esta bien?
+	************************
+**/
+SELECT c.nombre Club 
+FROM Clubes c
+WHERE EXISTS (
+				SELECT * 
+				FROM (
+						SELECT j.Id_Club FROm jugadores j WHERE j.nombre LIKE 'FLORES, SERGIO'
+					) fs
+				WHERE fs.Id_Club = c.Id_Club
+			)
 
--- 3.5 / 3.6 Determinar los jugadores de los equipos que no hayan ganado más de 2 partidos. Proyectar Nombre del jugador y nombre del club ordenados por club y jugador.
+/**
+	3.5 / 3.6 Determinar los jugadores de los equipos que no hayan ganado más de 2 partidos. 
+	Proyectar Nombre del jugador y nombre del club ordenados por club y jugador.
+**/
+SELECT c.nombre Nombre_Club, j.nombre nombre_Jugador
+FROM Jugadores j 
+INNER JOIN Clubes c PN c.Id_Club = j.Id_Club
+WHERE EXISTS (
+				SELECT * 
+				FROM (
+						SELECT g.Id_Club 
+						FROM General g 
+						WHERE g.ganados < 3
+					) tp where tp.Id_Club = j.Id_Club
+			)
+ORDER BY c.nombre, j.nombre 
 
-select c.nombre Nombre_Club, j.nombre nombre_Jugador
-from jugadores j inner join clubes c on c.Id_Club=j.Id_Club
-where EXISTS (select * from (select g.Id_Club from general g where g.ganados<3) tp where tp.Id_Club=j.Id_Club)
-order by c.nombre,j.nombre 
+
+/**
+	ANY
+**/
+/** 
+	3.7 Listar los jugadores que no se encuentren entre los mas viejos de cada club.(no utilizar la función min()). 
+	Proyectar nombre del jugador, fecha de nacimiento con formato:dd mmm aaaa y nombre del club.
+**/
+SELECT j.nombre, datename (dd, j.Fecha_Nac) + ' ' + datename(month, j.Fecha_Nac) + ' ' + datename(year, j.Fecha_Nac), c.nombre Club
+FROM Jugadores j 
+INNER JOIN clubes c ON c.Id_Club = j.Id_Club
+WHERE j.Fecha_Nac > ANY (
+							SELECT j1.Fecha_Nac 
+							FROM Jugadores j1
+							WHERE j1.Id_Club = j.Id_Club
+						)
 
 
------ANY-----
+/** 
+	3.8 Listar los jugadores de la categoría 84 cuyo club haya marcado más de 10 goles de visitante en algún partido. 
+	Proyectar Nombre del Jugador, Categoría y Nombre del Club.
+**/
+select j84.Nombre, j84.categoria, c.nombre Club
+FROM Clubes c INNER JOIN (
+							SELECT * 
+							FROM Jugadores j 
+							WHERE j.categoria = 84
+						) j84 ON j84.Id_Club = c.ID_Club 
+WHERE c.Id_Club = ANY (
+						SELECT DISTINCT p.Id_ClubV 
+						FROM Partidos p 
+						WHERE p.GolesV > 10
+					)
+ORDER BY c.Id_Club
 
--- 3.7 Listar los jugadores que no se encuentren entre los mas viejos de cada club.(no utilizar la función min()). Proyectar nombre del jugador, fecha de nacimiento con formato:dd mmm aaaa y nombre del club.
+/**
+	ALL
+**/
 
-select j.nombre, datename (dd,j.Fecha_Nac)+ ' ' + datename(month, j.Fecha_Nac)+' '+datename(year,j.Fecha_Nac), c.nombre Club
-from	jugadores j inner join clubes c on c.Id_Club=j.Id_Club
-where  	j.Fecha_Nac >any (select j1.Fecha_Nac from jugadores j1
-	      		  where j1.Id_Club=j.Id_Club)
+/** 
+	3.9 Listar los jugadores que se encuentren entre los más jóvenes de cada club. (no utilizar max())
+**/
+SELECT j.TipoDoc, j.NroDoc, j.nombre, j.Fecha_nac, c.nombre Club
+FROM Jugadores j 
+INNER JOIN Clubes c ON c.Id_Club = j.Id_Club
+WHERE j.Fecha_Nac >= ALL (
+							SELECT j1.Fecha_Nac 
+							FROM Jugadores j1 
+							WHERE j1.Id_Club = j.Id_Club
+						)
+ORDER BY j.Id_Club
 
-
--- 3.8 Listar los jugadores de la categoría 84 cuyo club haya marcado más de 10 goles de visitante en algún partido. Proyectar Nombre del Jugador, Categoría y Nombre del Club.
-
-select 	j84.Nombre, j84.categoria, c.nombre Club
-from 	clubes c inner join (select * from jugadores j where j.categoria=84)j84 on j84.Id_Club=c.ID_Club 
-where c.Id_Club=any(select distinct p.Id_ClubV from partidos p where p.GolesV>10)
-order by c.Id_Club
-
------ALL-----
-
--- 3.9 Listar los jugadores que se encuentren entre los más jóvenes de cada club. (no utilizar max())
-
-select j.TipoDoc, j.NroDoc, j.nombre, j.Fecha_nac, c.nombre Club
-from jugadores j inner join clubes c on c.Id_Club=j.Id_Club
-where j.Fecha_Nac>=all(select j1.Fecha_Nac from jugadores j1 where j1.Id_Club=j.Id_Club)
-order by j.Id_Club
-
--- 3.10 Listar los Clubes de la categoría 85 que no hayan marcado goles en ningún partido jugando de visitante en las primeras 6 fechas.
-select *
-from clubes c 
-where 0=all	(select p.GolesV
-		from partidos p 
-		where (p.Id_ClubV=c.Id_Club)and(p.nrofecha between 1 and 6)and (p.categoria=85))
+/**
+	3.10 Listar los Clubes de la categoría 85 que no hayan marcado goles en ningún partido jugando de visitante en las primeras 6 fechas.
+**/
+SELECT *
+FROM Clubes c 
+WHERE 0 = ALL (
+				SELECT p.GolesV
+				FROM Partidos p 
+				WHERE (p.Id_ClubV = c.Id_Club) AND (p.nrofecha BETWEEN 1 AND 6) AND (p.categoria = 85)
+			)
 		
-			
--- 3.11 Listar los jugadores y el nombre del club con menor diferencia de goles.
-
-select 	j.tipodoc, j.nrodoc, j.nombre,c.nombre Club
-from	jugadores j inner join clubes c on c.Id_Club=j.Id_Club
-where 	j.Id_Club=any	(select 	g.Id_Club
-			from 	general g
-			where	g.diferencia<=ALL(select g.diferencia from general g))
-
+/**
+	3.11 Listar los jugadores y el nombre del club con menor diferencia de goles.
+**/
+SELECT j.tipodoc, j.nrodoc, j.nombre,c.nombre Club
+FROM Jugadores j 
+INNER JOIN Clubes c ON c.Id_Club=j.Id_Club
+WHERE j.Id_Club = ANY (
+						SELECT g.Id_Club
+						FROM General g
+						WHERE g.diferencia <= ALL (
+													SELECT g.diferencia FROM general g
+												)
+					)
 
 -----CUALQUIER OPERADOR-----
 
--- 3.12 Determinar el Club y la cantidad de jugadores de los clubes que ganaron más partidos que los que perdieron.
+/**
+	3.12 Determinar el Club y la cantidad de jugadores de los clubes que ganaron más partidos que los que perdieron.
+**/
+SELECT c.nombre Club, COUNT(*) cant_jug
+FROM Clubes c 
+INNER JOIN Jugadores j ON j.Id_Club = c.Id_Club
+WHERE c.Id_Club = ANY (
+						SELECT g.Id_club 
+						FROM General g 
+						WHERE g.ganados > g.perdidos
+					)
+GROUP BY c.nombre
 
-select c.nombre Club, count(*) cant_jug
-from clubes c inner join jugadores j on j.Id_Club=c.Id_Club
-where c.Id_Club=Any(select g.Id_club from general g where g.ganados>g.perdidos)
-group by c.nombre
+/**
+	3.13 Listar los 5 números de documento más altos de los jugadores de cada categoría.
+**/
+SELECT j.nrodoc, j.categoria, j.nombre
+FROM Jugadores j
+WHERE 5 > (
+			SELECT COUNT(*) 
+			FROM Jugadores j1 
+			WHERE (j1.nrodoc > j.nrodoc) AND (j.categoria = j1.categoria))
+GROUP BY j.categoria, j.nrodoc, j.nombre
+ORDER BY j.nrodoc DESC
 
--- 3.13 Listar los 5 números de documento más altos de los jugadores de cada categoría.
+/**
+	3.14 Listar el 5a y 6a número de documento más alto de los jugadores de cada club.
+	************************
+	IMPORTANTE: ¿Esta bien?
+	************************
+**/
+SELECT j.nrodoc, j.Id_Club
+FROM Jugadores j 
+WHERE 3 > (
+			SELECT COUNT(*) 
+			FROM Jugadores j1 
+			WHERE (j1.nrodoc < j.nrodoc) AND (j1.Id_Club = j.Id_Club))
+GROUP BY j.nrodoc, j.Id_Club
+ORDER BY j.Id_Club
 
-select j.nrodoc, j.categoria, j.nombre
-from jugadores j
-where 5>(select count(*) from jugadores j1 where (j1.nrodoc>j.nrodoc)and(j.categoria=j1.categoria))
-group by j.categoria, j.nrodoc, j.nombre
-order by j.nrodoc desc
-
--- 3.14 Listar el 5a y 6a número de documento más alto de los jugadores de cada club.
-
-select j.nrodoc, j.Id_Club
-from jugadores j --inner join clubes c on c.Id_Club=j.Id_Club
-where 3>(select count(*) from jugadores j1 where (j1.nrodoc<j.nrodoc) and (j1.Id_Club=j.Id_Club))
-group by j.nrodoc, j.Id_Club
-order by j.Id_Club
+--inner join clubes c on c.Id_Club=j.Id_Club
 
 -- 3.15 Listar equipo y zona de la categoría 85 que hayan empatado entre la 5o y 7o fecha.
 
