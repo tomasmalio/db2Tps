@@ -6,6 +6,31 @@ Datos del paciente.
 Identificación del médico.
 Detalle de los estudios realizados.*/
 
+DECLARE cr_ficha_pacientes CURSOR FOR
+SELECT p.dni, p.apellido, m.apellido_medico, r.fecha_estudio, e.nombre_estudio FROM Registro r
+LEFT JOIN Paciente p ON p.dni= r.dni_paciente
+LEFT JOIN Medico m ON m.matricula = r.matricula_medico
+LEFT JOIN Estudio e on e.id = r.id_estudio
+where r.fecha_estudio > DATEADD(mm,-6,GETDATE())
+
+open cr_ficha_pacientes 
+declare @DniPaciente int
+declare @ApellidoPaciente varchar(50)
+declare @Medico varchar (50)
+declare @fecha date
+declare @Estudio varchar (100)
+declare @DateText varchar (20)
+WHILE @@FETCH_STATUS = 0
+	FETCH NEXT FROM cr_ficha_pacientes
+		INTO @DniPaciente, @ApellidoPaciente, @Medico, @fecha, @Estudio, @resultado
+		BEGIN
+			SET @DateText = cast(@fecha AS varchar)
+			PRINT 'Paciente: ' + @ApellidoPaciente + '; Medico: ' + @Medico + '; fecha estudio: ' + @DateText + '; Estudio:  ' + @Estudio + ';
+		END
+
+CLOSE cr_ficha_pacientes
+DEALLOCATE cr_ficha_pacientes
+
 
 /*6.2. Definir un Cursor:
 Que liste el detalle de los planes que cubren un determinado estudio identificando el porcentaje cubierto y la obra social, según formato:
