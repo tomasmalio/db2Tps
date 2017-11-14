@@ -38,6 +38,43 @@ Estudio.
 Obra social.
 Plan y Cobertura (ordenado en forma decreciente).*/
 
+create procedure detalle_plan
+@nombreEstudio varchar(50)
+as
+begin
+	DECLARE cr_detalle_plan CURSOR SCROLL
+	FOR
+		SELECT e.nombre_estudio, os.nombre, pl.nombre_plan, pe.cobertura FROM Plan_Estudio pe
+		LEFT JOIN Estudio e ON e.id = pe.id_estudio
+		LEFT JOIN Planes pl ON pl.id = pe.id_plan
+		LEFT JOIN ObraSocial os ON os.id = pl.id_obra_social
+		ORDER BY cobertura DESC
+
+	DECLARE @nestudio VARCHAR(50), @nobraSocial sigla, @nplan VARCHAR(50), @pcubierto INT
+	OPEN cr_detalle_plan
+
+	FETCH NEXT FROM cr_detalle_plan
+		INTO @nestudio, @nobraSocial, @nplan, @pcubierto
+		IF(@nestudio = @nombreEstudio)
+		BEGIN
+			PRINT 'Estudio: ' + @nestudio + '; OS: ' + @nobrasocial + '; Plan: ' + @nplan + '; porcentaje cubierto: ' + CAST(@pcubierto AS VARCHAR)
+		END
+	WHILE @@FETCH_STATUS = 0
+	BEGIN
+		FETCH NEXT FROM cr_detalle_plan
+		INTO @nestudio, @nobraSocial, @nplan, @pcubierto
+		IF(@nestudio = @nombreEstudio)
+		BEGIN
+			PRINT 'Estudio: ' + @nestudio + '; OS: ' + @nobrasocial + '; Plan: ' + @nplan + '; Cobertura: ' + cast(@pcubierto as VARCHAR)
+		END
+	END
+	CLOSE cr_detalle_plan
+	deallocate cr_detalle_plan
+end
+
+exec detalle_plan'Cardiología'
+DEALLOCATE cr_detalle_plan
+
 
 /*6.3. Crear una StoredProcedure que defina un Cursor:
 Que liste el resumen mensual de los importes a cargo de una obra social.
