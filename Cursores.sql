@@ -40,8 +40,8 @@ Plan y Cobertura (ordenado en forma decreciente).*/
 
 create procedure detalle_plan
 @nombreEstudio varchar(50)
-as
-begin
+AS
+BEGIN
 	DECLARE cr_detalle_plan CURSOR SCROLL
 	FOR
 		SELECT e.nombre_estudio, os.nombre, pl.nombre_plan, pe.cobertura FROM Plan_Estudio pe
