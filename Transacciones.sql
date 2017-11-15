@@ -8,6 +8,28 @@ Se debe actualizar en cadena todas las tablas afectadas al proceso.
 En caso de error se anulará la transacción presentando el mensaje correspondiente y devolviendo un código de error.
 Modificar en caso de ser necesaria la definición de los atributos de las tablas que impidan la ejecución de la transacción.*/
 
+CREATE PROCEDURE trans_modificar_obrasocial
+@siglaNueva sigla, 
+@siglaAnterior sigla, 
+@nombreNuevo varchar(80),
+@error int OUTPUT
+
+AS
+BEGIN transaction
+UPDATE ObraSocial SET nombre = @nombreNuevo, @sigla = @siglaNueva WHERE sigla = @siglaAnterior
+IF (@@Error = 0)
+	BEGIN
+		SET @errorcito = @@ERROR
+		commit transaction 
+	END
+ELSE
+	BEGIN
+		SET @error = @@ERROR
+		rollback transaction
+	END
+RETURN
+
+
 
 /*7.2. Definir una transacción que elimine de la Base de Datos a un paciente.
 Se anidarán las stored procedures que se necesiten para completar la transacción, que debe incluir los siguientes procesos:
