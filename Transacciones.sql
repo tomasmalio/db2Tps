@@ -1,0 +1,36 @@
+/*7. TRANSACCIONES*/
+
+/*7.1. Definir una transacción para modificar la sigla y el nombre de una obra social que se inicie desde una stored procedure
+que recibe los parámetros de la obra social a modificarse.
+INPUT: sigla anterior, sigla nueva, nombre nuevo.
+RETURN: código de error.
+Se debe actualizar en cadena todas las tablas afectadas al proceso.
+En caso de error se anulará la transacción presentando el mensaje correspondiente y devolviendo un código de error.
+Modificar en caso de ser necesaria la definición de los atributos de las tablas que impidan la ejecución de la transacción.*/
+
+
+/*7.2. Definir una transacción que elimine de la Base de Datos a un paciente.
+Se anidarán las stored procedures que se necesiten para completar la transacción, que debe incluir los siguientes procesos:
+Eliminar triggerasociado a la tabla historias para la acción de delete, previa verificación de existencia del mismo.
+Volver a afectar dicho trigger al finalizar el proceso de eliminación.
+Crear las tablas ex_pacientes y ex_historias (si no existen) y grabar los datos intervinientes en la eliminación.
+(los datos correspondientes a la afiliación del paciente se eliminan pero no se registran). Incluir en la tabla ex_pacientes 
+la registración del usuario que invocó la transacción y la fecha.
+Se deben eliminar en cadena todas las tablas afectadas al proceso, en caso de error se anulará la transacción presentando el 
+mensaje correspondiente y devolviendo un código de error.*/
+
+
+/*7.3. Definir una transacción que elimine lógicamente de la Base de Datos a todos los médicos de una determinada especialidad.
+Se anidarán las stored procedures que se necesiten para completar la transacción, que debe tener en cuenta lo siguiente:
+La eliminación del médico debe ser lógica conforme al trigger asociado a la acción de delete. (TP5)
+No se realizará la eliminación del médico si el mismo posee otra especialidad.
+Las historias no serán eliminadas.
+Crear una tabla temporaria donde se registrarán las referencias a los médicos e historias que intervinieron en el proceso.
+Emitir un listado de los datos involucrados en el proceso (grabados en la tabla temporaria), según el siguiente formato:
+Usuario responsable
+ELIMINACION DE MEDICOS DE LA ESPECIALIDAD X
+Dr(a) Nombre Apellido
+Fecha y estudio que indicó
+Total de estudios
+En caso de error se anulará la transacción presentando el mensaje correspondiente (Un error en la emisión del listado no debe 
+anular la transacción de eliminación).*/
