@@ -97,14 +97,16 @@ BEGIN
 			BEGIN
 				commit
 			END
-			
 	
 	DECLARE cr_paciente_to_DELETE cursor scroll
 	for
-		SELECT pa.dni, pa.nombre, pa.apellido FROM Paciente as pa
-		WHERE pa.dni = @dniPac
+		SELECT pa.dni, pa.nombre, pa.apellido 
+		FROM Paciente as pa
+		WHERE pa.dni = @dni_paciente
 	
-	DECLARE @dni dni, @nombre varchar(20), @apellido varchar(20)
+	DECLARE @dni dni, 
+			@nombre varchar(20), 
+			@apellido varchar(20)
 	
 	open cr_paciente_to_DELETE
 	
@@ -112,48 +114,54 @@ BEGIN
 	into @dni, @nombre, @apellido
 	while @@fetch_status = 0
 		BEGIN
-			insert into ex_pacientes values (@dni, @nombre, @apellido, CURRENT_USER, cast(getdate() as varchar))
+			INSERT INTO ex_pacientes VALUES (@dni, @nombre, @apellido, CURRENT_USER, cast(getdate() as varchar))
 			fetch next FROM cr_paciente_to_DELETE
 			into @dni, @nombre, @apellido
 		END
 	close cr_paciente_to_DELETE
 	deallocate cr_paciente_to_DELETE
 	
-	DECLARE @idPacienteABorrar id
+	DECLARE @dni_paciente_a_borrar dni
 
-	SELECT @idPacienteABorrar = pa.idPaciente
+	SELECT @dni_paciente_a_borrar = pa.dni
 	FROM Paciente as pa
 	WHERE pa.dni = @dni
 
 	DELETE Paciente_PlanB
-	WHERE idPaciente = @idPacienteABorrar
+	WHERE dni = @dni_paciente_a_borrar
 
 	DELETE Paciente
-	WHERE idPaciente = @idPacienteABorrar
+	WHERE idPaciente = @dni_paciente_a_borrar
 	
 	DECLARE cr_historial_to_DELETE cursor scroll
 	for
-		SELECT re.fecha, re.idEstudio, re.idInstituto, re.idMedico, re.idObraSocial, re.idPaciente, re.idRegistro, re.pago, re.resultado FROM Registro as re
-		WHERE re.idPaciente = @idPacienteABorrar
+		SELECT re.fecha_estduio, re.id_estudio, re.id_instituto, re.matricula_medico, re.id_obra_social, re.dni_paciente, re.id, re.pagado 
+		FROM Registro as re
+		WHERE re.dni_aciente = @dni_paciente_a_borrar
 	
-	DECLARE @fecha date, @idEstudio id, @idInstituto id, @idMedico id, @idObraSocial id, @idPaciente id, @pago float, @resultado varchar(50), @abonado bit
+	DECLARE @fecha_estudio date, 
+			@id_estudio id, 
+			@id_instituto id, 
+			@matricula_medico id, 
+			@id_obra_social id, 
+			@dni_paciente dni, 
+			@pagado pagado
 
 	open cr_historial_to_DELETE
 	
 	fetch next FROM cr_historial_to_DELETE
-	into @fecha, @idEstudio, @idInstituto, @idMedico, @idObraSocial, @idPaciente, @pago, @resultado, @abonado
-	while(@@fetch_status = 0)
+	into @fecha_estudio, @id_estudio, @id_instituto, @matricula_medico, @id_obra_social, @dni_paciente, @pagado
 		BEGIN
-			insert into ex_registros values (@fecha, @idEstudio, @idInstituto, @idMedico, @idObraSocial, @idPaciente, @pago, @resultado, @abonado)
+			insert into ex_registros values (@fecha_estudio, @id_estudio, @id_instituto, @matricula_medico, @id_obra_social, @dni_paciente, @pagado)
 			fetch next FROM cr_historial_to_DELETE
-			into @fecha, @idEstudio, @idInstituto, @idMedico, @idObraSocial, @idPaciente, @pago, @resultado, @abonado
+			into @fecha_estudio, @id_estudio, @id_instituto, @matricula_medico, @id_obra_social, @dni_paciente, @pagado
 		END
 
 	close cr_historial_to_DELETE
 	deallocate cr_historial_to_DELETE
 	
 	DELETE Registro
-	WHERE Registro.idPaciente = @idPacienteABorrar
+	WHERE Registro.dni_paciente = @dni_paciente_a_borrar
 END
 
 
@@ -162,7 +170,7 @@ create procedure sp_eliminar_paciente
 as
 BEGIN
 	BEGIN transaction
-		ALTER TABLE registro DISABLE TRIGGER historias_pacientes
+		ALTER TABLE Registro DISABLE TRIGGER historias_pacientes
 
 		if(@@error <> 0)
 			BEGIN
@@ -182,7 +190,7 @@ BEGIN
 				END
 		
 			BEGIN transaction
-				ALTER TABLE registro ENABLE TRIGGER historias_pacientes
+				ALTER TABLE Registro ENABLE TRIGGER historias_pacientes
 			
 				if(@@error <> 0)
 					BEGIN
