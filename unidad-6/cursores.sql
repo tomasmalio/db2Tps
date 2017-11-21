@@ -15,7 +15,7 @@ FETCH NEXT FROM lista_pacientes into @dni , @nombre , @apellido ,@sexo ,@matricu
 WHILE @@FETCH_STATUS = 0
    BEGIN
 			PRINT @dni +' - '+ @nombre +' - '+ @apellido +' - '+ @sexo +' - '+ convert(varchar(50),@matricula_medico)
-	       FETCH NEXT FROM lista_pacientes 
+		   FETCH NEXT FROM lista_pacientes 
    END
 CLOSE lista_pacientes
 DEALLOCATE lista_pacientes
@@ -37,16 +37,16 @@ DEALLOCATE lista_pacientes
    FETCH NEXT FROM Cursor_planes INTO @nombre_estudio, @id_os, @id_plan, @cobertura 
    
    IF @@FETCH_STATUS <> 0 
-        PRINT 'NO TIENE planes que cubren un determinado estudio'
+		PRINT 'NO TIENE planes que cubren un determinado estudio'
    ELSE
-        PRINT '==  TIENE planes que cubren un determinado estudio =='     
+		PRINT '==  TIENE planes que cubren un determinado estudio =='     
 	
 	DECLARE @mensaje varchar(255)
    WHILE @@FETCH_STATUS = 0
    BEGIN
 	print @nombre_estudio + convert(varchar(25),@id_os) +','+  convert(varchar(25),@id_plan) +','+  convert(varchar(3),@cobertura) 
-     
-      FETCH NEXT FROM Cursor_planes INTO @nombre_estudio, @id_os, @id_plan, @cobertura 
+	 
+	  FETCH NEXT FROM Cursor_planes INTO @nombre_estudio, @id_os, @id_plan, @cobertura 
    END
 
    CLOSE Cursor_planes
@@ -79,9 +79,9 @@ where o.nombre=@nombre_obra_social and datepart(mm, r.fecha_estudio) = @mes and 
    FETCH NEXT FROM Cursor_resumen INTO @nombre_instituto, @detalle_estudio, @nombre_os, @subtotalinstituo
    
    IF @@FETCH_STATUS <> 0 
-        PRINT 'NO TIENE planes que cubren un determinado estudio'
+		PRINT 'NO TIENE planes que cubren un determinado estudio'
    ELSE
-        PRINT '==  TIENE planes que cubren un determinado estudio =='     
+		PRINT '==  TIENE planes que cubren un determinado estudio =='     
 	
 	DECLARE @mensaje varchar(255)
    WHILE @@FETCH_STATUS = 0
@@ -93,7 +93,7 @@ where o.nombre=@nombre_obra_social and datepart(mm, r.fecha_estudio) = @mes and 
 		PRINT convert(varchar(50),@subtotalinstituo)
 		
 	
-     FETCH NEXT FROM Cursor_resumen INTO @nombre_instituto, @detalle_estudio, @nombre_os, @subtotalinstituo
+	 FETCH NEXT FROM Cursor_resumen INTO @nombre_instituto, @detalle_estudio, @nombre_os, @subtotalinstituo
    END
    PRINT 'El total de la OS fue :'+convert(varchar(50),@totalOS)
    CLOSE Cursor_resumen

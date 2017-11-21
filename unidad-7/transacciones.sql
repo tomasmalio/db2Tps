@@ -2,51 +2,56 @@
 
 /* 7.1. Definir una transacción para modificar la sigla y el nombre de una obra social que se inicie desde una stored procedure
 que recibe los parámetros de la obra social a modificarse.
-INPUT: sigla anterior, sigla nueva, nombre nuevo.
-RETURN: código de error.
-Se debe actualizar en cadena todas las tablas afectadas al proceso.
-En caso de error se anulará la transacción presentando el mensaje correspondiente y devolviendo un código de error.
-Modificar en caso de ser necesaria la definición de los atributos de las tablas que impidan la ejecución de la transacción.*/
+	INPUT: sigla anterior, sigla nueva, nombre nuevo.
+	RETURN: código de error.
+	Se debe actualizar en cadena todas las tablas afectadas al proceso.
+	En caso de error se anulará la transacción presentando el mensaje correspondiente y devolviENDo un código de error.
+	Modificar en caso de ser necesaria la definición de los atributos de las tablas que impidan la ejecución de la transacción.
+*/
 
-CREATE PROCEDURE trans_obrasocial
-@siglaNueva sigla, 
-@siglaAnterior sigla, 
-@nombreNuevo varchar(80),
-@error int OUTPUT
-
+CREATE PROCEDURE [sp_ObraSocial_UpdateSiglaNombre]
+	@sigla_vieja varchar(8),
+	@sigla_nueva varchar(8),
+	@descripcion varchar (70)
 AS
-BEGIN transaction
-UPDATE ObraSocial SET nombre = @nombreNuevo, @sigla = @siglaNueva WHERE sigla = @siglaAnterior
-IF (@@Error = 0)
-	BEGIN
-		SET @errorcito = @@ERROR
-		commit transaction 
-	END
-ELSE
-	BEGIN
-		SET @error = @@ERROR
-		rollback transaction
-	END
-RETURN
+BEGIN
+	BEGIN TRANSACTION
+		DECLARE @categoria varchar(2)
+		SET @categoria = (select categoria from OOSS where sigla = @sigla_vieja)
 
+		INSERT INTO ObraSocial(sigla, nombre, categoria) VALUES (@sigla_nueva, @descripcion, @categoria)
+		IF(@@error<>0)
+			ROLLBACK TRANSACTION
 
+		--Elimino la Obra Social anterior
+		DELETE FROM ObraSocial
+			WHERE sigla = @sigla_vieja
+		IF(@@error<>0)
+			ROLLBACK TRANSACTION
 
-/*7.2. Definir una transacción que elimine de la Base de Datos a un paciente.
-Se anidarán las stored procedures que se necesiten para completar la transacción, que debe incluir los siguientes procesos:
-Eliminar triggerasociado a la tabla historias para la acción de delete, previa verificación de existencia del mismo.
-Volver a afectar dicho trigger al finalizar el proceso de eliminación.
-Crear las tablas ex_pacientes y ex_historias (si no existen) y grabar los datos intervinientes en la eliminación.
-(los datos correspondientes a la afiliación del paciente se eliminan pero no se registran). Incluir en la tabla ex_pacientes 
-la registración del usuario que invocó la transacción y la fecha.
-Se deben eliminar en cadena todas las tablas afectadas al proceso, en caso de error se anulará la transacción presentando el 
-mensaje correspondiente y devolviendo un código de error.*/
+		COMMIT TRANSACTION
+
+	RETURN @@error
+END
+
+/* 
+	7.2. Definir una transacción que elimine de la Base de Datos a un paciente.
+	Se anidarán las stored procedures que se necesiten para completar la transacción, que debe incluir los siguientes procesos:
+	Eliminar triggerasociado a la tabla historias para la acción de delete, previa verificación de existencia del mismo.
+	Volver a afectar dicho trigger al finalizar el proceso de eliminación.
+	Crear las tablas ex_pacientes y ex_historias (si no existen) y grabar los datos intervinientes en la eliminación.
+	(los datos correspondientes a la afiliación del paciente se eliminan pero no se registran). Incluir en la tabla ex_pacientes 
+	la registración del usuario que invocó la transacción y la fecha.
+	Se deben eliminar en cadena todas las tablas afectadas al proceso, en caso de error se anulará la transacción presentando el 
+	mensaje correspondiente y devolviENDo un código de error.
+*/
 
 CREATE PROCEDURE sp_paciente
-@dniPac dni
+	@dniPac dni
 AS
 BEGIN
 	BEGIN transaction
-		IF(NOT EXISTS (SELECT * FROM sys.tables as tabla
+		IF (NOT EXISTS (SELECT * FROM sys.tables as tabla
 			WHERE tabla.name = 'ex_pacientes'))
 			BEGIN
 				CREATE TABLE ex_pacientes (
@@ -85,112 +90,112 @@ BEGIN
 				)
 			END
 		IF (@@error <> 0)
-			begin
+			BEGIN
 				rollback tran
 			END
 		ELSE
-			begin
+			BEGIN
 				commit
 			END
 			
 	
-	declare cr_paciente_to_delete cursor scroll
+	DECLARE cr_paciente_to_delete cursor scroll
 	for
-		select pa.dni, pa.nombre, pa.apellido from Paciente as pa
-		where pa.dni = @dniPac
+		SELECT pa.dni, pa.nombre, pa.apellido FROM Paciente as pa
+		WHERE pa.dni = @dniPac
 	
-	declare @dni dni, @nombre varchar(20), @apellido varchar(20)
+	DECLARE @dni dni, @nombre varchar(20), @apellido varchar(20)
 	
 	open cr_paciente_to_delete
 	
-	fetch next from cr_paciente_to_delete
+	fetch next FROM cr_paciente_to_delete
 	into @dni, @nombre, @apellido
 	while @@fetch_status = 0
-		begin
+		BEGIN
 			insert into ex_pacientes values (@dni, @nombre, @apellido, CURRENT_USER, cast(getdate() as varchar))
-			fetch next from cr_paciente_to_delete
+			fetch next FROM cr_paciente_to_delete
 			into @dni, @nombre, @apellido
-		end
+		END
 	close cr_paciente_to_delete
 	deallocate cr_paciente_to_delete
 	
-	declare @idPacienteABorrar id
+	DECLARE @idPacienteABorrar id
 
-	select @idPacienteABorrar = pa.idPaciente
-	from Paciente as pa
-	where pa.dni = @dni
+	SELECT @idPacienteABorrar = pa.idPaciente
+	FROM Paciente as pa
+	WHERE pa.dni = @dni
 
 	delete Paciente_PlanB
-	where idPaciente = @idPacienteABorrar
+	WHERE idPaciente = @idPacienteABorrar
 
 	delete Paciente
-	where idPaciente = @idPacienteABorrar
+	WHERE idPaciente = @idPacienteABorrar
 	
-	declare cr_historial_to_delete cursor scroll
+	DECLARE cr_historial_to_delete cursor scroll
 	for
-		select re.fecha, re.idEstudio, re.idInstituto, re.idMedico, re.idObraSocial, re.idPaciente, re.idRegistro, re.pago, re.resultado from Registro as re
-		where re.idPaciente = @idPacienteABorrar
+		SELECT re.fecha, re.idEstudio, re.idInstituto, re.idMedico, re.idObraSocial, re.idPaciente, re.idRegistro, re.pago, re.resultado FROM Registro as re
+		WHERE re.idPaciente = @idPacienteABorrar
 	
-	declare @fecha date, @idEstudio id, @idInstituto id, @idMedico id, @idObraSocial id, @idPaciente id, @pago float, @resultado varchar(50), @abonado bit
+	DECLARE @fecha date, @idEstudio id, @idInstituto id, @idMedico id, @idObraSocial id, @idPaciente id, @pago float, @resultado varchar(50), @abonado bit
 
 	open cr_historial_to_delete
 	
-	fetch next from cr_historial_to_delete
+	fetch next FROM cr_historial_to_delete
 	into @fecha, @idEstudio, @idInstituto, @idMedico, @idObraSocial, @idPaciente, @pago, @resultado, @abonado
 	while(@@fetch_status = 0)
-		begin
+		BEGIN
 			insert into ex_registros values (@fecha, @idEstudio, @idInstituto, @idMedico, @idObraSocial, @idPaciente, @pago, @resultado, @abonado)
-			fetch next from cr_historial_to_delete
+			fetch next FROM cr_historial_to_delete
 			into @fecha, @idEstudio, @idInstituto, @idMedico, @idObraSocial, @idPaciente, @pago, @resultado, @abonado
-		end
+		END
 
 	close cr_historial_to_delete
 	deallocate cr_historial_to_delete
 	
 	delete Registro
-	where Registro.idPaciente = @idPacienteABorrar
-end
+	WHERE Registro.idPaciente = @idPacienteABorrar
+END
 
 
 create procedure sp_eliminar_paciente
 @dniPaciente dni
 as
-begin
-	begin transaction
+BEGIN
+	BEGIN transaction
 		ALTER TABLE registro DISABLE TRIGGER historias_pacientes
 
 		if(@@error <> 0)
-			begin
+			BEGIN
 				RAISERROR ('Error en deshabilitar el trigger', 16, 1)
 				ROLLBACK TRAN
 				return
-			end
+			END
 	
-		begin transaction
+		BEGIN transaction
 			exec sp_delete_paciente @dniPaciente
 		
 			if(@@error <> 0)
-				begin
+				BEGIN
 					RAISERROR ('Error en delete de paciente', 16, 1)
 					ROLLBACK TRAN
 					return
-				end
+				END
 		
-			begin transaction
+			BEGIN transaction
 				ALTER TABLE registro ENABLE TRIGGER historias_pacientes
 			
 				if(@@error <> 0)
-					begin
+					BEGIN
 						RAISERROR ('Error en activar el trigger', 16, 1)
 						ROLLBACK TRAN
 						return
-					end
+					END
 			
 	while(@@TRANCOUNT <> 0)
-		begin
+		BEGIN
 			COMMIT
-		end
-end
+		END
+END
 
 
 
