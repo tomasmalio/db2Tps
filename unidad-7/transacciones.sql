@@ -37,7 +37,7 @@ END
 /* 
 	7.2. Definir una transacción que elimine de la Base de Datos a un paciente.
 	Se anidarán las stored procedures que se necesiten para completar la transacción, que debe incluir los siguientes procesos:
-	Eliminar triggerasociado a la tabla historias para la acción de delete, previa verificación de existencia del mismo.
+	Eliminar triggerasociado a la tabla historias para la acción de DELETE, previa verificación de existencia del mismo.
 	Volver a afectar dicho trigger al finalizar el proceso de eliminación.
 	Crear las tablas ex_pacientes y ex_historias (si no existen) y grabar los datos intervinientes en la eliminación.
 	(los datos correspondientes a la afiliación del paciente se eliminan pero no se registran). Incluir en la tabla ex_pacientes 
@@ -47,7 +47,7 @@ END
 */
 
 CREATE PROCEDURE sp_paciente
-	@dniPac dni
+	@dni_paciente dni
 AS
 BEGIN
 	BEGIN transaction
@@ -84,7 +84,7 @@ BEGIN
 					ex_matricula_medico id,
 					ex_id_obra_social id,
 					ex_id_paciente id,
-					ex_pagado pagado,
+					ex_Pagado pagado,
 					exResultado varchar(50),
 					exAbonado bit
 				)
@@ -99,25 +99,25 @@ BEGIN
 			END
 			
 	
-	DECLARE cr_paciente_to_delete cursor scroll
+	DECLARE cr_paciente_to_DELETE cursor scroll
 	for
 		SELECT pa.dni, pa.nombre, pa.apellido FROM Paciente as pa
 		WHERE pa.dni = @dniPac
 	
 	DECLARE @dni dni, @nombre varchar(20), @apellido varchar(20)
 	
-	open cr_paciente_to_delete
+	open cr_paciente_to_DELETE
 	
-	fetch next FROM cr_paciente_to_delete
+	fetch next FROM cr_paciente_to_DELETE
 	into @dni, @nombre, @apellido
 	while @@fetch_status = 0
 		BEGIN
 			insert into ex_pacientes values (@dni, @nombre, @apellido, CURRENT_USER, cast(getdate() as varchar))
-			fetch next FROM cr_paciente_to_delete
+			fetch next FROM cr_paciente_to_DELETE
 			into @dni, @nombre, @apellido
 		END
-	close cr_paciente_to_delete
-	deallocate cr_paciente_to_delete
+	close cr_paciente_to_DELETE
+	deallocate cr_paciente_to_DELETE
 	
 	DECLARE @idPacienteABorrar id
 
@@ -125,34 +125,34 @@ BEGIN
 	FROM Paciente as pa
 	WHERE pa.dni = @dni
 
-	delete Paciente_PlanB
+	DELETE Paciente_PlanB
 	WHERE idPaciente = @idPacienteABorrar
 
-	delete Paciente
+	DELETE Paciente
 	WHERE idPaciente = @idPacienteABorrar
 	
-	DECLARE cr_historial_to_delete cursor scroll
+	DECLARE cr_historial_to_DELETE cursor scroll
 	for
 		SELECT re.fecha, re.idEstudio, re.idInstituto, re.idMedico, re.idObraSocial, re.idPaciente, re.idRegistro, re.pago, re.resultado FROM Registro as re
 		WHERE re.idPaciente = @idPacienteABorrar
 	
 	DECLARE @fecha date, @idEstudio id, @idInstituto id, @idMedico id, @idObraSocial id, @idPaciente id, @pago float, @resultado varchar(50), @abonado bit
 
-	open cr_historial_to_delete
+	open cr_historial_to_DELETE
 	
-	fetch next FROM cr_historial_to_delete
+	fetch next FROM cr_historial_to_DELETE
 	into @fecha, @idEstudio, @idInstituto, @idMedico, @idObraSocial, @idPaciente, @pago, @resultado, @abonado
 	while(@@fetch_status = 0)
 		BEGIN
 			insert into ex_registros values (@fecha, @idEstudio, @idInstituto, @idMedico, @idObraSocial, @idPaciente, @pago, @resultado, @abonado)
-			fetch next FROM cr_historial_to_delete
+			fetch next FROM cr_historial_to_DELETE
 			into @fecha, @idEstudio, @idInstituto, @idMedico, @idObraSocial, @idPaciente, @pago, @resultado, @abonado
 		END
 
-	close cr_historial_to_delete
-	deallocate cr_historial_to_delete
+	close cr_historial_to_DELETE
+	deallocate cr_historial_to_DELETE
 	
-	delete Registro
+	DELETE Registro
 	WHERE Registro.idPaciente = @idPacienteABorrar
 END
 
@@ -172,11 +172,11 @@ BEGIN
 			END
 	
 		BEGIN transaction
-			exec sp_delete_paciente @dniPaciente
+			exec sp_DELETE_paciente @dniPaciente
 		
 			if(@@error <> 0)
 				BEGIN
-					RAISERROR ('Error en delete de paciente', 16, 1)
+					RAISERROR ('Error en DELETE de paciente', 16, 1)
 					ROLLBACK TRAN
 					return
 				END
@@ -201,7 +201,7 @@ END
 
 /*7.3. Definir una transacción que elimine lógicamente de la Base de Datos a todos los médicos de una determinada especialidad.
 Se anidarán las stored procedures que se necesiten para completar la transacción, que debe tener en cuenta lo siguiente:
-La eliminación del médico debe ser lógica conforme al trigger asociado a la acción de delete. (TP5)
+La eliminación del médico debe ser lógica conforme al trigger asociado a la acción de DELETE. (TP5)
 No se realizará la eliminación del médico si el mismo posee otra especialidad.
 Las historias no serán eliminadas.
 Crear una tabla temporaria donde se registrarán las referencias a los médicos e historias que intervinieron en el proceso.
