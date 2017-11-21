@@ -55,9 +55,9 @@ BEGIN
 			WHERE tabla.name = 'ex_pacientes'))
 			BEGIN
 				CREATE TABLE ex_pacientes (
-					exPaciente_dni dni not null,
-					exPaciente_nombre varchar(80),
-					exPaciente_apellido varchar(80),
+					ex_Paciente_dni dni not null,
+					ex_paciente_nombre varchar(80),
+					ex_paciente_apellido varchar(80),
 					usuario varchar(80),
 					fecha date
 				)
@@ -78,13 +78,13 @@ BEGIN
 			WHERE tab.name = 'ex_registros'))
 			BEGIN
 				CREATE TABLE ex_registros (
-					exFecha date,
-					exIdEstudio id,
-					exIdInstituto id,
+					ex_fecha_estudio date,
+					ex_id_estudio id,
+					ex_id_instituto id,
 					ex_matricula_medico id,
-					exIdObraSocial id,
-					exIdPaciente id,
-					exPago float,
+					ex_id_obra_social id,
+					ex_id_paciente id,
+					ex_pagado pagado,
 					exResultado varchar(50),
 					exAbonado bit
 				)
