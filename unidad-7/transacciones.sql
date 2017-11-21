@@ -1,6 +1,6 @@
-/*7. TRANSACCIONES*/
+/* 7. TRANSACCIONES */
 
-/*7.1. Definir una transacción para modificar la sigla y el nombre de una obra social que se inicie desde una stored procedure
+/* 7.1. Definir una transacción para modificar la sigla y el nombre de una obra social que se inicie desde una stored procedure
 que recibe los parámetros de la obra social a modificarse.
 INPUT: sigla anterior, sigla nueva, nombre nuevo.
 RETURN: código de error.

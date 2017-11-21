@@ -36,31 +36,18 @@ CREATE PROCEDURE pr1037546_23052917
 	@numeroDeCategoria int,
 	@numeroDeZona int
 AS
-	SELECT MIN(res.Cantidad)
+	SELECT *
 	FROM Clubes c, (
-						SELECT COUNT(*) AS Cantidad, j.Id_Club
-						FROM Jugadores j
-						WHERE j.Categoria = 84
-						GROUP BY j.Id_Club
-					) res
-	WHERE c.Nrozona = 1 AND c.Id_Club = res.Id_Club
+					SELECT MIN(res.Cantidad), res.Id_Club
+					FROM (
+												SELECT COUNT(*) AS Cantidad, j.Id_Club
+												FROM Jugadores j
+												WHERE j.Categoria = @numeroDeCategoria
+												GROUP BY j.Id_Club
+											) res
+					) resultado
+	WHERE resultado.Id_Club = c.Id_Club AND c.Nrozona = @numeroDeZona
 GO
-
-
-
-
-SELECT *
-FROM Clubes c, (
-				SELECT MIN(res.Cantidad), res.Id_Club
-				FROM (
-											SELECT COUNT(*) AS Cantidad, j.Id_Club
-											FROM Jugadores j
-											WHERE j.Categoria = 84
-											GROUP BY j.Id_Club
-										) res
-				) resultado
-WHERE resultad.Id_Club = c.Id_Club AND c.Nrozona = 1
-
 
 
 /**
@@ -68,5 +55,5 @@ WHERE resultad.Id_Club = c.Id_Club AND c.Nrozona = 1
 	Crear un trigger tr###### que se accione cunado se elimina un jugador:
 	* No se elimina, sino que se asigna al club que tenga la menor cantidad de jugadores en la categoria  y pertenezca a la zona correspondiente al jugador
 	* No debe permitir la acción correspondiente al club con la menor cantidad de jugadores en la categoria de la zona respectiva
-	
+
 **/
