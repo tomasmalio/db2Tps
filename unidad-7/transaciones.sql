@@ -222,4 +222,79 @@ END
 	En caso de error se anulará la transacción presentando el mensaje correspondiente (Un error en la emisión del listado no debe 
 	anular la transacción de eliminación).
 */
+CREATE TRIGGER tr_eliminar_medicos 
+	ON Medico
+	INSTEAD OF DELETE
+	AS 
+		UPDATE Medico SET estado = 'inactivo'
+		WHERE matricula IN (SELECT matricula FROM deleted)
+	GO
+
+	DELETE FROM Medico
+WHERE nombre_medico = 'Juan'
+select * FROM Medico
+WHERE nombre_medico = 'Juan'
+
+update Medico set estado='activo'
+WHERE nombre_medico = 'Juan'
+
+	select * from sys.objects where name='tr_eliminar_medicos'
+
+	GO
+
+	CREATE PROCEDURE [baja_medicos] @input_especialidad smallint as
+	BEGIN
+		BEGIN TRANSACTION
+			
+			create table #TABLA_TEMP4 (matricula smallint)
+					
+			
+			if not exists(select id_medico FROM Medico m inner join medico_especialidad espe on m.matricula= espe.id_medico  where espe.id_medico in(select id_medico from Medico_Especialidad where id_especialidad=9 ) group by id_medico having count(id_medico)>1 )
+				begin 
+				insert into #TABLA_TEMP4 select id_medico FROM Medico m inner join medico_especialidad espe on m.matricula= espe.id_medico  where espe.id_medico in(select id_medico from Medico_Especialidad where id_especialidad=9 ) group by id_medico having count(id_medico)>1 
+					delete from Medico where matricula in( select matricula from #TABLA_TEMP4)
+					select * FROM #TABLA_TEMP4 
+					
+				end
+				
+--Crear una tabla temporaria donde se registrarán las referencias a los médicos e
+--historias que intervinieron en el proceso.
+	
+	
+				
+					
+
+			if (@medicos_especialidad is not null)
+				begin
+				
+				--creo unn cursor
+									
+				DECLARE @matricula smallint, @especialidad smallint
+DECLARE lista_medicos_especialidad CURSOR 
+FOR Select espe.id_medico, espe.id_especialidad 
+from Medico m inner join medico_especialidad espe on m.matricula= espe.id_medico WHERE ESPE.id_especialidad<>9
+
+OPEN lista_medicos_especialidad
+FETCH NEXT FROM lista_medicos_especialidad into @matricula, @especialidad 
+WHILE @@FETCH_STATUS = 0
+   BEGIN
+			PRINT @matricula +' - '+ @especialidad 
+					   FETCH NEXT FROM lista_medicos_especialidad 
+   END
+CLOSE lista_medicos_especialidad
+DEALLOCATE lista_medicos_especialidad
+
+				
+			--No se realizará la eliminación del médico si el mismo posee otra especialidad.
+
+
+--			Crear una tabla temporaria donde se registrarán las referencias a los médicos e
+--historias que intervinieron en el proceso.
+-- Emitir un listado de los datos involucrados 
+create table #medicos_historias (matricula smallint,historias smallint)
+INSERT INTO  #medicos_historias SELECT matricula, 
+
+
+		COMMIT TRANSACTION
+	END
 
