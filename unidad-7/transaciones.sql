@@ -230,71 +230,124 @@ CREATE TRIGGER tr_eliminar_medicos
 		WHERE matricula IN (SELECT matricula FROM deleted)
 	GO
 
-	DELETE FROM Medico
-WHERE nombre_medico = 'Juan'
-select * FROM Medico
-WHERE nombre_medico = 'Juan'
+create procedure eliminar_medico
+	@matricula smallint
+as
 
-update Medico set estado='activo'
-WHERE nombre_medico = 'Juan'
+begin
+	begin transaction
 
-	select * from sys.objects where name='tr_eliminar_medicos'
-
-	GO
-
-	CREATE PROCEDURE [baja_medicos] @input_especialidad smallint as
-	BEGIN
-		BEGIN TRANSACTION
-			
-			create table #TABLA_TEMP4 (matricula smallint)
-					
-			
-			if not exists(select id_medico FROM Medico m inner join medico_especialidad espe on m.matricula= espe.id_medico  where espe.id_medico in(select id_medico from Medico_Especialidad where id_especialidad=9 ) group by id_medico having count(id_medico)>1 )
-				begin 
-				insert into #TABLA_TEMP4 select id_medico FROM Medico m inner join medico_especialidad espe on m.matricula= espe.id_medico  where espe.id_medico in(select id_medico from Medico_Especialidad where id_especialidad=9 ) group by id_medico having count(id_medico)>1 
-					delete from Medico where matricula in( select matricula from #TABLA_TEMP4)
-					select * FROM #TABLA_TEMP4 
-					
-				end
-				
---Crear una tabla temporaria donde se registrarán las referencias a los médicos e
---historias que intervinieron en el proceso.
+	if exist(select id_medico from medico_especialidad where id_medico =@matricula group by id_medico having (count(id_medico)>1))
+		begin
+				raiserror 50001 'No se pueden eliminar medicos con mas de una especialidad'
+		end
+	else
+		begin
+				delete medico_especialidad where id_medico = @matricula;
+				delete Medico where matricula = @matricula;
+		end
 	
-	
-				
-					
 
-			if (@medicos_especialidad is not null)
-				begin
-				
-				--creo unn cursor
-									
-				DECLARE @matricula smallint, @especialidad smallint
-DECLARE lista_medicos_especialidad CURSOR 
-FOR Select espe.id_medico, espe.id_especialidad 
-from Medico m inner join medico_especialidad espe on m.matricula= espe.id_medico WHERE ESPE.id_especialidad<>9
-
-OPEN lista_medicos_especialidad
-FETCH NEXT FROM lista_medicos_especialidad into @matricula, @especialidad 
-WHILE @@FETCH_STATUS = 0
-   BEGIN
-			PRINT @matricula +' - '+ @especialidad 
-					   FETCH NEXT FROM lista_medicos_especialidad 
-   END
-CLOSE lista_medicos_especialidad
-DEALLOCATE lista_medicos_especialidad
-
-				
-			--No se realizará la eliminación del médico si el mismo posee otra especialidad.
-
-
---			Crear una tabla temporaria donde se registrarán las referencias a los médicos e
---historias que intervinieron en el proceso.
--- Emitir un listado de los datos involucrados 
-create table #medicos_historias (matricula smallint,historias smallint)
-INSERT INTO  #medicos_historias SELECT matricula, 
-
+	IF(@@error<>0)
+			ROLLBACK TRANSACTION
 
 		COMMIT TRANSACTION
+
+	RETURN @@error
+end
+
+create procedure eliminar_medico_por_especialidad 
+	@nombre_especialidad varchar(50)
+as
+BEGIN
+DECLARE @input_especialidad smallint ;
+select @input_especialidad  from Especialidad where nombre_especialidad = @nombre_especialidad;
+
+
+begin transaction  delete_medicos_por_especialidad WITH MARK = 'Elimina lógicamente de la Base de Datos a todos los médicos de una determinada especialidad.'
+
+create table #medicos_historias (usuarioResponasable varchar(50), medicosEspecialidadAELiminar varchar(50),matricula smallint, nombreYapellido varchar(255), fechaEstudio date, tipoEstudio  varchar(50), totalEstudios int)
+DECLARE @usuarioResponasable varchar(50), @medicosEspecialidadAELiminar varchar(50),@matricula smallint, @nombreYapellido varchar(255), @fechaEstudio date, @tipoEstudio varchar(50))
+
+DECLARE lista_medicos_especialidad CURSOR 
+FOR select id_medico from medico_especialidad me where me.id_especialidad=@input_especialidad
+		where  ( select count(id_especialidad) from medico m where m.id_especialidade = me.idsp group by id_especialidad) < 2
+
+
+OPEN lista_medicos_especialidad
+FETCH NEXT FROM lista_medicos_especialidad into @matricula
+
+WHILE @@FETCH_STATUS = 0
+   BEGIN
+			PRINT @matricula  
+			
+			declare @totalEstudios int = 0
+
+			begin transaction
+			DECLARE @id smallint,@id_estudio smallint,@id_instituto smallint,@id_obra_social smallint, @matricula_medico smallint,	@dni_paciente varchar(8),@fecha_estudio date,	@pagado pagado)
+			
+			declare cursor_registros cursor
+			forward_only read_only
+
+			for 
+			select id,id_estudio ,id_instituto,id_obra_social,matricula_medico,dni_paciente,fecha_estudio,pagado
+			from Registro where matricula_medico = @matricula
+
+			open cursor_registros
+			fetch next from cursor_registros
+			into @id,@id_estudio,@id_instituto,@id_obra_social, @matricula_medico,	@dni_paciente ,@fecha_estudio,	@pagado)
+			
+			if @@FETCH_STATUS <>0
+				raiserror 50001 'No hay registros de estudios realizados'
+			else
+						
+			while @@FETCH_STATUS = 0
+				begin	
+				INSERT INTO  #medicos_historias VALUES(CURRENT_USER, select nombre_especialidad from Especialidad esp inner join Medico_Especialidad me on esp.id_especialidad = me.id_especialidad where me.id_medico = @matricula ,@matricula, select nombre_medico + ' ' + apellido_medico  from Medico where matricula=@matricula, cast(@fechaEstudio as varchar), select nombre_estudio from Estudio where id=@id_estudio, @totalEstudios
+				@totalEstudios = @totalEstudios + 1;
+				fetch next from cursor_registros
+				end
+			
+			if(@@error<>0)
+				begin
+					raiserror 50001 'Error al crear el listado temporal'
+					rollback transaction
+				end
+			else
+				begin
+					commit transaction
+				end
+
+					DECLARE listado_historias_medicos CURSOR FORWARD_ONLY READ_ONLY
+					FOR SELECT usuarioResponasable, medicosEspecialidadAELiminar,matricula, nombreYapellido, fechaEstudio, tipoEstudio, totalEstudios 
+					From #medicos_historias
+
+					OPEN listado_historias_medicos
+					FETCH NEXT FROM listado_historias_medicos into @usuarioResponasable, @medicosEspecialidadAELiminar,@matricula, @nombreYapellido, @fechaEstudio, @tipoEstudio, @totalEstudios 	
+					WHILE @@FETCH_STATUS = 0
+					   BEGIN
+									Print 'Usuario responsable'+ usuarioResponasable
+									Print 'ELIMINACION DE MEDICOS DE LA ESPECIALIDAD '+ @medicosEspecialidadAELiminar
+									Print 'Dr(a) '+ @nombreYapellido
+					                Print 'Fecha y estudio que indicó'+ @fechaEstudio + ' ' + @tipoEstudio
+									Print 'Total de estudios ' @totalEstudios
+
+								FETCH NEXT FROM listado_historias_medicos 
+					   END
+
+					CLOSE listado_historias_medicos
+					DEALLOCATE listado_historias_medicos
+
+					exec eliminar_medico @matricula
+
+					IF (@@Error = 0)
+					Commit transaction
+
 	END
+
+CLOSE lista_medicos_especialidad
+DEALLOCATE lista_medicos_especialidad
+Drop table #medicos_historias
+
+END
 
