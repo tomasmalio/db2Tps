@@ -326,11 +326,11 @@ WHILE @@FETCH_STATUS = 0
 					FETCH NEXT FROM listado_historias_medicos into @usuarioResponasable, @medicosEspecialidadAELiminar,@matricula, @nombreYapellido, @fechaEstudio, @tipoEstudio, @totalEstudios 	
 					WHILE @@FETCH_STATUS = 0
 					   BEGIN
-									Print 'Usuario responsable'+ usuarioResponasable
+									Print 'Usuario responsable'+ @usuarioResponasable
 									Print 'ELIMINACION DE MEDICOS DE LA ESPECIALIDAD '+ @medicosEspecialidadAELiminar
 									Print 'Dr(a) '+ @nombreYapellido
 					                Print 'Fecha y estudio que indicó'+ @fechaEstudio + ' ' + @tipoEstudio
-									Print 'Total de estudios ' @totalEstudios
+									Print 'Total de estudios ' + @totalEstudios
 
 								FETCH NEXT FROM listado_historias_medicos 
 					   END
