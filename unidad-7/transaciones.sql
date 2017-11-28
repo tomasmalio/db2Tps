@@ -229,7 +229,7 @@ CREATE TRIGGER tr_eliminar_medicos
 		UPDATE Medico SET estado = 'inactivo'
 		WHERE matricula IN (SELECT matricula FROM deleted)
 	GO
-reate procedure imprimirlista @especialidad varchar(15) as
+create procedure imprimirlista @especialidad varchar(15) as
 begin try
     create table #medicosTemp 
     (id_medico varchar(15) not null,
