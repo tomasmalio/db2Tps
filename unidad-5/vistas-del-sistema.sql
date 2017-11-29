@@ -40,10 +40,12 @@ INNER JOIN sys.tables t ON i.object_id = t.object_id
 	5.7. Identificar los procedimientos y triggers existentes en la base.
 **/
 /**
-	5.8. Crear un procedimiento que reciba el nombre de una tabla. Proyectar las restricciones foreignkey de la tabla indicando nombre de la restricción, columnas y tipo de datos que la componen, nombre de la tabla referenciada y columna referenciada.
+	5.8. Crear un procedimiento que reciba el nombre de una tabla. 
+	Proyectar las restricciones foreignkey de la tabla indicando nombre de la restricción, columnas y tipo de datos que la componen, nombre de la tabla referenciada y columna referenciada.
 **/
 /**
-	5.9. Crear un procedimiento que reciba un tipo de dato. Indicar la cantidad de columnas de tablas con ese tipo de dato.
+	5.9. Crear un procedimiento que reciba un tipo de dato. 
+	Indicar la cantidad de columnas de tablas con ese tipo de dato.
 **/
 /**
 	5.10. Crear un procedimiento que reciba el nombre de una tabla y elimine en forma dinámica el 1° trigger encontrado vinculado a la tabla.
