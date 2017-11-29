@@ -113,6 +113,57 @@ Inst. B $ $ - $
 Total $ $ $ $
 */
 
+CREATE PROCEDURE importe_mensual_abonado
+@n int=0
+AS
+declare cursor1 cursor global scroll
+FOR 
+SELECT ie.precio, i.nombre_instituto, r.id_Estudio, h.fecha_estudio FROM Registro r 
+				INNER JOIN Instituto_Estudio ie ON r.id_estudio = ie.id_estudio AND r.id_instituto = ie.id_instituto
+				IINER JOIN Instituto i ON r.id_instituto = i.id
+WHERE r.fecha_estudio BETWEEN Getdate()-8 AND Getdate()
+ORDER BY r.id_instituto, r.fecha_estudio
+
+declare @CPrecio int, @CPrecio_acum_inst int, @CPrecio_acum_mes int, @CInstituto varchar(40), 
+	@CInstituto_old varchar(40), @CFecha smalldatetime, @CFecha_old smalldatetime,  
+	@CEstudio varchar(40), @message varchar(200)
+SET @CPrecio_acum_inst=0
+SET @CPrecio_acum_mes=0
+SET @message=''
+
+OPEN cursor1
+FETCH NEXT FROM cursor1 INTO @CPrecio, @CInstituto, @CEstudio, @CFecha
+IF @@fetch_status<>0
+	PRINT 'Sin registros de estudios realizados en los ultimos '+@n+'meses'
+ELSE 
+@CInstituto_old=@CInstituto
+@CFecha_old=@CFecha
+WHILE (@@fetch_status=0 AND @CInstituto=@CInstituto_old)
+ BEGIN
+	SET @CInstituto_old=@CInstituto
+	SET @CPrecio_Acum_inst=0
+   WHILE (@@fetch_status=0 AND @CFecha=@CFecha_old)
+   BEGIN 
+	SET @CPrecio_Acum_mes=@CPrecio_Acum_mes+@CPrecio
+	SET @CPrecio_Acum_inst=@CPrecio_Acum_inst+@CPrecio
+	FETCH NEXT FROM Cursor1 INTO @CPrecio, @CInstituto, @CEstudio, @CFecha
+   END
+	SET @message=@message+convert(varchar(10),@CPrecio_Acum_mes)
+	PRINT Space(20)+'Mes: '+Convert(varchar(10),@CFecha)
+	PRINT Space(10)+'Instituto: '+@CInstituto+space(5)+
+ END
+	PRINT 'TOTAL DE LA OBRA SOCIAL: $'+convert(varchar(20),@CPrecio_acum_obra) 
+	PRINT ''
+END
+
+CLOSE cursor1
+DEALLOCATE cursor1
+GO
+
+exec importe_mensual_abonado
+
+SELECT * FROM Registro
+
 /*
 6.5. Definir un Cursor:
 Que actualiceel campo observaciones de la tabla historias con las siguientes indicaciones:
