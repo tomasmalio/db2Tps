@@ -46,9 +46,6 @@ select * from sys.indexes i inner join sys.columns c on i.object_id=c.object_id 
 /**
 	5.6. Crear un procedimiento que reciba el nombre de una tabla y proyecte la cantidad de cada tipo de dato de su estructura.
 **/
-create procedure proyecta_cantidad_tipo_dato @nombre_tabla varchar(15) as
-select count(y.name) from sys.tables t join sys.columns c on t.object_id=c.object_id join sys.types y on y.system_type_id = c.system_type_id where t.name =@nombre_tabla
-
 /**
 	5.7. Identificar los procedimientos y triggers existentes en la base.
 **/
@@ -71,6 +68,19 @@ GO
 	5.8. Crear un procedimiento que reciba el nombre de una tabla. 
 	Proyectar las restricciones foreignkey de la tabla indicando nombre de la restricción, columnas y tipo de datos que la componen, nombre de la tabla referenciada y columna referenciada.
 **/
+CREATE PROCEDURE sp_proyectar_info_de_tabla
+	@nombre_tabla varchar(50)
+AS
+BEGIN
+	SELECT c.name, fk.constraint_column_id, ty.name
+	FROM sys.tables t
+	INNER JOIN sys.foreign_key_columns fk ON fk.parent_object_id = t.object_id
+	INNER JOIN sys.columns c ON fk.parent_object_id = c.object_id AND fk.parent_column_id = c.column_id
+	INNER JOIN sys.types ty ON ty.system_type_id = c.system_type_id
+	WHERE t.name = @nombre_tabla
+
+END
+
 /**
 	5.9. Crear un procedimiento que reciba un tipo de dato. 
 	Indicar la cantidad de columnas de tablas con ese tipo de dato.
