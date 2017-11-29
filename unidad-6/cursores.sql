@@ -265,13 +265,42 @@ cada estudio de distinta especialidad a las restantes.
 Ej.: 1º especialidad un 2%, 2º especialidad un 4%, ...
 */
 
-/*
-6.7. Definir un Cursor:
-Que elimine todas las claves foráneas de la tabla Registro (registro de los estudios realizados).
-Debe proyectar el nombre de las restricciones realizadas indicando la tabla referenciada.
-- Volver a crearlas con un proceso externo al cursor -
-*/
+CREATE PROCEDURE Actualizar_precios (@estudio VARCHAR(55), @incremento FLOAT)
+AS
+BEGIN
+	DECLARE @idEstudio AS INT
+	DECLARE @idInstituto AS INT
+	DECLARE @Precio AS FLOAT
+	DECLARE @PrecioNuevo AS FLOAT
+	DECLARE @mensaje AS VARCHAR(600)
 
+	DECLARE Estudio_x_Instituto CURSOR
+	FOR
+	SELECT ie.id_estudio, ie.id_instituto, ie.precio
+	FROM Estudio e
+	INNER JOIN Instituto_Estudio ie ON ie.id_estudio = e.id
+	WHERE e.nombre_estudio = @estudio
 
+	OPEN Estudio_x_Instituto
 
+	FETCH NEXT
+	FROM Estudio_x_Instituto
+	INTO @idEstudio, @idInstituto, @Precio
 
+	IF @@FETCH_STATUS <> 0
+	BEGIN
+		PRINT space(20) + 'NO EXISTE COBERTURA PARA EL ESTUDIO'
+	END
+	WHILE @@FETCH_STATUS = 0
+	BEGIN
+		SET @PrecioNuevo = @Precio + ((@Precio * @incremento) / 100)
+		SET @mensaje = convert(VARCHAR(20), @idEstudio) + space(20 - DATALENGTH(convert(VARCHAR(20), @idEstudio))) + @idInstituto + space(20 - DATALENGTH(@idInstituto)) + ' $ Anterior  ' + convert(VARCHAR(20), @Precio) + space(20 - DATALENGTH(convert(VARCHAR(20), @Precio))) + ' $ nuevo  ' + convert(VARCHAR(20), @PrecioNuevo) + space(20 - DATALENGTH(convert(VARCHAR(20), @PrecioNuevo)))
+		PRINT @mensaje
+		FETCH NEXT
+		FROM Estudio_x_Instituto
+		INTO @idEstudio, @idInstituto, @Precio
+	END
+	CLOSE Estudio_x_Instituto
+	DEALLOCATE Estudio_x_Instituto
+END
+GO
