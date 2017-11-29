@@ -47,6 +47,17 @@ INNER JOIN sys.tables t ON i.object_id = t.object_id
 	5.9. Crear un procedimiento que reciba un tipo de dato. 
 	Indicar la cantidad de columnas de tablas con ese tipo de dato.
 **/
+
+CREATE PROCEDURE sp_indicar_columnas_con_mismo_tipo_dato
+	@tipo_de_dato tipoDeDato
+AS
+BEGIN
+	SELECT COUNT(*) 
+	FROM sys.columns cols
+	INNER JOIN sys.types type ON type.system_type_id = cols.system_type_id
+	WHERE type.name = @tipoDeDato
+END
+
 /**
 	5.10. Crear un procedimiento que reciba el nombre de una tabla y elimine en forma dinámica el 1° trigger encontrado vinculado a la tabla.
 **/
