@@ -173,6 +173,91 @@ Diagnóstico no confirmado: si el mismo se realizó en cualquier otro instituto 
 solicitado por el tercer médico de la tabla (orden alfabético).
 */
 
+DECLARE @idinstituto integer, @matricula varchar(30), @dni integer,
+	@fecha datetime, @idestudio integer
+	
+DECLARE ctualizarobservaciones CURSOR  
+FOR
+SELECT r.dni_paciente, r.id_instituto, r.id_estudio, r.matricula_medico, r.fecha_estudio
+	FROM Registro r
+FOR UPDATE OF r.observaciones
+
+OPEN Cursor_actualizarobservaciones
+FETCH NEXT FROM Cursor_actualizarobservaciones 
+	INTO @dni, @idinstituto, @idestudio, @matricula, @fecha
+	 IF @@FETCH_STATUS <> 0 
+   BEGIN
+        PRINT space(20)+'SIN REGISTROS'
+   END
+  WHILE @@FETCH_STATUS = 0
+  BEGIN
+	FETCH NEXT FROM Cursor_actualizarobservaciones 
+	INTO @dni, @idinstituto, @idestudio, @matricula, @fecha
+  END
+
+CLOSE Cursor_actualizarobservaciones 
+DEALLOCATE Cursor_actualizarobservaciones
+GO
+
+SELECT matricula
+	FROM Medico 
+	WHERE 1 = (SELECT COUNT(*) FROM Medico m 
+		WHERE m.apellido_medico > Medico.apellido_medico)
+
+DECLARE @SegundoInstituto
+
+SELECT @SegundoInstituto = (SELECT i.id
+				FROM Registro r
+				INNER JOIN Instituto i ON ( i.id = r.id_instituto)
+				WHERE 2 = (SELECT COUNT(*) FROM Instituto
+					   WHERE i.nombre_instituto < institutos.nombre_instituto)
+				GROUP BY i.id
+				ORDER BY i.id
+			   )
+ 
+declare @currentespecialidad integer, @idestudio integer, @idespecialidad integer,
+	@porcentaje float 
+
+DECLARE actualizar_precio CURSOR  
+FOR
+SELECT ie.id_estudio, ee.id_especialidad
+	FROM Instituto_Estudio ie
+	INNER JOIN Especialidad_Estudio ee ON (ee.id_estudio = ie.idestudio)
+	ORDER BY ee.ide_especialidad
+FOR UPDATE of ie.precio
+
+OPEN Cursor_actualizarprecio
+FETCH NEXT FROM Cursor_actualizarprecio INTO @idestudio, @idespecialidad
+
+	 IF @@FETCH_STATUS <> 0 
+   BEGIN
+        PRINT space(20)+'Sin regristros de estudios'
+   END
+   ELSE
+   BEGIN
+	SET @porcentaje = 0.98
+	SET @currentespecialidad = @idespecialidad
+   END
+	 WHILE @@FETCH_STATUS = 0
+	   BEGIN
+		IF (@currentespecialidad = @idespecialidad)
+		BEGIN		
+			UPDATE Instituto_Estudio SET precio = precio + (precio * (1 - @porcentaje))
+			WHERE CURRENT OF Cursor_actualizarprecio
+		END
+		ELSE
+		BEGIN
+			SET @porcentaje = @porcentaje - 0.02
+			UPDATE Instituto_Estudio SET precio = precio + (precio * (1 - @porcentaje))
+			WHERE CURRENT OF Cursor_actualizarprecio
+		END
+		FETCH NEXT FROM Cursor_actualizarprecio INTO @idestudio, @idespecialidad
+	END
+
+CLOSE Cursor_actualizarprecio 
+DEALLOCATE Cursor_actualizarprecio
+GO
+
 /*
 6.6. Definir un Cursor:
 Que actualiceel campo precio de la tabla precios incrementando en un 2% los mismos para

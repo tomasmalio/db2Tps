@@ -101,3 +101,10 @@ END
 /**
 	5.10. Crear un procedimiento que reciba el nombre de una tabla y elimine en forma dinámica el 1° trigger encontrado vinculado a la tabla.
 **/
+create procedure elimina_dinamica_1er_trigger @nombre_tabla varchar(15) as
+
+declare @trigger_a_borrar varchar(20)
+select top 1 @trigger_a_borrar = t1.name from sys.tables t inner join sys.triggers t1 on t.object_id=t1.parent_id where t.name=@nombre_tabla
+declare @comando varchar(500);
+set @comando = concat('drop trigger'+ @trigger_a_borrar,'on database')
+exec (@comando)
