@@ -46,6 +46,9 @@ select * from sys.indexes i inner join sys.columns c on i.object_id=c.object_id 
 /**
 	5.6. Crear un procedimiento que reciba el nombre de una tabla y proyecte la cantidad de cada tipo de dato de su estructura.
 **/
+create procedure proyecta_cantidad_tipo_dato @nombre_tabla varchar(15) as
+select count(y.name) from sys.tables t join sys.columns c on t.object_id=c.object_id join sys.types y on y.system_type_id = c.system_type_id where t.name =@nombre_tabla
+
 /**
 	5.7. Identificar los procedimientos y triggers existentes en la base.
 **/
