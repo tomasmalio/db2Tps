@@ -3,15 +3,7 @@
 **/
 use master
 
-SELECT * FROM sysusers --Para SQL2000
-
-SELECT * FROM syslogins --Para SQL2000
-
-SELECT * FROM sys.database_principals 
-
-SELECT * FROM sys.server_principals
-
-SELECT * FROM sys.sql_logins
+SELECT * FROM sysusers
 
 /**
 	5.2. Listar los tipos de datos creados.
@@ -46,6 +38,16 @@ select * from sys.indexes i inner join sys.columns c on i.object_id=c.object_id 
 /**
 	5.6. Crear un procedimiento que reciba el nombre de una tabla y proyecte la cantidad de cada tipo de dato de su estructura.
 **/
+CREATE PROCEDURE sp_cantidad_cada_tipode_dato 
+	@nombreTabla varchar(50)
+AS
+	BEGIN
+	SELECT DATA_TYPE 'tipoDato',count(*)
+	FROM information_schema.columns
+	WHERE TABLE_NAME = @nombreTabla
+	GROUP BY DATA_TYPE
+END
+
 /**
 	5.7. Identificar los procedimientos y triggers existentes en la base.
 **/
