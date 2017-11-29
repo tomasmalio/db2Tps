@@ -28,10 +28,20 @@ INNER JOIN sys.tables t ON i.object_id = t.object_id
 /**
 	5.4. Proyectar las restricciones vinculadas a los índices anteriores.
 **/
-
+SELECT
+  [schema] = OBJECT_SCHEMA_NAME([object_id]),
+  [table]  = OBJECT_NAME([object_id]),
+  [index]  = name, 
+  is_unique_constraint,
+  is_unique,
+  is_primary_key
+FROM sys.indexes
 /**
 	5.5. Crear un procedimiento que reciba el nombre de un índice y proyecte las columnas con su respectivo tipo de tato que lo conforman.
 **/
+create procedure proyecta_tipo_dato @nombre_indice varchar(15) as
+select * from sys.indexes i inner join sys.columns c on i.object_id=c.object_id join sys.types y on y.system_type_id = c.system_type_id  where i.name= @nombre_indice
+
 
 /**
 	5.6. Crear un procedimiento que reciba el nombre de una tabla y proyecte la cantidad de cada tipo de dato de su estructura.
@@ -39,6 +49,21 @@ INNER JOIN sys.tables t ON i.object_id = t.object_id
 /**
 	5.7. Identificar los procedimientos y triggers existentes en la base.
 **/
+SELECT name AS procedure_name   
+    ,SCHEMA_NAME(schema_id) AS schema_name  
+    ,type_desc  
+    ,create_date  
+    ,modify_date  
+FROM sys.procedures;  
+GO  
+
+SELECT name as trigger_name
+    ,type_desc  
+    ,create_date  
+    ,modify_date  
+FROM sys.triggers;  
+GO  
+
 /**
 	5.8. Crear un procedimiento que reciba el nombre de una tabla. 
 	Proyectar las restricciones foreignkey de la tabla indicando nombre de la restricción, columnas y tipo de datos que la componen, nombre de la tabla referenciada y columna referenciada.
