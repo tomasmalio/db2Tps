@@ -18,3 +18,8 @@ SELECT * FROM sys.sql_logins
 **/
 select name from systypes;
 
+/**
+	5.3. Listar el nombre de los índices existentes en la base de datos.
+**/
+SELECT DISTINCT t.name FROM sys.indexes i 
+INNER JOIN sys.tables t ON i.object_id = t.object_id 
