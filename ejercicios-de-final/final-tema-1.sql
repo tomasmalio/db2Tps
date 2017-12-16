@@ -21,7 +21,9 @@ create table Suplentes (
 	Constraint suplentes_pk_jugadores Foreign Key (Tipodoc, Nrodoc) references jugadores(Tipodoc, Nrodoc)
 )
 
-
+/**
+ * Generar tabla dínamica
+ **/
 CREATE PROCEDURE pr_crear_tabla
 @tabla varchar(128)
 as
@@ -29,7 +31,7 @@ as
     declare @objectId int, @createTableQuery varchar(500), @primaryKeyColumns varchar(500), @lengthQuery varchar(3)
    
     -- Obtengo el object id de las tabla jugadores
-    set @objectId = (select object_id from sys.tables where name = 'jugadores')
+    set @objectId = (select object_id from sys.tables where name = 'Jugadores')
     
     -- variables para el cursor
     declare @nombre varchar(128), @tipoDato varchar(128), @maxLength varchar(4)
@@ -46,7 +48,8 @@ as
     		c.object_id = @objectId 
     		AND c.column_id IN (
     				SELECT column_id 
-    				FROM sys.index_columns WHERE object_id = @objectId
+    				FROM sys.index_columns 
+    				WHERE object_id = @objectId
     			)
     
     SET @createTableQuery = 'CREATE TABLE '+ @tabla+ ' ('
@@ -54,6 +57,7 @@ as
     
     open cursor_composicion_clave_primaria
     fetch next FROM cursor_composicion_clave_primaria into @nombre, @tipoDato, @maxLength
+    
     WHILE @@FETCH_STATUS = 0
     	BEGIN
 			SET @lengthQuery = ''
