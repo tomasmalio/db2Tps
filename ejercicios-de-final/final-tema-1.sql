@@ -21,6 +21,64 @@ create table Suplentes (
 	Constraint suplentes_pk_jugadores Foreign Key (Tipodoc, Nrodoc) references jugadores(Tipodoc, Nrodoc)
 )
 
+
+CREATE PROCEDURE pr_crear_tabla
+@tabla varchar(128)
+as
+    -- Variables de soporte
+    declare @objectId int, @createTableQuery varchar(500), @primaryKeyColumns varchar(500), @lengthQuery varchar(3)
+   
+    -- Obtengo el object id de las tabla jugadores
+    set @objectId = (select object_id from sys.tables where name = 'jugadores')
+    
+    -- variables para el cursor
+    declare @nombre varchar(128), @tipoDato varchar(128), @maxLength varchar(4)
+    
+    -- Cursor para recorrer las columnas de la clave compuesta de jugadores
+    -- Query a todas las columnas del sistema, unidas con los tipos de datos filtradas por el index para la PK de jugadores
+    -- es para conseguir el nombre y el tipo de dato y crear la PK de suplentes/titulares
+    -- resultado: 1 -> NroDoc, Integer | 2 -> Tipodoc, char
+    declare cursor_composicion_clave_primaria cursor for
+    	SELECT c.name, t.name, c.max_length 
+    	FROM sys.all_columns c
+    	INNER JOIN sys.types t ON c.system_type_id = t.system_type_id
+    	WHERE 
+    		c.object_id = @objectId 
+    		AND c.column_id IN (
+    				SELECT column_id 
+    				FROM sys.index_columns WHERE object_id = @objectId
+    			)
+    
+    SET @createTableQuery = 'CREATE TABLE '+ @tabla+ ' ('
+    SET @primaryKeyColumns = ''
+    
+    open cursor_composicion_clave_primaria
+    fetch next FROM cursor_composicion_clave_primaria into @nombre, @tipoDato, @maxLength
+    WHILE @@FETCH_STATUS = 0
+    	BEGIN
+			SET @lengthQuery = ''
+            IF (@tipoDato in('varchar', 'char'))
+            BEGIN
+				SET @lengthQuery = '('+@maxLength+')'
+            END
+            SET @createTableQuery = @createTableQuery +  @nombre + ' ' + @tipoDato + @lengthQuery + ' not null,'
+            SET @primaryKeyColumns = @primaryKeyColumns + @nombre + ','
+            fetch next FROM cursor_composicion_clave_primaria into @nombre, @tipoDato, @maxLength
+    	END
+    close cursor_composicion_clave_primaria
+    deallocate cursor_composicion_clave_primaria
+
+    -- Eliminamos la ultima coma
+    SET @primaryKeyColumns = substring(@primaryKeyColumns,1, len(@primaryKeyColumns) -1)
+	SET @createTableQuery = @createTableQuery + ' primary key (' + @primaryKeyColumns + '))'
+    PRINT @createTableQuery
+    exec (@createTableQuery)
+    RETURN 0
+GO
+
+
+
+
 /**
  * 2. Función
  *
@@ -51,10 +109,29 @@ CREATE FUNCTION fn1037546 (@id_Club smallint, @categoria tinyint, @n int)
 create function dbo.fn_jugadores (@n int, @equipo varchar(30), @categoria int)
 returns table
 as
-return (select * from jugadores j where j.id_club = (select id_club from clubes where nombre = @equipo) and  j.categoria = @categoria and
-@n > (select count(*) from jugadores j2 where j.fecha_nac > j2.fecha_nac
-and j2.id_club = (select id_club from clubes where nombre = @equipo) and j2.categoria = @categoria))
-go
+return (
+	SELECT * 
+	FROM Jugadores j 
+	WHERE 
+		j.id_club = (
+						SELECT id_club 
+						FROM Clubes 
+						WHERE nombre = @equipo
+					) 
+		AND j.categoria = @categoria 
+		AND @n > (
+					SELECT COUNT(*) 
+					FROM Jugadores j2 
+					WHERE j.fecha_nac > j2.fecha_nac 
+					AND j2.id_club = (
+										SELECT id_club 
+										FROM clubes 
+										WHERE nombre = @equipo
+									) 
+					AND j2.categoria = @categoria
+				)
+	)
+GO
 /** 
 	EOF / VER OTRA FORMA
 **/
@@ -73,7 +150,7 @@ go
 
 CREATE TRIGGER tr1037546
 ON Suplentes
-AFTER DELETE
+FOR DELETE
 AS
 	declare @id_club_ant smallint
 	declare @categoria_ant Tinyint
@@ -85,8 +162,8 @@ AS
 		BEGIN
 			SET @id_club_nuevo 		= (SELECT TOP 1 j.Id_Club FROM Deleted d INNER JOIN Jugadores j ON j.Nrodoc = d.Nrodoc)
 			SET @categoria_nuevo 	= (SELECT TOP 1 j.Categoria FROM Deleted d INNER JOIN Jugadores j ON j.Nrodoc = d.Nrodoc)
-			SET @id_club_ant 		= (SELECT TOP 2 j.Id_Club FROM Deleted d INNER JOIN Jugadores j ON j.Nrodoc = d.Nrodoc)
-			SET @categoria_ant 		= (SELECT TOP j.Categoria FROM Deleted d INNER JOIN Jugadores j ON j.Nrodoc = d.Nrodoc)
+			SET @id_club_ant 		= (SELECT TOP 2 j.Id_Club FROM Inserted i INNER JOIN Jugadores j ON j.Nrodoc = i.Nrodoc)
+			SET @categoria_ant 		= (SELECT TOP j.Categoria FROM Inserted i INNER JOIN Jugadores j ON j.Nrodoc = i.Nrodoc)
 			
 			IF ((@id_club_nuevo = @id_club_ant) AND (@categoria_nuevo = @categoria_ant))
 				BEGIN
