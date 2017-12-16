@@ -110,37 +110,33 @@ CREATE FUNCTION fn1037546 (@id_Club smallint, @categoria tinyint, @n int)
 /** 
 	VER OTRA FORMA
 **/
-create function dbo.fn_jugadores (@n int, @equipo varchar(30), @categoria int)
-returns table
-as
-return (
+CREATE FUNCTION fn1037546_2 (@id_Club smallint, @categoria tinyint, @n int)
+RETURNS table
+AS
+RETURN (
 	SELECT * 
 	FROM Jugadores j 
 	WHERE 
-		j.id_club = (
-						SELECT id_club 
-						FROM Clubes 
-						WHERE nombre = @equipo
-					) 
+		@n > (
+				SELECT COUNT(*) 
+				FROM Jugadores jj 
+				WHERE j.Fecha_Nac > jj.Fecha_Nac
+				AND jj.Id_club = (
+									SELECT id_club 
+									FROM Clubes 
+									WHERE Id_club = @id_Club
+								) 
+				AND jj.categoria = @categoria
+			)
+		AND j.Id_Club = @id_Club
 		AND j.categoria = @categoria 
-		AND @n > (
-					SELECT COUNT(*) 
-					FROM Jugadores j2 
-					WHERE j.fecha_nac > j2.fecha_nac 
-					AND j2.id_club = (
-										SELECT id_club 
-										FROM clubes 
-										WHERE nombre = @equipo
-									) 
-					AND j2.categoria = @categoria
-				)
 	)
 GO
+
+SELECT * FROM fn1037546_2 ('23', '84', '5')
 /** 
 	EOF / VER OTRA FORMA
 **/
-
-
 
 /**
  * 3. Trigger
@@ -160,7 +156,6 @@ AS
 	declare @categoria_ant Tinyint
 	declare @id_club_nuevo smallint
 	declare @categoria_nuevo Tinyint
-
 
 	IF ((SELECT COUNT(*) FROM Deleted) > 1)
 		BEGIN
@@ -183,7 +178,6 @@ AS
 			INSERT INTO Titulares (Tipodoc, Nrodoc) (SELECT Tipodoc, Nrodoc FROM Deleted)
 		END 
 GO
-
 
 /**
  * 4. Transacción
