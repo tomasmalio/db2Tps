@@ -121,11 +121,7 @@ RETURN (
 				SELECT COUNT(*) 
 				FROM Jugadores jj 
 				WHERE j.Fecha_Nac > jj.Fecha_Nac
-				AND jj.Id_club = (
-									SELECT id_club 
-									FROM Clubes 
-									WHERE Id_club = @id_Club
-								) 
+				AND jj.Id_club = @id_Club 
 				AND jj.categoria = @categoria
 			)
 		AND j.Id_Club = @id_Club
@@ -134,6 +130,12 @@ RETURN (
 GO
 
 SELECT * FROM fn1037546_2 ('23', '84', '5')
+
+
+
+
+
+
 /** 
 	EOF / VER OTRA FORMA
 **/
