@@ -10,6 +10,7 @@
 CREATE TABLE Goles (
 	Id_Partido      smallint not null,
 	NroFecha		tinyint not null,
+	Tipodoc			char(3) not null,
 	Nrodoc 			Integer not null,
 	Id_Club			smallint not null,
 	Categoria		Tinyint not null,
