@@ -154,8 +154,7 @@ AS
 		-- Recorremos cada equipo para saber si tiene 11 jugadores como titulares
 		WHILE @@FETCH_STATUS = 0
 			BEGIN 
-
-				
+				-- Obtenemos la cantidad de jugadores que tiene el equipo de esa categoria
 				SET @cant_jugadores_por_equipo_cat = (
 															SELECT COUNT(*)
 															FROM Jugadores j
