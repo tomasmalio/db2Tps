@@ -238,6 +238,8 @@ AS
 					ORDER BY len(j.Nombre) ASC
 
 				OPEN jugadores_sup_por_nombre_largo
+
+				-- Selecccionamos únicamente el primer jugador que cumpla con todas las condiciones
 				FETCH FIRST FROM jugadores_sup_por_nombre_largo
 				INTO @Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado
 
