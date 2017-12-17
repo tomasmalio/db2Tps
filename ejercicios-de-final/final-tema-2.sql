@@ -58,7 +58,7 @@ SELECT * FROM fn1037546_jovenes (23, 84, 5)
  * No utilizar cursores.
  *
  **/
-CREATE TRIGGER tr1037545_02
+CREATE TRIGGER tr1037546_02
 ON Titulares
 FOR DELETE
 AS
@@ -93,7 +93,7 @@ AS
 												)
 										);	
 
-	IF (@cant_jugadores_titulares >= 11)
+	IF (@cant_jugadores_titulares > 11)
 		BEGIN
 			-- Vamos a quitar un jugador como titular pero registrarlo como Suplente
 			-- Primero obtenemos los datos del jugador para poder insertarlo en Suplentes
@@ -106,18 +106,10 @@ AS
 	ELSE
 		BEGIN
 			-- Cancelamos la operación porque la cantidad de jugadores como tituales no es 11
+			PRINT 'Son 11 jugadores, no se puede borrar más'
 			ROLLBACK TRANSACTION
 		END
 GO
 
-
-declare @id_club_ant smallint
-declare @categoria_ant Tinyint
-declare @id_club_nuevo smallint
-declare @categoria_nuevo Tinyint
-
-
-Tipodoc	Char(3),
-Nrodoc	Integer,
 
 
