@@ -238,7 +238,7 @@ AS
 					ORDER BY len(j.Nombre) ASC
 
 				OPEN jugadores_sup_por_nombre_largo
-				FETCH ABSOLUTE 1 FROM jugadores_sup_por_nombre_largo
+				FETCH FIRST FROM jugadores_sup_por_nombre_largo
 				INTO @Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado
 
 				-- Insertamos en Titulares el jugador con el nombre más largo
