@@ -106,7 +106,7 @@ AS
 	ELSE
 		BEGIN
 			-- Cancelamos la operación porque la cantidad de jugadores como tituales no es 11
-			PRINT 'Son 11 jugadores, no se puede borrar más'
+			PRINT '¡ATENCIÓN! Son 11 jugadores, no se puede borrar más por condición'
 			ROLLBACK TRANSACTION
 		END
 GO
