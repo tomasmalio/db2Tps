@@ -7,81 +7,19 @@
  * que correspondan, indicando estructura y comportamiento.
  *
  **/
-create table Titulares (
+CREATE TABLE Titulares (
 	Tipodoc Char(3),
 	Nrodoc Integer,
 	Primary Key (Tipodoc, Nrodoc),
-	Constraint titulares_pk_jugadores Foreign Key (Tipodoc, Nrodoc) references jugadores(Tipodoc, Nrodoc)
+	Constraint titulares_pk_jugadores Foreign Key (Tipodoc, Nrodoc) references Jugadores(Tipodoc, Nrodoc)
 )
 
-create table Suplentes (
+CREATE TABLE Suplentes (
 	Tipodoc Char(3),
 	Nrodoc Integer,
 	Primary Key (Tipodoc, Nrodoc),
-	Constraint suplentes_pk_jugadores Foreign Key (Tipodoc, Nrodoc) references jugadores(Tipodoc, Nrodoc)
+	Constraint suplentes_pk_jugadores Foreign Key (Tipodoc, Nrodoc) references Jugadores(Tipodoc, Nrodoc)
 )
-
-/**
- * Generar tabla dínamica
- **/
-CREATE PROCEDURE pr_crear_tabla
-@tabla varchar(128)
-as
-    -- Variables de soporte
-    declare @objectId int, @createTableQuery varchar(500), @primaryKeyColumns varchar(500), @lengthQuery varchar(3)
-   
-    -- Obtengo el object id de las tabla jugadores
-    set @objectId = (select object_id from sys.tables where name = 'Jugadores')
-    
-    -- variables para el cursor
-    declare @nombre varchar(128), @tipoDato varchar(128), @maxLength varchar(4)
-    
-    -- Cursor para recorrer las columnas de la clave compuesta de jugadores
-    -- Query a todas las columnas del sistema, unidas con los tipos de datos filtradas por el index para la PK de jugadores
-    -- es para conseguir el nombre y el tipo de dato y crear la PK de suplentes/titulares
-    -- resultado: 1 -> NroDoc, Integer | 2 -> Tipodoc, char
-    declare cursor_composicion_clave_primaria cursor for
-    	SELECT c.name, t.name, c.max_length 
-    	FROM sys.all_columns c
-    	INNER JOIN sys.types t ON c.system_type_id = t.system_type_id
-    	WHERE 
-    		c.object_id = @objectId 
-    		AND c.column_id IN (
-    				SELECT column_id 
-    				FROM sys.index_columns 
-    				WHERE object_id = @objectId
-    			)
-    
-    SET @createTableQuery = 'CREATE TABLE '+ @tabla+ ' ('
-    SET @primaryKeyColumns = ''
-    
-    open cursor_composicion_clave_primaria
-    fetch next FROM cursor_composicion_clave_primaria into @nombre, @tipoDato, @maxLength
-    
-    WHILE @@FETCH_STATUS = 0
-    	BEGIN
-			SET @lengthQuery = ''
-            IF (@tipoDato in('varchar', 'char'))
-            BEGIN
-				SET @lengthQuery = '('+@maxLength+')'
-            END
-            SET @createTableQuery = @createTableQuery +  @nombre + ' ' + @tipoDato + @lengthQuery + ' not null,'
-            SET @primaryKeyColumns = @primaryKeyColumns + @nombre + ','
-            fetch next FROM cursor_composicion_clave_primaria into @nombre, @tipoDato, @maxLength
-    	END
-    close cursor_composicion_clave_primaria
-    deallocate cursor_composicion_clave_primaria
-
-    -- Eliminamos la ultima coma
-    SET @primaryKeyColumns = substring(@primaryKeyColumns,1, len(@primaryKeyColumns) -1)
-	SET @createTableQuery = @createTableQuery + ' primary key (' + @primaryKeyColumns + '))'
-    PRINT @createTableQuery
-    exec (@createTableQuery)
-    RETURN 0
-GO
-
-
-
 
 /**
  * 2. Función
@@ -91,25 +29,6 @@ GO
  *		+ Devolver los n jugadores más viejos de ese club en esa categoria
  *		+ La resolución debe efectuarse en una consulta correlacionada. Sin utilizar la cláusula top.
  **/
-CREATE FUNCTION fn1037546 (@id_Club smallint, @categoria tinyint, @n int)
-	RETURNS TABLE
-	AS
-	RETURN (
-		SELECT *
-		FROM Jugadores jj
-		WHERE jj.Nrodoc IN (
-							SELECT j.Nrodoc
-							FROM Jugadores j 
-							WHERE j.id_Club = @id_Club AND j.Categoria = @categoria 
-							ORDER BY j.Fecha_Nac ASC
-							OFFSET 0 ROWS
-							FETCH NEXT @n ROWS ONLY 
-						)
-	)
-
-/** 
-	VER OTRA FORMA
-**/
 CREATE FUNCTION fn1037546_2 (@id_Club smallint, @categoria tinyint, @n int)
 RETURNS table
 AS
@@ -131,14 +50,25 @@ GO
 
 SELECT * FROM fn1037546_2 ('23', '84', '5')
 
+CREATE FUNCTION fn1037546 (@id_Club smallint, @categoria tinyint, @n int)
+	RETURNS TABLE
+	AS
+	RETURN (
+		SELECT *
+		FROM Jugadores jj
+		WHERE jj.Nrodoc IN (
+							SELECT j.Nrodoc
+							FROM Jugadores j 
+							WHERE j.id_Club = @id_Club AND j.Categoria = @categoria 
+							ORDER BY j.Fecha_Nac ASC
+							OFFSET 0 ROWS
+							FETCH NEXT @n ROWS ONLY 
+						)
+	)
+GO
 
+SELECT * FROM fn1037546 ('23', '84', '5')
 
-
-
-
-/** 
-	EOF / VER OTRA FORMA
-**/
 
 /**
  * 3. Trigger
