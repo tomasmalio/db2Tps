@@ -154,7 +154,8 @@ AS
 		-- Recorremos cada equipo para saber si tiene 11 jugadores como titulares
 		WHILE @@FETCH_STATUS = 0
 			BEGIN 
-				SET @cantidad_jugadores_ingresados = 1
+
+				
 				SET @cant_jugadores_por_equipo_cat = (
 															SELECT COUNT(*)
 															FROM Jugadores j
@@ -176,6 +177,9 @@ AS
 				
 				-- Recorremos el cursor generado anteriormente con el objetivo de poner
 				-- 11 jugadores en titulares y el resto en suplentes
+
+				-- Generamos una variblae para recorrer 
+				SET @cantidad_jugadores_ingresados = 1
 				WHILE @@FETCH_STATUS = 0
 					BEGIN
 
