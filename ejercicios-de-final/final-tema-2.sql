@@ -128,21 +128,21 @@ GO
  **/
 CREATE PROCEDURE st1037546_02 
 AS
-	BEGIN TRANSACTION st_01
+	DECLARE @Id_Club_buscado 				int
+	DECLARE @Categoria_buscado 				tinyint
+	DECLARE @cant_jugadores_por_equipo_cat 	int
+	DECLARE @Tipodoc_jugador_buscado 		Char(3)
+	DECLARE @Nrodoc_jugador_buscado 		int
 
+	BEGIN TRANSACTION st_01
+	
 		-- Establecer en cada categoría de cada club hasta un máximo de 11 jugadores como titulares, 
 		-- los restantes como suplentes (se debe invocar la función del punto 2)
-		DECLARE @Id_Club_buscado 				int
-		DECLARE @Categoria_buscado 				int
-		DECLARE @cant_jugadores_por_equipo_cat 	int
-		DECLARE @Tipodoc_jugador_buscado 		Char(3)
-		DECLARE @Nrodoc_jugador_buscado 		int
-
 		DECLARE listado_de_equipos CURSOR FOR
 			SELECT j.Id_Club, j.Categoria 
 			FROM Jugadores j 
-			GROUP BY j.Id_Club 
-			ORDER BY j.Id_Club ASC
+			GROUP BY j.Id_Club, j.Categoria  
+			ORDER BY j.Id_Club, j.Categoria ASC
 
 		OPEN listado_de_equipos
 
@@ -168,7 +168,7 @@ AS
 						-- utilizando la función del punto 2 (fn1037546_jovenes)
 						DECLARE jugadores_a_suplentes CURSOR FOR
 							SELECT * 
-							FROM fn1037546_jovenes (@Id_Club, @categoria tinyint, @cant_jugadores_por_equipo_cat - 11)
+							FROM fn1037546_jovenes (@Id_Club_buscado, @Categoria_buscado, @cant_jugadores_por_equipo_cat - 11)
 
 						OPEN jugadores_a_suplentes
 
@@ -207,17 +207,11 @@ AS
 	-- y categoría) que posea el nombre más largo en cantidad de caracteres.
 	BEGIN TRANSACTION st_02
 
-		DECLARE @Id_Club_buscado 				int
-		DECLARE @Categoria_buscado 				int
-		DECLARE @cant_jugadores_por_equipo_cat 	int
-		DECLARE @Tipodoc_jugador_buscado 		Char(3)
-		DECLARE @Nrodoc_jugador_buscado 		int
-
 		DECLARE listado_de_equipos CURSOR FOR
 			SELECT j.Id_Club, j.Categoria 
 			FROM Jugadores j 
-			GROUP BY j.Id_Club 
-			ORDER BY j.Id_Club ASC
+			GROUP BY j.Id_Club , j.Categoria 
+			ORDER BY j.Id_Club, j.Categoria ASC
 
 		OPEN listado_de_equipos
 
@@ -252,7 +246,7 @@ AS
 				INSERT INTO Titulares (Tipodoc, Nrodoc) VALUES (@Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado)
 
 				-- Borramos de Suplentes el jugador con el nombre más largo
-				DELETE Suplentes s WHERE s.Tipodoc = @Tipodoc_jugador_buscado AND s.Nrodoc = @Nrodoc_jugador_buscado
+				DELETE Suplentes WHERE Tipodoc = @Tipodoc_jugador_buscado AND Nrodoc = @Nrodoc_jugador_buscado
 
 				FETCH NEXT FROM listado_de_equipos
 			END
