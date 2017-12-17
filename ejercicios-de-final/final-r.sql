@@ -22,7 +22,6 @@ CREATE TABLE Goles (
 GO
 
 
-
 /**
  * 
  * 2) Implementar una única transacción que defina y organice las siguientes unidades de un proceso:
