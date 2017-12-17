@@ -181,15 +181,18 @@ AS
 				-- 11 jugadores en titulares y el resto en suplentes
 				WHILE @@FETCH_STATUS = 0
 					BEGIN
-
+						-- Como todavía no se ingresaron más de 11 jugadores es titular
 						IF (@cantidad_jugadores_ingresados < 12)
 							BEGIN
 								INSERT INTO Titulares (Tipodoc, Nrodoc) VALUES (@Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado)
 							END
+						-- Cuando superan los 11 jugadores titulares se los ingresa en Suplentes
 						ELSE 
 							BEGIN
 								INSERT INTO Suplentes (Tipodoc, Nrodoc) VALUES (@Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado)
 							END
+
+						-- Incrementamos una variable para saber cuantos jugadores se ingresaron
 						SET @cantidad_jugadores_ingresados = @cantidad_jugadores_ingresados + 1
 
 						FETCH NEXT FROM jugadores_a_titular_suplentes
