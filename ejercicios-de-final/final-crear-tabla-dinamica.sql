@@ -79,7 +79,7 @@ as
 	RETURN 0
 GO
 
-EXEC sr1037546 'Titulares'
+EXEC sr1037546 'Titulares';
 GO
-EXEC sr1037546 'Suplentes'
+EXEC sr1037546 'Suplentes';
 GO
