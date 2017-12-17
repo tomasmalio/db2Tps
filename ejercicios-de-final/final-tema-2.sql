@@ -62,11 +62,11 @@ CREATE TRIGGER tr1037546_02
 ON Titulares
 FOR DELETE
 AS
-	declare @id_club_eliminar smallint
-	declare @categoria_eliminar Tinyint
-	declare @cant_jugadores_titulares Integer
-	declare @tipodoc_eliminar Char(3)
-	declare @nrodoc_eliminar Integer
+	declare @id_club_eliminar 			smallint
+	declare @categoria_eliminar 		Tinyint
+	declare @cant_jugadores_titulares 	int
+	declare @tipodoc_eliminar 			Char(3)
+	declare @nrodoc_eliminar 			int
 
 	-- Obtenemos los datos del jugador (id_club y categoria) que se está eliminado
 	SET @id_club_eliminar 			= (
