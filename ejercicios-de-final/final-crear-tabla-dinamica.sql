@@ -23,7 +23,7 @@
  * La creación de ambas tablas debe ser invocando el procedimiento anterior. 
  *
  **/
-CREATE PROCEDURE pr_crear_tabla
+CREATE PROCEDURE sr1037546
 @tabla varchar(128)
 as
 	-- Variables de soporte
@@ -77,4 +77,9 @@ as
 	PRINT @createTableQuery
 	exec (@createTableQuery)
 	RETURN 0
+GO
+
+EXEC sr1037546 ('Titulares')
+GO
+EXEC sr1037546 ('Suplentes')
 GO
