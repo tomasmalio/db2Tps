@@ -73,7 +73,7 @@ SELECT * FROM fn1037546 ('23', '84', '5')
 /**
  * 3. Trigger
  *
- * Definir una trigger fn###### que se accione al eliminar suplentes, debiendo controlar:
+ * Definir una trigger tr###### que se accione al eliminar suplentes, debiendo controlar:
  * 		+ Si se quita un jugador como suplente, el mismo debe registrarse como titular.
  *		+ No permitir eliminar jugadores de distinto club y categoría en la misma eliminación.
  * No utilizar cursores.
@@ -127,6 +127,7 @@ GO
 
  **/
 CREATE PROCEDURE st1037546 
+AS
 
 
 
