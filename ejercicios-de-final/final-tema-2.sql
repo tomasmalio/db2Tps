@@ -196,6 +196,10 @@ AS
 		CLOSE listado_de_equipos
 		DEALLOCATE listado_de_equipos
 
+
+		-- Establecemos un punto de grabación
+		SAVE TRANSACTION punto_de_grabacion
+
 	COMMIT TRANSACTION st_01
 	-- Eof primera transacción
 
@@ -276,6 +280,12 @@ AS
 
 	COMMIT TRANSACTION st_03
 	-- Eof tercera transacción
+
+	BEGIN TRANSACTION st_04
+		-- Deshacemos la transacción hasta el punto de grabación 
+		ROLLBACK TRANSACTION punto_de_grabacion
+
+	COMMIT TRANSACTION st04
 GO
 
 
