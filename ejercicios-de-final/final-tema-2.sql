@@ -197,6 +197,7 @@ AS
 		DEALLOCATE listado_de_equipos
 
 	COMMIT TRANSACTION st_01
+	-- Eof primera transacción
 
 	-- Incorporar como titular para cada categoría de cada club al jugador suplente (de ese club
 	-- y categoría) que posea el nombre más largo en cantidad de caracteres.
@@ -274,6 +275,7 @@ AS
 						)
 
 	COMMIT TRANSACTION st_03
+	-- Eof tercera transacción
 GO
 
 
