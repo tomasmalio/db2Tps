@@ -133,6 +133,7 @@ AS
 	DECLARE @cant_jugadores_por_equipo_cat 	int
 	DECLARE @Tipodoc_jugador_buscado 		Char(3)
 	DECLARE @Nrodoc_jugador_buscado 		int
+	DECLARE @cantidad_jugadores_ingresados	int
 
 	BEGIN TRANSACTION st_01
 	
@@ -149,53 +150,57 @@ AS
 		FETCH NEXT FROM listado_de_equipos
 		INTO @Id_Club_buscado, @Categoria_buscado
 
+
 		-- Recorremos cada equipo para saber si tiene 11 jugadores como titulares
 		WHILE @@FETCH_STATUS = 0
 			BEGIN 
+				SET @cantidad_jugadores_ingresados = 1
 				SET @cant_jugadores_por_equipo_cat = (
 															SELECT COUNT(*)
 															FROM Jugadores j
-															LEFT JOIN Titulares t ON t.Nrodoc = j.Nrodoc
 															WHERE 
 																j.Id_Club = @Id_Club_buscado
 																AND j.Categoria = @Categoria_buscado
 														)
-				-- Si la cantidad de jugadores que hay por equipo es mayor a 11
-				-- debemos pasar el resto de los jugadores titulares a suplentes
-				IF (@cant_jugadores_por_equipo_cat > 11)
+
+				-- Buscamos todos los jugadores que tiene el equipo de esa categoria
+				-- utilizando la función del punto 2 (fn1037546_jovenes)
+				DECLARE jugadores_a_titular_suplentes CURSOR FOR
+					SELECT * 
+					FROM fn1037546_jovenes (@Id_Club_buscado, @Categoria_buscado, @cant_jugadores_por_equipo_cat)
+
+				OPEN jugadores_a_titular_suplentes
+
+				FETCH NEXT FROM jugadores_a_titular_suplentes
+				INTO @Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado
+				
+				-- Recorremos el cursor generado anteriormente con el objetivo de poner
+				-- 11 jugadores en titulares y el resto en suplentes
+				WHILE @@FETCH_STATUS = 0
 					BEGIN
-						-- Buscamos el resto de los jugadores para pasarlos a Suplentes
-						-- utilizando la función del punto 2 (fn1037546_jovenes)
-						DECLARE jugadores_a_suplentes CURSOR FOR
-							SELECT * 
-							FROM fn1037546_jovenes (@Id_Club_buscado, @Categoria_buscado, @cant_jugadores_por_equipo_cat - 11)
 
-						OPEN jugadores_a_suplentes
-
-						FETCH NEXT FROM jugadores_a_suplentes
-						INTO @Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado
-
-						WHILE @@FETCH_STATUS = 0
+						IF (@cantidad_jugadores_ingresados < 12)
 							BEGIN
-								-- Borramos de Tiulares y gracias al trigger del ejercicio 3 (tr1037546_02)
-								-- me pasa el titular a Suplente automáticamente
-								DELETE FROM Titulares 
-								WHERE Tipodoc = @Tipodoc_jugador_buscado AND Nrodoc = @Nrodoc_jugador_buscado
-
-								FETCH NEXT FROM jugadores_a_suplentes
+								INSERT INTO Titulares (Tipodoc, Nrodoc) VALUES (@Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado)
 							END
+						ELSE 
+							BEGIN
+								INSERT INTO Suplentes (Tipodoc, Nrodoc) VALUES (@Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado)
+							END
+						SET @cantidad_jugadores_ingresados = @cantidad_jugadores_ingresados + 1
 
-						CLOSE jugadores_a_suplentes
-						DEALLOCATE jugadores_a_suplentes
-
+						FETCH NEXT FROM jugadores_a_titular_suplentes
 					END
+
+				CLOSE jugadores_a_titular_suplentes
+				DEALLOCATE jugadores_a_titular_suplentes
+
 				
 				FETCH NEXT FROM listado_de_equipos
 			END  
 
 		CLOSE listado_de_equipos
 		DEALLOCATE listado_de_equipos
-
 
 		-- Establecemos un punto de grabación
 		SAVE TRANSACTION punto_de_grabacion
