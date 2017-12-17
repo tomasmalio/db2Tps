@@ -51,6 +51,27 @@ GO
  * e. Deshacer los puntos c y d, de la transacción, y finalizarla.
  *
  **/
+CREATE FUNCTION fn_1037546_jugador (@Id_Club smallint, @Categoria tinyint)
+RETURN int
+AS
+	RETURN (
+			SELECT j.Nrodoc
+			FROM Jugadores j
+			WHERE 
+				j.Id_Club = @Id_Club
+				AND j.Categoria = @Categoria
+				AND j.Nrodoc = (SELECT g.Nrodoc FROM Goles g GROUP BY g.Nrodoc HAVING SUM(g.CantidadGoles) as cant ORDER BY cant DESC)
+			
+		)
+GO
+
+CREATE PROCEDURE st1037546_r
+AS
+	BEGIN TRANSACTION asigGoles
+		
+	COMMIT TRANSACTION asigGoles
+
+GO
 
 /**
  *
@@ -60,3 +81,12 @@ GO
  * b. Resolver sin utilizar cursores.
  *
  **/
+CREATE TRIGGER tr1037546_r
+ON Goles
+AFTER Delete
+AS
+	DECLARE @Id_Partido smallint
+	DECLARE @NroFecha tinyint
+	DECLARE @Id_Club smallint
+	DECLARE @Categoria Tinyint
+GO

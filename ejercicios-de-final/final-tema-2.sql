@@ -166,7 +166,7 @@ AS
 				-- Buscamos todos los jugadores que tiene el equipo de esa categoria
 				-- utilizando la función del punto 2 (fn1037546_jovenes)
 				DECLARE jugadores_a_titular_suplentes CURSOR FOR
-					SELECT * 
+					SELECT Tipodoc, Nrodoc 
 					FROM fn1037546_jovenes (@Id_Club_buscado, @Categoria_buscado, @cant_jugadores_por_equipo_cat)
 
 				OPEN jugadores_a_titular_suplentes
@@ -258,6 +258,9 @@ AS
 
 				-- Borramos de Suplentes el jugador con el nombre más largo
 				DELETE Suplentes WHERE Tipodoc = @Tipodoc_jugador_buscado AND Nrodoc = @Nrodoc_jugador_buscado
+
+				CLOSE jugadores_sup_por_nombre_largo
+				DEALLOCATE jugadores_sup_por_nombre_largo
 
 				FETCH NEXT FROM listado_de_equipos
 			END
