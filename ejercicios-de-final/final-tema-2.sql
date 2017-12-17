@@ -198,8 +198,63 @@ AS
 
 	COMMIT TRANSACTION st_01
 
+	-- Incorporar como titular para cada categoría de cada club al jugador suplente (de ese club
+	-- y categoría) que posea el nombre más largo en cantidad de caracteres.
 	BEGIN TRANSACTION st_02
+
+		DECLARE @Id_Club_buscado 				int
+		DECLARE @Categoria_buscado 				int
+		DECLARE @cant_jugadores_por_equipo_cat 	int
+		DECLARE @Tipodoc_jugador_buscado 		Char(3)
+		DECLARE @Nrodoc_jugador_buscado 		int
+
+		DECLARE listado_de_equipos CURSOR FOR
+			SELECT j.Id_Club, j.Categoria 
+			FROM Jugadores j 
+			GROUP BY j.Id_Club 
+			ORDER BY j.Id_Club ASC
+
+		OPEN listado_de_equipos
+
+		FETCH NEXT FROM listado_de_equipos
+		INTO @Id_Club_buscado, @Categoria_buscado
+
+		-- Recorremos cada equipo para buscar el que tiene más nombre del equipo Suplente
+		-- para pasarlo al equipo Titular
+		WHILE @@FETCH_STATUS = 0
+			BEGIN 
+				-- Generamos un cursor con el listado de jugadores ordenados por nombre
+				-- más largo de un Club y Categoria (id_club / categoria) que sea Suplente
+				DECLARE jugadores_sup_por_nombre_largo CURSOR FOR
+					SELECT j.Tipodoc, j.Nrodoc
+					FROM Jugadores j
+					WHERE 
+						j.Id_Club = @Id_Club_buscado
+						AND j.Categoria = @Categoria_buscado
+						AND j.Nrodoc IN (
+											SELECT s.Nrodoc 
+											FROM Suplentes s
+										)
+					ORDER BY len(j.Nombre) ASC
+
+				OPEN jugadores_sup_por_nombre_largo
+				FETCH ABSOLUTE 1 FROM jugadores_sup_por_nombre_largo
+				INTO @Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado
+
+				-- Insertamos en Titulares el jugador con el nombre más largo
+				INSERT INTO Titulares (Tipodoc, Nrodoc) VALUES (@Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado)
+
+				-- Borramos de Suplentes el jugador con el nombre más largo
+				DELETE Suplentes s WHERE s.Tipodoc = @Tipodoc_jugador_buscado AND s.Nrodoc = @Nrodoc_jugador_buscado
+
+				FETCH NEXT FROM listado_de_equipos
+			END
+
+		CLOSE listado_de_equipos
+		DEALLOCATE listado_de_equipos
+
 	COMMIT TRANSACTION st_02
+	-- Eof segunda transacción
 
 	-- Proyectar todos los jugadores suplentes
 	BEGIN TRANSACTION st_03
