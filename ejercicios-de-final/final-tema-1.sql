@@ -118,11 +118,11 @@ GO
  * conformando una única transacción.
  *		+ Establecer en cada categoría de cada club hasta un máximo de 11 jugadores como titulares,
  *		los restantes como suplentes (se debe invocar la función del punto 2).
- *		+ Incorporar como suplente para cada categoría de cada club aljugador titular (de ese club
+ *		+ Incorporar como suplente para cada categoría de cada club al jugador titular (de ese club
  *		y categoría) que posea el nombre más corto en cantidad de caracteres.
  *		+ Proyectar todos los jugadores suplentes
  *		+ Deshacer la última actualización
- *		+ Finalizar la transacción.
+ * Finalizar la transacción.
  * Los menesajes de error deben mostrarse con la función raiserror.
 
  **/
