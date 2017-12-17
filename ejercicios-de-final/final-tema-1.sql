@@ -79,36 +79,57 @@ SELECT * FROM fn1037546 ('23', '84', '5')
  * No utilizar cursores.
  *
  **/
-
 CREATE TRIGGER tr1037546
 ON Suplentes
-FOR DELETE
+AFTER DELETE
 AS
-	declare @id_club_ant smallint
-	declare @categoria_ant Tinyint
-	declare @id_club_nuevo smallint
-	declare @categoria_nuevo Tinyint
+	BEGIN
+		IF ((SELECT COUNT(*) FROM Deleted) = 1)
+			BEGIN
+				INSERT INTO Titulares (Tipodoc, Nrodoc) VALUES (SELECT Tipodoc, Nrodoc FROM Deleted)
+			END
+		ELSE
+			BEGIN
+				DECLARE @idClub int
+				DECLARE @cat int
 
-	IF ((SELECT COUNT(*) FROM Deleted) > 1)
-		BEGIN
-			SET @id_club_nuevo 		= (SELECT TOP 1 j.Id_Club FROM Deleted d INNER JOIN Jugadores j ON j.Nrodoc = d.Nrodoc)
-			SET @categoria_nuevo 	= (SELECT TOP 1 j.Categoria FROM Deleted d INNER JOIN Jugadores j ON j.Nrodoc = d.Nrodoc)
-			SET @id_club_ant 		= (SELECT TOP 2 j.Id_Club FROM Inserted i INNER JOIN Jugadores j ON j.Nrodoc = i.Nrodoc)
-			SET @categoria_ant 		= (SELECT TOP j.Categoria FROM Inserted i INNER JOIN Jugadores j ON j.Nrodoc = i.Nrodoc)
-			
-			IF ((@id_club_nuevo = @id_club_ant) AND (@categoria_nuevo = @categoria_ant))
-				BEGIN
-					INSERT INTO Titulares (Tipodoc, Nrodoc) (SELECT Tipodoc, Nrodoc FROM Deleted)
-				END
-			ELSE
-				BEGIN
-					INSERT INTO Suplentes (Tipodoc, Nrodoc) (SELECT Tipodoc, Nrodoc FROM Deleted)
-				END
-		END
-	ELSE
-		BEGIN
-			INSERT INTO Titulares (Tipodoc, Nrodoc) (SELECT Tipodoc, Nrodoc FROM Deleted)
-		END 
+				SET @idClub = (
+								SELECT j.Id_Club 
+								FROM Jugadores j 
+								INNER JOIN Deleted d ON d.Tipodoc = j.Tipodoc AND d.Nrodoc = j.Nrodoc
+								ORDER BY j.Tipodoc, j.Nrodoc
+								OFFSET 0 ROWS FETCH FIRST 1 rows only
+							)
+				SET @cat = (
+								SELECT j.Categoria 
+								FROM Jugadores j
+								INNER JOIN Deleted d ON d.Tipodoc = j.Tipodoc AND d.Nrodoc = j.Nrodoc
+								ORDER BY j.Tipodoc, j.Nrodoc
+								OFFSET 0 ROWS FETCH FIRST 1 rows only
+							)
+
+				-- Inserta en Titulares siempre y cuando el que se está borrando
+				-- sea del mismo equipo y categoría que el primero que se borro
+				INSERT INTO Titulares (Tipodoc, Nrodoc) VALUES (
+																	SELECT d.Tipodoc, d.Nrodoc 
+																	FROM Deleted d
+																	INNER JOIN Jugadores j ON j.Tipodoc = d.Tipodoc AND j.Nrodoc = d.Nrodoc
+																	WHERE 
+																		j.Id_Club = @idClub 
+																		AND j.Categoria = @cat
+																)
+				-- Inserta en Suplentes siempre y cuando el que se esté borrando
+				-- se haya borrado por error y no sea del mismo equipo y categoria
+				INSERT INTO Suplentes (Tipodoc, Nrodoc) VALUES (
+																	SELECT d.Tipodoc, d.Nrodoc 
+																	FROM Deleted d
+																	INNER JOIN Jugadores j ON j.Tipodoc = d.Tipodoc AND j.Nrodoc = d.Nrodoc
+																	WHERE 
+																		j.Id_Club <> @idClub 
+																		AND j.Categoria <> @cat
+																)
+			END
+	END
 GO
 
 /**
