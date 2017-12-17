@@ -128,7 +128,7 @@ GO
  **/
 CREATE PROCEDURE st1037546_02 
 AS
-	BEGIN TRANSACTION st
+	BEGIN TRANSACTION st_01
 
 		-- Establecer en cada categoría de cada club hasta un máximo de 11 jugadores como titulares, 
 		-- los restantes como suplentes (se debe invocar la función del punto 2)
@@ -196,6 +196,31 @@ AS
 		CLOSE listado_de_equipos
 		DEALLOCATE listado_de_equipos
 
-	COMMIT TRANSACTION
+	COMMIT TRANSACTION st_01
+
+	BEGIN TRANSACTION st_02
+	COMMIT TRANSACTION st_02
+
+	-- Proyectar todos los jugadores suplentes
+	BEGIN TRANSACTION st_03
+		PRINT 'Proyectamos todos los jugadores suplentes'
+
+		SELECT j.Tipodoc, j.Nrodoc, j.Nombre, j.Fecha_Nac, j.Categoria, j.Id_Club, c.Nombre
+		FROM Jugadores j
+		LEFT JOIN Clubes c ON (c.Id_Club = j.Id_Club)
+		WHERE j.Nrodoc IN (
+							SELECT s.Nrodoc 
+							FROM Suplentes s 
+							WHERE 
+								s.Tipodoc = j.Tipodoc 
+								AND s.Nrodoc = j.Nrodoc
+						)
+
+	COMMIT TRANSACTION st_03
 GO
+
+
+
+
+
 
