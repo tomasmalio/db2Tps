@@ -174,11 +174,11 @@ AS
 				FETCH NEXT FROM jugadores_a_titular_suplentes
 				INTO @Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado
 				
+				-- Generamos una variable para recorrer 
+				SET @cantidad_jugadores_ingresados = 1
+
 				-- Recorremos el cursor generado anteriormente con el objetivo de poner
 				-- 11 jugadores en titulares y el resto en suplentes
-
-				-- Generamos una variblae para recorrer 
-				SET @cantidad_jugadores_ingresados = 1
 				WHILE @@FETCH_STATUS = 0
 					BEGIN
 
