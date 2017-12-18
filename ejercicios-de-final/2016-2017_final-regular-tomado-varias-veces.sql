@@ -24,7 +24,6 @@ DECLARE @cantidadDeGoles 				int
 DECLARE @NroFecha_maximo 				int
 DECLARE @cantidadDeGoles_maximo 		int
 DECLARE @cantidad_de_goles_resultado 	int
-DECLARE @nro_fecha_resultado			int
 DECLARE @nombre_del_club 				varchar
 DECLARE @cantidad_de_goles_club			int
 DECLARE @Categoria 						int 
@@ -66,11 +65,11 @@ DECLARE cu1037546_a_res CURSOR SCROLL FOR
 
 OPEN cu1037546_a_res
 
-FETCH FIRST FROM cu1037546_a_res INTO @cantidad_de_goles_resultado, @nro_fecha_resultado
+FETCH FIRST FROM cu1037546_a_res INTO @cantidad_de_goles_resultado
 
 IF (@@FETCH_STATUS <> 0)
 	BEGIN
-		PRINT 'Nº fecha:(nº) ' + @nro_fecha_resultado + ' Cantidad de goles: (total de la fecha) ' + converter(varchar(5), @cantidad_de_goles_resultado)
+		PRINT 'Nº fecha:(nº) ' + @NroFecha_maximo + ' Cantidad de goles: (total de la fecha) ' + convert(varchar(5), @cantidad_de_goles_resultado)
 	END
 
 CLOSE cu1037546_a_res
@@ -91,18 +90,18 @@ DECLARE cu1037546_b_clubes CURSOR FOR
 	) tabla ON tabla.Id_Club = cc.Id_Club
 	ORDER BY tabla.Cantidad DESC
 
-OPEN cu1037546_b
+OPEN cu1037546_b_clubes
 
-FETCH NEXT FROM cu1037546_b INTO @nombre_del_club, @cantidad_de_goles_club
+FETCH NEXT FROM cu1037546_b_clubes INTO @nombre_del_club, @cantidad_de_goles_club
 
 WHILE (@@FETCH_STATUS = 0)
 	BEGIN
 		PRINT 'Club:(nombre) ' + @nombre_del_club + 'Total de goles: (total del club) ' + convert(varchar(5), @cantidad_de_goles_club)
-		FETCH NEXT FROM cu1037546_b INTO @nombre_del_club, @cantidad_de_goles_club
+		FETCH NEXT FROM cu1037546_b_clubes INTO @nombre_del_club, @cantidad_de_goles_club
 	END
 
-CLOSE cu1037546_b
-DEALLOCATE cu1037546_b
+CLOSE cu1037546_b_clubes
+DEALLOCATE cu1037546_b_clubes
 
 -- Generamos una tabla con los datos de la categoria y la
 -- cantidad de goles.
@@ -124,6 +123,7 @@ CLOSE cu1037546_b_categorias
 DEALLOCATE cu1037546_b_categorias
 
 GO
+
 /*
 2 - Implementar una unica transaccion que invoque una funcion y actualice y proyecte la tabla de partidos, conforme a siguiente detalle:
 a - Definir una función escalar que retorne en nº de fecha donde se registraron la menor cantidad de empates entre los clubes de la zona 2.
