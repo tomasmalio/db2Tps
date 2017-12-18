@@ -135,7 +135,7 @@ AS
 	DECLARE @Nrodoc_jugador_buscado 		int
 	DECLARE @cantidad_jugadores_ingresados	int
 
-	BEGIN TRANSACTION st_01
+	BEGIN TRANSACTION transaction_02
 	
 		-- Establecer en cada categoría de cada club hasta un máximo de 11 jugadores como titulares, 
 		-- los restantes como suplentes (se debe invocar la función del punto 2)
@@ -208,12 +208,12 @@ AS
 		-- Establecemos un punto de grabación
 		SAVE TRANSACTION punto_de_grabacion
 
-	COMMIT TRANSACTION st_01
+	--COMMIT TRANSACTION st_01
 	-- Eof primera transacción
 
 	-- Incorporar como titular para cada categoría de cada club al jugador suplente (de ese club
 	-- y categoría) que posea el nombre más largo en cantidad de caracteres.
-	BEGIN TRANSACTION st_02
+	--BEGIN TRANSACTION st_02
 
 		DECLARE listado_de_equipos CURSOR FOR
 			SELECT j.Id_Club, j.Categoria 
@@ -270,11 +270,11 @@ AS
 		CLOSE listado_de_equipos
 		DEALLOCATE listado_de_equipos
 
-	COMMIT TRANSACTION st_02
+	--COMMIT TRANSACTION st_02
 	-- Eof segunda transacción
 
 	-- Proyectar todos los jugadores suplentes
-	BEGIN TRANSACTION st_03
+	--BEGIN TRANSACTION st_03
 		PRINT 'Proyectamos todos los jugadores suplentes'
 
 		SELECT j.Tipodoc, j.Nrodoc, j.Nombre, j.Fecha_Nac, j.Categoria, j.Id_Club, c.Nombre
@@ -288,14 +288,16 @@ AS
 								AND s.Nrodoc = j.Nrodoc
 						)
 
-	COMMIT TRANSACTION st_03
+	--COMMIT TRANSACTION st_03
 	-- Eof tercera transacción
 
-	BEGIN TRANSACTION st_04
+	--BEGIN TRANSACTION st_04
 		-- Deshacemos la transacción hasta el punto de grabación 
 		ROLLBACK TRANSACTION punto_de_grabacion
 
-	COMMIT TRANSACTION st04
+	--COMMIT TRANSACTION st04
+
+	COMMIT TRANSACTION transaction_02
 GO
 
 
