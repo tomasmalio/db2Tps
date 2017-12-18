@@ -80,7 +80,17 @@ GO
 update tb107878
 	set cantSuplentes = 5
 
-/*Ejercicio 5*/
+/*
+ * 5) Cursores
+ * Definir un cursor que actualice automáticamente el campo Tipodo de la tabla
+ * Jugadores. Respetando las siguientes condiciones:
+ * + Si Tipodoc es igual a CPA modificar a PPA
+ * + Si Tipodoc es igual a PB modificar a PBA
+ * + Caso contrario no se modifica
+ * + Mostrar nuevo Tipodoc y Nrodoc de las filas modificadas
+ * + Mostrar el mensaje: 'Cantidad de actualizaciones XX'
+ *
+ **/
 
 declare @contador int
 declare @tipodoc char(3)
