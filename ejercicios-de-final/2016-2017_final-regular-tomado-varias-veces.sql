@@ -97,7 +97,7 @@ FETCH NEXT FROM cu1037546_b INTO @nombre_del_club, @cantidad_de_goles_club
 
 WHILE (@@FETCH_STATUS = 0)
 	BEGIN
-		PRINT 'Club:(nombre) ' + @nombre_del_club + 'Total de goles: (total del club) ' + converter(varchar(5), @cantidad_de_goles_club)
+		PRINT 'Club:(nombre) ' + @nombre_del_club + 'Total de goles: (total del club) ' + convert(varchar(5), @cantidad_de_goles_club)
 		FETCH NEXT FROM cu1037546_b INTO @nombre_del_club, @cantidad_de_goles_club
 	END
 
@@ -117,7 +117,7 @@ FETCH NEXT FROM cu1037546_b_categorias INTO @Categoria, @cantidad_de_goles_categ
 
 WHILE (@@FETCH_STATUS = 0)
 	BEGIN
-		PRINT 'Categoria ' + converter(varchar(5), @Categoria) + ':' + converter(varchar(5), @cantidad_de_goles_categoria)
+		PRINT 'Categoria ' + convert(varchar(5), @Categoria) + ':' + convert(varchar(5), @cantidad_de_goles_categoria)
 	END
 
 CLOSE cu1037546_b_categorias
