@@ -248,11 +248,18 @@ AS
 				-- Selecccionamos únicamente el primer jugador que cumpla con todas las condiciones
 				FETCH FIRST FROM jugadores_sup_por_nombre_largo INTO @Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado
 
-				-- Insertamos en Titulares el jugador con el nombre más largo
-				INSERT INTO Titulares (Tipodoc, Nrodoc) VALUES (@Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado)
+				IF ((SELECT t.Nrodoc FROM Titulares t WHERE t.Tipodoc = @Tipodoc_jugador_buscado AND t.Nrodoc = @Nrodoc_jugador_buscado) <> @Nrodoc_jugador_buscado)
+					BEGIN
+						-- Insertamos en Titulares el jugador con el nombre más largo
+						INSERT INTO Titulares (Tipodoc, Nrodoc) VALUES (@Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado)
 
-				-- Borramos de Suplentes el jugador con el nombre más largo
-				DELETE Suplentes WHERE Tipodoc = @Tipodoc_jugador_buscado AND Nrodoc = @Nrodoc_jugador_buscado
+						-- Borramos de Suplentes el jugador con el nombre más largo
+						DELETE Suplentes WHERE Tipodoc = @Tipodoc_jugador_buscado AND Nrodoc = @Nrodoc_jugador_buscado
+					END
+				ELSE
+					BEGIN
+						PRINT 'El jugador del equipo ' + @Id_Club_buscado + ' cuya categoria es ' + @Categoria_buscado + ' ya se encontraba en los Titulares'
+					ELSE				
 
 				CLOSE jugadores_sup_por_nombre_largo
 				DEALLOCATE jugadores_sup_por_nombre_largo
