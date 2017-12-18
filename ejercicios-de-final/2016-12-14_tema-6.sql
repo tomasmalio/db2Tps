@@ -98,9 +98,9 @@ DECLARE @tipodoc char(3)
 SET @contador = 0
 DECLARE cu107878 CURSOR FORWARD_ONLY 
 FOR
-SELECT Tipodoc FROM jugadores
+SELECT Tipodoc FROM Jugadores
 FOR
-UPDATE of tipodoc 
+UPDATE of Tipodoc 
 
 OPEN cu107878
 
@@ -151,6 +151,5 @@ CLOSE cu107878
 DEALLOCATE cu107878
 
 GO
-
 
 SELECT * FROM Jugadores
