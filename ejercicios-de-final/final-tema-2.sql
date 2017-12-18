@@ -259,7 +259,7 @@ AS
 				ELSE
 					BEGIN
 						PRINT 'El jugador del equipo ' + @Id_Club_buscado + ' cuya categoria es ' + @Categoria_buscado + ' ya se encontraba en los Titulares'
-					ELSE				
+					END				
 
 				CLOSE jugadores_sup_por_nombre_largo
 				DEALLOCATE jugadores_sup_por_nombre_largo
