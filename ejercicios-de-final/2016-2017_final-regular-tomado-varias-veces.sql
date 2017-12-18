@@ -32,9 +32,9 @@ DECLARE @cantidad_de_goles_categoria 	int
 SET @cantidadDeGoles_maximo = 0
 
 DECLARE cu1037546_a CURSOR FOR
-SELECT SUM(p.GolesL + p.GolesV) AS cantidad, p.NroFecha
-			FROM Partidos p
-			GROUP BY p.NroFecha
+	SELECT SUM(p.GolesL + p.GolesV) AS cantidad, p.NroFecha
+	FROM Partidos p
+	GROUP BY p.NroFecha
 
 OPEN cu1037546_a
 
