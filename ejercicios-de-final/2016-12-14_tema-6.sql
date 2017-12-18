@@ -35,20 +35,22 @@ exec sp107878 1
  *
  **/
 
-ALTER FUNCTION fn107878 (@categoria tinyint, @nrozona tinyint, @NroFecha tinyint)
+CREATE FUNCTION fn107878 (@categoria tinyint, @nrozona tinyint, @NroFecha tinyint)
 RETURNS TABLE
 AS
 	RETURN ( 
-			SELECT cv.nombre as 'Nombre de Visitante', cl.nombre as 'Nombre de Local', p.golesl, p.golesV
+			SELECT cv.nombre AS 'Nombre de Visitante', cl.nombre AS 'Nombre de Local', p.golesl AS 'Goles Local', p.golesV AS 'Goles Visitante'
 			FROM Partidos p 
 			INNER JOIN Clubes cv ON p.id_clubv = cv.Id_Club
 			INNER JOIN Clubes cl ON p.id_clubl = cl.Id_Club
 			WHERE 
-				categoria = @categoria 
+				p.Categoria = @categoria 
 				AND p.nrozona = @nrozona
 				AND p.NroFecha = @NroFecha
+			ORDER BY cl.Id_Club ASC
 	)
 GO
+
 SELECT * FROM fn107878(84,2,7)
 
 
