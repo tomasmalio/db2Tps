@@ -179,7 +179,7 @@ AS
 				WHILE @@FETCH_STATUS = 0
 					BEGIN
 						-- Como todavía no se ingresaron más de 11 jugadores es titular
-						IF (@cantidad_jugadores_ingresados < 12)
+						IF (@cantidad_jugadores_ingresados <= 11)
 							BEGIN
 								INSERT INTO Titulares (Tipodoc, Nrodoc) VALUES (@Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado)
 							END
