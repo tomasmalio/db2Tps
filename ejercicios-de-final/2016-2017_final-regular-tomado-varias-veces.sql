@@ -19,10 +19,16 @@
  *      Categoria 85: (subtotal de la categoria)
  *
  **/
-DECLARE @NroFecha 				int
-DECLARE @cantidadDeGoles 		int
-DECLARE @NroFecha_maximo 		int
-DECLARE @cantidadDeGoles_maximo int
+DECLARE @NroFecha 						int
+DECLARE @cantidadDeGoles 				int
+DECLARE @NroFecha_maximo 				int
+DECLARE @cantidadDeGoles_maximo 		int
+DECLARE @cantidad_de_goles_resultado 	int
+DECLARE @nro_fecha_resultado			int
+DECLARE @nombre_del_club 				varchar
+DECLARE @cantidad_de_goles_club			int
+DECLARE @Categoria 						int 
+DECLARE @cantidad_de_goles_categoria 	int
 
 SET @cantidadDeGoles_maximo = 0
 
