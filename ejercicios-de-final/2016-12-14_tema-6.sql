@@ -98,22 +98,27 @@ GO
 
 exec st107878  85
 
-/*Ejercicio 4*/
 
-
+/**
+ * 4) Trigger
+ * Definir un trigger tr###### a la tabla creada tb###### para que se accione si
+ * se ejecuta un update
+ * 	+ Debe actualizar únicamente el campo cantSuplentes si es menor o igual a 4
+ * 	+ Mostrar un mensaje de sentencia no realizada en caso contrario
+ *
+ **/
 CREATE TRIGGER tr107878
 ON tb107878
-AFTER update
+AFTER UPDATE
 AS 
-IF ((Select cantSuplentes from inserted) > 4)
-    BEGIN
-        PRINT 'Sentencia no realizada, disculpe las molestias'
-        ROLLBACK TRANSACTION
-    END
+	IF ((SELECT cantSuplentes FROM Inserted) > 4)
+	    BEGIN
+	        PRINT 'Sentencia no realizada, disculpe las molestias, no cumple con los requisitos'
+	        ROLLBACK TRANSACTION
+	    END
 GO
 
-update tb107878
-	set cantSuplentes = 5
+UPDATE tb107878 SET cantSuplentes = 5
 
 /*
  * 5) Cursores
