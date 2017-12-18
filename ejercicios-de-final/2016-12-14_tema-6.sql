@@ -91,7 +91,9 @@ AS
 				GROUP BY c.id_club
 	
 		IF (NOT EXISTS (SELECT * FROM tb107878))
-			RAISERROR ('No hay datos', 16, 1)
+			BEGIN
+				RAISERROR ('No hay datos', 16, 1)
+			END
 	
 	COMMIT TRANSACTION Creartabla
 GO
