@@ -150,7 +150,6 @@ AS
 		FETCH NEXT FROM listado_de_equipos
 		INTO @Id_Club_buscado, @Categoria_buscado
 
-
 		-- Recorremos cada equipo para saber si tiene 11 jugadores como titulares
 		WHILE @@FETCH_STATUS = 0
 			BEGIN 
@@ -196,6 +195,7 @@ AS
 						SET @cantidad_jugadores_ingresados = @cantidad_jugadores_ingresados + 1
 
 						FETCH NEXT FROM jugadores_a_titular_suplentes
+						INTO @Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado
 					END
 
 				CLOSE jugadores_a_titular_suplentes
@@ -203,6 +203,7 @@ AS
 
 				
 				FETCH NEXT FROM listado_de_equipos
+				INTO @Id_Club_buscado, @Categoria_buscado
 			END  
 
 		CLOSE listado_de_equipos
@@ -263,6 +264,7 @@ AS
 				DEALLOCATE jugadores_sup_por_nombre_largo
 
 				FETCH NEXT FROM listado_de_equipos
+				INTO @Id_Club_buscado, @Categoria_buscado
 			END
 
 		CLOSE listado_de_equipos
