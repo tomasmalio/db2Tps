@@ -66,6 +66,7 @@ SELECT * FROM fn107878(84,2,7)
  *
  **/
 
+-- VER PORQUE ESTA MAL HECHO
 CREATE PROCEDURE st107878 
    @categoria tinyint
 AS 
