@@ -1,33 +1,54 @@
-/*Ejercicio 1*/
-
-
-CREATE PROCEDURE sp107878 
-   @nm int
+/**
+ * 1) Correlacionadas
+ * Crear un store procedure sp###### que reciba la posición del número de
+ * documento más alto de los jugadores de cada club.
+ * (Ej.: el 3 número de documento más alto)
+ * 	+ Devolver el nombre del club y el documento y nombre del jugador 
+ * 	+ Ejecutar el store procedure y mostrar el resultado
+ *
+ **/
+CREATE PROCEDURE sp107878 (@nm int)
 AS 
-	select c.nombre,j.Nrodoc,j.nombre 
-	from jugadores j inner join clubes c on  c.id_club = j.id_club
-	where @nm = (select count (*)
-		     from jugadores as jj 
-		     where jj.id_club = j.id_club
-		     and jj.nrodoc > j.nrodoc)
+	SELECT c.nombre, j.Nrodoc, j.nombre 
+	FROM Jugadores j 
+	INNER JOIN Clubes c ON c.id_club = j.id_club
+	WHERE @nm = (
+					SELECT COUNT (*) 
+					FROM Jugadores jj 
+					WHERE 
+						jj.id_club = j.id_club
+						AND jj.nrodoc > j.nrodoc
+				)
 
 exec sp107878 1
 
 
-/*Ejercicio 2*/
+/**
+ * 2) Función
+ * Definir una función fn###### que:
+ * 	+ Reciba la categoria, la zona y el número de fecha de los partidos.
+ * 	+ Retomar el resultado de los partidos (nombre del club local, nombre del
+ * 	club visitante, goles del local y goles del visitante), para esa fecha,
+ * 	zona y categoria.
+ * + Debe estar ordenado por club local (no usar modificador Top)
+ * + Ejecutar la función y mostrar el resultado
+ *
+ **/
 
-alter function fn107878 (@categoria tinyint,@nrozona tinyint,@NroFecha tinyint)
+ALTER FUNCTION fn107878 (@categoria tinyint, @nrozona tinyint, @NroFecha tinyint)
 RETURNS TABLE
 AS
-RETURN ( 
-
-SELECT cv.nombre as 'Nombre de Vicitante',cl.nombre as 'Nombre de Local',p.golesl,p.golesV
-FROM   partidos p inner join clubes cv on p.id_clubv = cv.id_club
-       inner join clubes cl on p.id_clubl = cl.id_club
-WHERE  categoria = @categoria and p.nrozona =@nrozona and @NroFecha = NroFecha
-
-)
-
+	RETURN ( 
+			SELECT cv.nombre as 'Nombre de Visitante', cl.nombre as 'Nombre de Local', p.golesl, p.golesV
+			FROM Partidos p 
+			INNER JOIN Clubes cv ON p.id_clubv = cv.Id_Club
+			INNER JOIN Clubes cl ON p.id_clubl = cl.Id_Club
+			WHERE 
+				categoria = @categoria 
+				AND p.nrozona = @nrozona
+				AND p.NroFecha = @NroFecha
+	)
+GO
 SELECT * FROM fn107878(84,2,7)
 
 
