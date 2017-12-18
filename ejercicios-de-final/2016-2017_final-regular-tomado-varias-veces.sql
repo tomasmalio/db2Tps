@@ -12,15 +12,16 @@
  * 	
  *	Fecha con mayor cantidad de goles convertidos.
  * 		Nº fecha:(nº)           Cantidad de goles: (total de la fecha) 
+ *
  * 	Goles convertidos por los clubes ordenados de mayor a menor.
  *		Club:(nombre)           Total de goles:(total del club)
- *       Categoria 84: (subtotal de la categoria)
- *       Categoria 85: (subtotal de la categoria)
+ *      Categoria 84: (subtotal de la categoria)
+ *      Categoria 85: (subtotal de la categoria)
  *
  **/
-DECLARE @NroFecha int
-DECLARE @cantidadDeGoles int
-DECLARE @NroFecha_maximo int
+DECLARE @NroFecha 				int
+DECLARE @cantidadDeGoles 		int
+DECLARE @NroFecha_maximo 		int
 DECLARE @cantidadDeGoles_maximo int
 
 SET @cantidadDeGoles_maximo = 0
@@ -68,6 +69,53 @@ IF (@@FETCH_STATUS <> 0)
 
 CLOSE cu1037546_a_res
 DEALLOCATE cu1037546_a_res
+
+
+-- Generamos un cursor con los datos de cada equipo y la cantidad
+-- de goles como visitante y local
+DECLARE cu1037546_b_clubes CURSOR FOR
+	SELECT cc.Nombre, tabla.Cantidad
+	FROM Clubes cc
+	INNER JOIN (
+		SELECT c.Id_Club, SUM(pL.GolesL + pV.GolesV) as Cantidad
+		FROM Clubes c
+		LEFT JOIN Partidos pL ON pL.Id_ClubL = c.Id_Club
+		LEFT JOIN Partidos pV ON pV.Id_ClubV = c.Id_Club
+		GROUP BY c.Id_Club
+	) tabla ON tabla.Id_Club = cc.Id_Club
+	ORDER BY tabla.Cantidad DESC
+
+OPEN cu1037546_b
+
+FETCH NEXT FROM cu1037546_b INTO @nombre_del_club, @cantidad_de_goles_club
+
+WHILE (@@FETCH_STATUS = 0)
+	BEGIN
+		PRINT 'Club:(nombre) ' + @nombre_del_club + 'Total de goles: (total del club) ' + converter(varchar(5), @cantidad_de_goles_club)
+		FETCH NEXT FROM cu1037546_b INTO @nombre_del_club, @cantidad_de_goles_club
+	END
+
+CLOSE cu1037546_b
+DEALLOCATE cu1037546_b
+
+-- Generamos una tabla con los datos de la categoria y la
+-- cantidad de goles.
+DECLARE cu1037546_b_categorias CURSOR FOR
+	SELECT p.Categoria, SUM(p.GolesL + p.GolesV) 
+	FROM Partidos p
+	GROUP BY p.Categoria
+
+OPEN cu1037546_b_categorias
+
+FETCH NEXT FROM cu1037546_b_categorias INTO @Categoria, @cantidad_de_goles_categoria
+
+WHILE (@@FETCH_STATUS = 0)
+	BEGIN
+		PRINT 'Categoria ' + converter(varchar(5), @Categoria) + ':' + converter(varchar(5), @cantidad_de_goles_categoria)
+	END
+
+CLOSE cu1037546_b_categorias
+DEALLOCATE cu1037546_b_categorias
 
 GO
 /*
