@@ -258,7 +258,7 @@ AS
 					END
 				ELSE
 					BEGIN
-						PRINT 'El jugador del equipo ' + @Id_Club_buscado + ' cuya categoria es ' + @Categoria_buscado + ' ya se encontraba en los Titulares'
+						PRINT 'El jugador del equipo ' + convert(varchar(5), @Id_Club_buscado) + ' cuya categoria es ' + convert(varchar(5), @Categoria_buscado) + ' ya se encontraba en los Titulares'
 					END				
 
 				CLOSE jugadores_sup_por_nombre_largo
