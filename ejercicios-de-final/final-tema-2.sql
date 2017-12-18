@@ -147,8 +147,7 @@ AS
 
 		OPEN listado_de_equipos
 
-		FETCH NEXT FROM listado_de_equipos
-		INTO @Id_Club_buscado, @Categoria_buscado
+		FETCH NEXT FROM listado_de_equipos INTO @Id_Club_buscado, @Categoria_buscado
 
 		-- Recorremos cada equipo para saber si tiene 11 jugadores como titulares
 		WHILE @@FETCH_STATUS = 0
@@ -170,8 +169,7 @@ AS
 
 				OPEN jugadores_a_titular_suplentes
 
-				FETCH NEXT FROM jugadores_a_titular_suplentes
-				INTO @Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado
+				FETCH NEXT FROM jugadores_a_titular_suplentes INTO @Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado
 				
 				-- Generamos una variable para recorrer 
 				SET @cantidad_jugadores_ingresados = 1
@@ -194,16 +192,14 @@ AS
 						-- Incrementamos una variable para saber cuantos jugadores se ingresaron
 						SET @cantidad_jugadores_ingresados = @cantidad_jugadores_ingresados + 1
 
-						FETCH NEXT FROM jugadores_a_titular_suplentes
-						INTO @Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado
+						FETCH NEXT FROM jugadores_a_titular_suplentes INTO @Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado
 					END
 
 				CLOSE jugadores_a_titular_suplentes
 				DEALLOCATE jugadores_a_titular_suplentes
 
 				
-				FETCH NEXT FROM listado_de_equipos
-				INTO @Id_Club_buscado, @Categoria_buscado
+				FETCH NEXT FROM listado_de_equipos INTO @Id_Club_buscado, @Categoria_buscado
 			END  
 
 		CLOSE listado_de_equipos
@@ -227,8 +223,7 @@ AS
 
 		OPEN listado_de_equipos
 
-		FETCH NEXT FROM listado_de_equipos
-		INTO @Id_Club_buscado, @Categoria_buscado
+		FETCH NEXT FROM listado_de_equipos INTO @Id_Club_buscado, @Categoria_buscado
 
 		-- Recorremos cada equipo para buscar el que tiene más nombre del equipo Suplente
 		-- para pasarlo al equipo Titular
@@ -236,7 +231,7 @@ AS
 			BEGIN 
 				-- Generamos un cursor con el listado de jugadores ordenados por nombre
 				-- más largo de un Club y Categoria (id_club / categoria) que sea Suplente
-				DECLARE jugadores_sup_por_nombre_largo CURSOR FOR
+				DECLARE jugadores_sup_por_nombre_largo CURSOR SCROLL FOR
 					SELECT j.Tipodoc, j.Nrodoc
 					FROM Jugadores j
 					WHERE 
@@ -251,8 +246,7 @@ AS
 				OPEN jugadores_sup_por_nombre_largo
 
 				-- Selecccionamos únicamente el primer jugador que cumpla con todas las condiciones
-				FETCH FIRST FROM jugadores_sup_por_nombre_largo
-				INTO @Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado
+				FETCH FIRST FROM jugadores_sup_por_nombre_largo INTO @Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado
 
 				-- Insertamos en Titulares el jugador con el nombre más largo
 				INSERT INTO Titulares (Tipodoc, Nrodoc) VALUES (@Tipodoc_jugador_buscado, @Nrodoc_jugador_buscado)
@@ -263,8 +257,7 @@ AS
 				CLOSE jugadores_sup_por_nombre_largo
 				DEALLOCATE jugadores_sup_por_nombre_largo
 
-				FETCH NEXT FROM listado_de_equipos
-				INTO @Id_Club_buscado, @Categoria_buscado
+				FETCH NEXT FROM listado_de_equipos INTO @Id_Club_buscado, @Categoria_buscado
 			END
 
 		CLOSE listado_de_equipos
