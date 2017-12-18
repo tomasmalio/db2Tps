@@ -54,35 +54,47 @@ GO
 SELECT * FROM fn107878(84,2,7)
 
 
-/*Ejercicio 3*/ 
+/**
+ * 3) Transacciones
+ * Crear un store procedure st###### que reciba una categoria como
+ * parámetro y que defina los siguientes pasos en una transacción:
+ * 	+ Crear una tabla tb###### (idClub, cantJugadores, cantSuplentes)
+ * 	+ Insertar los idClub y cantidad de jugadores de la categoría que sean
+ * 	menores a 30 y 4 suplentes a los clubes de la zona 1 
+ * 	+ Mostrar los mensajes de error utilizando la función raiserror.
+ * + Ejecutar la transacción
+ *
+ **/
 
-alter PROCEDURE st107878 
+CREATE PROCEDURE st107878 
    @categoria tinyint
 AS 
-
 	BEGIN TRANSACTION Creartabla
-		create table tb107878
-		( idClub smallint not null primary key, 
-  		  cantJugadores int not null, 
-  		  cantSuplentes int not null
-		 )
-		insert into tb107878
-			select c.id_club,count(*),4
-			from jugadores j inner join 
-			clubes c on c.id_club = j.id_club
-			where nrozona = 2 and categoria = 84 and 30 > 
-				(select count (*)
-	    	 		from jugadores jj
-	    			where jj.id_club = j.id_club)
-			group by c.id_club
-	
-	if (not exists(select * from tb107878))
-	RAISERROR ('no hay datos',16,1)
-	
-	commit TRANSACTION Creartabla
+		CREATE TABLE tb107878 ( 
+			idClub smallint not null primary key, 
+			cantJugadores int not null, 
+			cantSuplentes int not null
+		)
 
-
-		
+		INSERT INTO tb107878
+			SELECT c.id_club, COUNT(*), 4
+			FROM Jugadores j 
+			INNER JOIN Clubes c ON c.id_club = j.id_club
+			WHERE 
+				nrozona = 2 
+				AND categoria = 84 
+				AND 30 >  (
+							SELECT COUNT(*)
+							FROM Jugadores jj
+							WHERE jj.id_club = j.id_club
+						)
+				GROUP BY c.id_club
+	
+		IF (NOT EXISTS (SELECT * FROM tb107878))
+			RAISERROR ('No hay datos', 16, 1)
+	
+	COMMIT TRANSACTION Creartabla
+GO
 
 exec st107878  85
 
