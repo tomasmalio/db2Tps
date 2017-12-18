@@ -92,13 +92,14 @@ update tb107878
  *
  **/
 
-declare @contador int
-declare @tipodoc char(3)
-set @contador = 0
+DECLARE @contador int
+DECLARE @tipodoc char(3)
+
+SET @contador = 0
 DECLARE cu107878 CURSOR FORWARD_ONLY 
 FOR
-SELECT tipodoc FROM jugadores
-for
+SELECT Tipodoc FROM jugadores
+FOR
 UPDATE of tipodoc 
 
 OPEN cu107878
@@ -106,40 +107,50 @@ OPEN cu107878
 FETCH NEXT FROM cu107878 INTO @tipodoc
 
 
-if (@tipodoc  = 'Cpa')
-UPDATE jugadores SET tipodoc = 'PPA'
-WHERE CURRENT OF cu107878
+IF (@tipodoc = 'CPA')
+	BEGIN
+		UPDATE Jugadores SET Tipodoc = 'PPA' WHERE CURRENT OF cu107878
+	END
+ELSE
+	IF (@tipodoc = 'PB')
+		BEGIN
+			UPDATE Jugadores SET Tipodoc = 'PBA' WHERE CURRENT OF cu107878
+		END
+	ELSE
+		BEGIN
+			PRINT 'No se modifico nada'
+		END
 
-else
-	if (@tipodoc = 'PB')
-	UPDATE jugadores SET tipodoc = 'PBA'
-	WHERE CURRENT OF cu107878
+SET @contador = @contador + 1 
 
-	else
-		print 'no se modifico nada'
-
-set @contador = @contador + 1 
 FETCH NEXT FROM cu107878 INTO @tipodoc
+
 WHILE @@FETCH_STATUS = 0
-begin
-	if (@tipodoc  = 'Cpa')
-UPDATE jugadores SET tipodoc = 'PPA'
-WHERE CURRENT OF cu107878
+	BEGIN
+		if (@tipodoc  = 'CPA')
+			BEGIN
+				UPDATE jugadores SET Tipodoc = 'PPA' WHERE CURRENT OF cu107878
+			END
+		else
+			BEGIN
+				IF (@tipodoc = 'PB')
+					BEGIN
+						UPDATE Jugadores SET Tipodoc = 'PBA' WHERE CURRENT OF cu107878
+					END
+				ELSE
+					BEGIN
+						PRINT 'No se modifico nada'
+					END
+			END
+		SET @contador = @contador + 1 
+	END
 
-else
-	if (@tipodoc = 'PB')
-	UPDATE jugadores SET tipodoc = 'PBA'
-	WHERE CURRENT OF cu107878
+PRINT @contador
 
-	else
-		print 'no se modifico nada'
-
-set @contador = @contador + 1 
-end
-print @contador
 CLOSE cu107878
 DEALLOCATE cu107878
+
 GO
 
 
-select * from jugadores
+SELECT * FROM Jugadores
