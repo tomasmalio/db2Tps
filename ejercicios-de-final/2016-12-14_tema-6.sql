@@ -62,7 +62,7 @@ SELECT * FROM fn107878(84,2,7)
  * 	+ Insertar los idClub y cantidad de jugadores de la categoría que sean
  * 	menores a 30 y 4 suplentes a los clubes de la zona 1 
  * 	+ Mostrar los mensajes de error utilizando la función raiserror.
- * + Ejecutar la transacción
+ * 	+ Ejecutar la transacción
  *
  **/
 
