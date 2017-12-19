@@ -279,11 +279,11 @@ BEGIN TRAN
 							)
 
 	IF (@@error <> 0)
-		Begin
+		BEGIN
 			RAISERROR('Error al actualizar poscate285 V',16,3)
 			ROLLBACK TRAN
 			RETURN
-		End
+		END
 
 
 	-- Diferencia y Puntos
@@ -295,9 +295,9 @@ BEGIN TRAN
 			ROLLBACK TRAN
 			RETURN
 		End
-
-		
+	
 	ROLLBACK TRAN Actualizar
+
 COMMIT TRAN
 
 
