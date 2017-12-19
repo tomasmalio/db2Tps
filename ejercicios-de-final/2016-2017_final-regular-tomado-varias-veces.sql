@@ -447,7 +447,6 @@ BEGIN
 		BEGIN
 			-- Identificamos de que club es el que tiene menos jugadores a intercambiar
 			-- para realizar dicha operación
-
 			DECLARE @equipo_ant int
 			DECLARE @equipo_nuevo int
 			
