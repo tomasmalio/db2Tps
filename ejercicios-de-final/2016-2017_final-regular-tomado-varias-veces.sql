@@ -130,10 +130,13 @@ GO
  * 	a - Definir una función escalar que retorne en nº de fecha donde se registraron 
  * 	la menor cantidad de empates entre los clubes de la zona 2.
  * 	Debe resolverse por correlacionada.
+ *
  * 	b - Iniciar una transaccion que actualice todos los partidos de la zona 2 
  * 	correspondiente a la fecha retornada por la funcion, agregando un
  * 	gol a cada club visitante en la categoria 85.
- *	c - Modificar la tabla poscate285 en funcion de los goles agregados en el punto b. Debiendo:
+ *
+ *	c - Modificar la tabla poscate285 en funcion de los goles agregados en el punto b. 
+ *	Debiendo:
  * 		I - Actualizar la cantidad de partidos ganados, empatados y perdidos de los clubes afectados.
  * 		II - Actualizar la cantidad de goles (a favor) y golesC (en contra) de los mismos.
  * 		III - Actualizar los puntos de dichos clubes teniendo en cuenta 3 puntos por partido 
@@ -145,12 +148,123 @@ GO
  * No utilizar cursores.
  *
  **/
- CREATE PROCEDURE st1037546
- AS
- 	BEGIN TRANSACTION tran
+CREATE FUNCTION fn1037546_fecha_menor_empates ()
+RETURNS INT
+AS
+	BEGIN
+		DECLARE @fechaMinima int 
+		SET @fechaMinima = (
+				SELECT MIN(p.Cantidad)
+				FROM (
+							SELECT COUNT(*) as Cantidad, pp.NroFecha 
+							FROM Partidos pp 
+							WHERE 
+								pp.NroZona = 2 
+								AND pp.GolesL = pp.GolesV 
+							GROUP BY pp.NroFecha
+					) p
+			)
+		RETURN @fechaMinima
+	END
 
- 	COMMIT TRANSACTION tran
- GO
+DECLARE @respuesta int;   
+EXEC @respuesta = fn1037546_fecha_menor_empates
+PRINT @respuesta
+
+BEGIN TRAN
+
+	UPDATE partidos SET GolesV = GolesV + 1 WHERE (NroFecha = DBO.fn1037546_fecha_menor_empates()) AND (Categoria = 85)
+
+	IF (@@error <> 0)
+		BEGIN
+			RAISERROR('Error al actualizar partidos', 16, 1)
+			ROLLBACK TRAN
+			RETURN
+		END
+
+	SAVE TRAN Actualizar
+
+	
+	UPDATE Poscate285 SET Ganados = 0, Empatados = 0, perdidos = 0, GolesF = 0, golesc = 0
+
+	-- Locales
+	UPDATE Poscate285 SET 
+		Ganados = Ganados + (
+							SELECT COUNT(Id_ClubL) 
+							FROM Partidos 
+							WHERE 
+								Categoria = 85 
+								AND Id_ClubL = Poscate285.Id_Club 
+								AND GolesL > GolesV
+							),
+		Empatados = Empatados + (
+								SELECT COUNT(Id_ClubL) 
+								FROM Partidos 
+								WHERE 
+									Categoria = 85 
+									AND Id_ClubL = Poscate285.Id_Club 
+									AND GolesL = GolesV
+								),
+		perdidos = perdidos + (
+								SELECT COUNT(id_clubl) 
+								FROM Partidos 
+								WHERE 
+									Categoria = 85 
+									AND Id_ClubL = Poscate285.Id_Club 
+									AND GolesL < GolesV
+								),
+		GolesF = GolesF + (
+							SELECT SUM(golesl) 
+							FROM Partidos 
+							WHERE 
+								Categoria = 85 
+								AND Id_ClubL = Poscate285.Id_Club 
+							),
+		GolesC = GolesC + (
+							SELECT SUM(GolesV) 
+							FROM Partidos 
+							WHERE 
+								Categoria = 85 
+								AND Id_ClubL = Poscate285.Id_Club
+							)
+
+	IF (@@error <> 0)
+		BEGIN
+			RAISERROR('Error al actualizar poscate285 L',16,2)
+			ROLLBACK TRAN
+			RETURN
+		End
+
+		
+	/visitantes/
+	UPDATE poscate285 SET 
+		ganados=ganados+(SELECT COUNT(id_clubv) FROM partidos WHERE categoria=85 AND id_clubv=poscate285.id_club AND golesv > golesl),
+		empatados=empatados+(SELECT COUNT(id_clubv) FROM partidos WHERE categoria=85 AND id_clubv=poscate285.id_club AND golesv = golesl),
+		perdidos=perdidos+(SELECT COUNT(id_clubv) FROM partidos WHERE categoria=85 AND id_clubv=poscate285.id_club AND golesv < golesl),
+		golesf=golesf+(SELECT SUM(golesv) FROM partidos WHERE categoria=85 AND id_clubv=poscate285.id_club),
+		golesc=golesc+(SELECT SUM(golesl) FROM partidos WHERE categoria=85 AND id_clubv=poscate285.id_club)
+
+	IF (@@error <> 0)
+		Begin
+			RAISERROR('Error al actualizar poscate285 V',16,3)
+			ROLLBACK TRAN
+			RETURN
+		End
+
+
+	/* Diferencia y Puntos */
+	UPDATE poscate285 SET diferencia=(golesf-golesc),puntos=(ganados*3)+(empatados*1)
+
+	IF (@@error <> 0)
+		Begin
+			RAISERROR('Error al actualizar poscate285 Dif y Puntos',16,4)
+			ROLLBACK TRAN
+			RETURN
+		End
+
+		
+	ROLLBACK TRAN Actualizar
+COMMIT TRAN
 
 
 /*
@@ -163,3 +277,44 @@ c - Si la cantidad a intercambiar no es posible satisfacerla, se ajusta a la can
 No utilizar cursores.
 */
 
+
+CREATE TRIGGER trZona ON clubes
+FOR INSERT,UPDATE
+AS
+BEGIN
+
+IF UPDATE(nrozona)
+Begin
+
+	IF (SELECT COUNT(*) FROM INSERTED) > 1
+		Begin
+			PRINT 'No se permite actualizaciones multiples'
+			ROLLBACK TRANSACTION
+		End
+
+	IF ( (SELECT nrozona FROM DELETED) = (SELECT nrozona FROM INSERTED) )
+		Begin
+			PRINT 'No se permite actualizar a la misma zona'
+			ROLLBACK TRANSACTION
+		End
+
+	IF ( (SELECT nrozona FROM INSERTED) NOT IN (1,2) )
+		Begin
+			PRINT 'No se permite una zona distinta de 1 o 2'
+			ROLLBACK TRANSACTION
+		End
+
+	IF ( (SELECT nrozona FROM INSERTED) = (SELECT c.nrozona
+										   FROM clubes c
+										   GROUP BY c.nrozona
+										   HAVING COUNT() >= ALL (SELECT COUNT()
+																   FROM clubes c1
+																   GROUP BY c1.nrozona)) )
+		Begin
+			PRINT 'No se permite actualizar a la zona de mayor cant de clubes'
+			ROLLBACK TRANSACTION
+		End
+
+End --if update
+
+END --tr
