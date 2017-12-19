@@ -49,7 +49,6 @@ WHILE @@FETCH_STATUS = 0
 				SET @cantidadDeGoles_maximo = @cantidadDeGoles
 				SET @NroFecha_maximo = @NroFecha
 			END
-
 		FETCH NEXT FROM cu1037546_a INTO @cantidadDeGoles, @NroFecha
 	END
 CLOSE cu1037546_a
@@ -67,7 +66,7 @@ OPEN cu1037546_a_res
 
 FETCH FIRST FROM cu1037546_a_res INTO @cantidad_de_goles_resultado
 
-IF (@@FETCH_STATUS <> 0)
+WHILE @@FETCH_STATUS = 0
 	BEGIN
 		PRINT 'Nº fecha:(nº) ' + convert(varchar(5), @NroFecha_maximo) + ' Cantidad de goles: (total de la fecha) ' + convert(varchar(5), @cantidad_de_goles_resultado)
 	END
