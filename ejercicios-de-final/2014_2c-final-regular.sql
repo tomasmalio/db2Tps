@@ -338,7 +338,7 @@ BEGIN
 					ROLLBACK TRANSACTION
 				END
 
-			-- d) 
+			-- d) No Permitir que actualice a la zona con mayor cantidad de clubes 
 			IF ( (SELECT NroZona FROM Inserted) = (SELECT c.nrozona
 												   FROM clubes c
 												   GROUP BY c.nrozona

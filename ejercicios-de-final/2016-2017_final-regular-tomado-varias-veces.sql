@@ -312,10 +312,31 @@ COMMIT TRAN
  *
  *		No utilizar cursores.
  **/
- CREATE TRIGGER trZona 
-ON Clubes
-FOR INSERT, UPDATE
+CREATE TRIGGER tr_club_2016 
+ON Jugadores
+FOR UPDATE
 AS
 BEGIN
+	DECLARE @id_club_proveniente int
+	DECLARE @id_club_destino int
+
+	SET @id_club_proveniente = (
+									SELECT j.Id_Club
+									FROM Updated u
+									OFFSET 0 ROWS FETCH FIRST 1 rows only
+								)
+
+	-- Validación de la misma cantidad de jugadores de cada equipo
+	IF (SELECT COUNT(*) FROM Inserted)
 END
+
+
+
+
+
+
+
+
+
+
 
