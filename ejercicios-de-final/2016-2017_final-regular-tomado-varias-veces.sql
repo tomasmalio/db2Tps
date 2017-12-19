@@ -312,28 +312,193 @@ COMMIT TRAN
  *
  *		No utilizar cursores.
  **/
+CREATE FUNCTION fnIntercambiarJugador (@id_club_proveniente int, @id_club_destino int)
+RETURNS int
+AS
+	BEGIN
+		
+		DECLARE @categoria_jugadores int
+		DECLARE @jugador_a_traspasar int
+
+		DECLARE @return int
+		SET @return = 0
+
+		SET @categoria_jugadores = (
+									SELECT u.Categoria
+									FROM Updated u
+									WHERE u.Id_Club <> @id_club_proveniente
+									OFFSET 0 ROWS FETCH FIRST 1 rows only
+								)
+
+		-- Localizamos un jugador a traspazar que no esté seleccionado
+		SET @jugador_a_traspasar = (
+									SELECT j.Nrodoc
+									FROM Jugadores j
+									INNER JOIN Clubes c ON c.Id_Club = j.Id_Club
+									WHERE 
+										j.Id_Club = @id_club_proveniente
+										AND j.Categoria = @categoria_jugadores
+										AND NOT EXISTS (
+												SELECT *
+												FROM Updated u
+												WHERE u.Nrodoc = j.Nrodoc
+											)
+								)
+		IF (@jugador_a_traspasar > 0)
+			BEGIN
+				@return = @jugador_a_traspasar
+			END
+
+		RETURN @return
+	END
+GO
+-- Eof function Intercambiar Jugador
+
 CREATE TRIGGER tr_club_2016 
 ON Jugadores
 FOR UPDATE
 AS
 BEGIN
-	DECLARE @id_club_proveniente int
-	DECLARE @id_club_destino int
+	DECLARE @id_club_proveniente 				int
+	DECLARE @id_club_destino 					int
 
+	DECLARE @cant_de_jugadores_int_proveniente 	int
+	DECLARE @cant_de_jugadores_int_destino 		int
+
+	DECLARE @diferencia_de_jugadores 			int
+	SET diferencia_de_jugadores 				= 0
+
+	DECLARE @cant_de_jugadores_prov_zona_cate 	int
+	DECLARE @cant_de_jugadores_dest_zona_cate 	int
+
+	-- Obtenemos el id del club principal a hacer el intercambio
 	SET @id_club_proveniente = (
-									SELECT j.Id_Club
+									SELECT u.Id_Club
 									FROM Updated u
 									OFFSET 0 ROWS FETCH FIRST 1 rows only
 								)
+	-- Obtenemos el id del club secundario a hacer el intercambio
+	SET @id_club_destino = (
+								SELECT u.Id_Club
+								FROM Updated u
+								WHERE u.Id_Club <> @id_club_proveniente
+								OFFSET 0 ROWS FETCH FIRST 1 rows only
+							)
 
-	-- Validación de la misma cantidad de jugadores de cada equipo
-	IF (SELECT COUNT(*) FROM Inserted)
+	-- Obtenemos la cantidad de jugadores del equipo que provienen
+	SET @cant_de_jugadores_int_proveniente = (
+												SELECT COUNT(*)
+												FROM Updated u
+												WHERE u.Id_Club = @id_club_proveniente
+											)
+
+	-- Obtenemos la cantidad de jugadores del otro equipo
+	SET @cant_de_jugadores_int_destino = (
+												SELECT COUNT(*)
+												FROM Updated u
+												WHERE u.Id_Club = @id_club_destino
+											)
+	
+	-- a) Validamos que ambos equipos estén intercambiando la misma cantidad de jugadores
+	IF (@cant_de_jugadores_int_proveniente <> @cant_de_jugadores_int_destino)
+		BEGIN
+			PRINT 'No se está realizando un intercambio con la misma cantidad de jugadores de ambos equipos.'
+			SET @diferencia_de_jugadores = SELECT ABS(@cant_de_jugadores_int_proveniente - @cant_de_jugadores_int_destino)
+		END
+
+	-- Obtenemos la cantidad de jugadores del club que provienen en función de su
+	-- zona y categoria
+	SET @cant_de_jugadores_prov_zona_cate = (
+											SELECT MAX(cc.Cantidad)
+											FROM (
+													SELECT COUNT(c.Nrozona) AS Cantidad, j.Categoria
+													FROM Updated u
+													INNER JOIN Jugadores j ON j.Id_Club = u.Id_Club
+													INNER JOIN Clubes c ON c.Id_Club = u.Id_Club
+													WHERE 
+														u.Id_Club = @id_club_proveniente
+													GROUP BY j.Categoria
+												) cc
+											)
+	-- Obtenemos la cantidad de jugadores del otro club en función de su
+	-- zona y categoria
+	SET @cant_de_jugadores_dest_zona_cate = (
+											SELECT MAX(cc.Cantidad)
+											FROM (
+													SELECT COUNT(c.Nrozona) AS Cantidad, j.Categoria
+													FROM Updated u
+													INNER JOIN Jugadores j ON j.Id_Club = u.Id_Club
+													INNER JOIN Clubes c ON c.Id_Club = u.Id_Club
+													WHERE 
+														u.Id_Club = @id_club_destino
+													GROUP BY j.Categoria
+												) cc
+											)
+
+	-- b) Validación de que todos los jugadores sean de la misma zona y categoria
+	IF (@cant_de_jugadores_prov_zona_cate <> @cant_de_jugadores_dest_zona_cate)
+		BEGIN
+			PRINT 'Los jugadores NO son de la misma zona y categoria'
+		END
+
+	-- Si la cantidad a intercambiar no es posible satisfacerla, se ajusta a la cantidad 
+	-- correcta para realizar el intercambio.
+	IF (@diferencia_de_jugadores > 0)
+		BEGIN
+			-- Identificamos de que club es el que tiene menos jugadores a intercambiar
+			-- para realizar dicha operación
+
+			DECLARE @equipo_ant int
+			DECLARE @equipo_nuevo int
+			
+			-- La cantida de jugadores del equipo principal es menor que la de destino
+			-- con lo cual tendremos que buscar la cantidad de jugadores que faltan para
+			-- equipararlo.
+			IF (@cant_de_jugadores_int_proveniente < @cant_de_jugadores_int_destino)
+				BEGIN
+					@equipo_ant = @id_club_proveniente
+					@equipo_nuevo = @id_club_destino
+				END
+			ELSE
+				BEGIN
+					@equipo_ant = @id_club_destino
+					@equipo_nuevo = @id_club_proveniente
+				END
+
+			-- Generamos una variable para poder incrementar y recorrer la cantidad de jugadores
+			-- que necesitamos
+			DECLARE @variable_i int
+			SET @variable_i = 0
+
+			-- Variable para indentificar el jugador
+			DECLARE @jugador_intercambiar int;
+
+			-- Recorremos hasta que la cantida de jugadores que necesitaba encontrar
+			WHILE (@variable_i < @diferencia_de_jugadores)
+				BEGIN
+					-- Buscamos un jugador a intercambiar en la funcion
+					-- fnIntercambiarJugador enviándole el equipo que proviene y club nuevo
+					EXEC @jugador_intercambiar = fnIntercambiarJugador (@equipo_ant, @equipo_nuevo)
+					
+					-- Si el jugador a intercambiar es mayor a 0 (cero) significa que encontre
+					-- uno a través de la función fnIntercambiarJugador para poder actualizarlo
+					-- y así equiparar los equipos
+					IF (@jugador_intercambiar > 0)
+						BEGIN
+							UPDATE Jugadores (Tipodoc, Id_Club) VALUES (@jugador_intercambiar, @id_club_destino)
+						END
+					ELSE
+						BEGIN	
+							RAISERROR ('No hay jugadores para poder hacer el intercambio', 16, 1)
+							-- Forzamos a que salga del while ya que no hay jugadores
+							@variable_i = @diferencia_de_jugadores
+						END
+
+					SET @variable_i = @variable_i + 1
+				END
+
+		END
 END
-
-
-
-
-
 
 
 
