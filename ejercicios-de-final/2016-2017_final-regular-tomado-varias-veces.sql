@@ -42,7 +42,7 @@ FETCH NEXT FROM cu1037546_a INTO @cantidadDeGoles, @NroFecha
 
 -- Recorremos los datos con el objetivo de encontrar la fecha
 -- con mayor cantidad de goles
-WHILE @@FETCH_STATUS = 0
+WHILE (@@FETCH_STATUS = 0)
 	BEGIN
 		IF (@cantidadDeGoles > @cantidadDeGoles_maximo)
 			BEGIN
@@ -66,7 +66,7 @@ OPEN cu1037546_a_res
 
 FETCH FIRST FROM cu1037546_a_res INTO @cantidad_de_goles_resultado
 
-WHILE @@FETCH_STATUS = 0
+IF (@@FETCH_STATUS = 0)
 	BEGIN
 		PRINT 'Nº fecha:(nº) ' + convert(varchar(5), @NroFecha_maximo) + ' Cantidad de goles: (total de la fecha) ' + convert(varchar(5), @cantidad_de_goles_resultado)
 	END
@@ -95,7 +95,7 @@ FETCH NEXT FROM cu1037546_b_clubes INTO @nombre_del_club, @cantidad_de_goles_clu
 
 WHILE (@@FETCH_STATUS = 0)
 	BEGIN
-		PRINT 'Club:(nombre) ' + @nombre_del_club + 'Total de goles: (total del club) ' + convert(varchar(5), @cantidad_de_goles_club)
+		PRINT 'Club:(nombre) ' + @nombre_del_club + ' Total de goles: (total del club) ' + convert(varchar(5), @cantidad_de_goles_club)
 		FETCH NEXT FROM cu1037546_b_clubes INTO @nombre_del_club, @cantidad_de_goles_club
 	END
 
@@ -116,6 +116,7 @@ FETCH NEXT FROM cu1037546_b_categorias INTO @Categoria, @cantidad_de_goles_categ
 WHILE (@@FETCH_STATUS = 0)
 	BEGIN
 		PRINT 'Categoria ' + convert(varchar(5), @Categoria) + ':' + convert(varchar(5), @cantidad_de_goles_categoria)
+		FETCH NEXT FROM cu1037546_b_categorias INTO @Categoria, @cantidad_de_goles_categoria
 	END
 
 CLOSE cu1037546_b_categorias
@@ -123,22 +124,34 @@ DEALLOCATE cu1037546_b_categorias
 
 GO
 
-/*
-2 - Implementar una unica transaccion que invoque una funcion y actualice y proyecte la tabla de partidos, conforme a siguiente detalle:
-a - Definir una función escalar que retorne en nº de fecha donde se registraron la menor cantidad de empates entre los clubes de la zona 2.
-Debe resolverse por correlacionada.
-b - Iniciar una transaccion que actualice todos los partidos de la zona 2 correspondiente a la fecha retornada por la funcion, agregando un
-gol a cada club visitante en la categoria 85.
-c - Modificar la tabla poscate285 en funcion de los goles agregados en el punto b. Debiendo:
-  I - Actualizar la cantidad de partidos ganados, empatados y perdidos de los clubes afectados.
-  II - Actualizar la cantidad de goles (a favor) y golesC (en contra) de los mismos.
-  III - Actualizar los puntos de dichos clubes teniendo en cuenta 3 puntos por partido ganado y 1 punto por partido empatado.
-d - Proyectar la tabla poscate285 luego de ser actualizada.
-e - Deshacer el punto c y confirmar el punto b de la transaccion antes de finalizarla.
+/**
+ * 2 - Implementar una unica transaccion que invoque una funcion y actualice y 
+ * proyecte la tabla de partidos, conforme a siguiente detalle:
+ * 	a - Definir una función escalar que retorne en nº de fecha donde se registraron 
+ * 	la menor cantidad de empates entre los clubes de la zona 2.
+ * 	Debe resolverse por correlacionada.
+ * 	b - Iniciar una transaccion que actualice todos los partidos de la zona 2 
+ * 	correspondiente a la fecha retornada por la funcion, agregando un
+ * 	gol a cada club visitante en la categoria 85.
+ *	c - Modificar la tabla poscate285 en funcion de los goles agregados en el punto b. Debiendo:
+ * 		I - Actualizar la cantidad de partidos ganados, empatados y perdidos de los clubes afectados.
+ * 		II - Actualizar la cantidad de goles (a favor) y golesC (en contra) de los mismos.
+ * 		III - Actualizar los puntos de dichos clubes teniendo en cuenta 3 puntos por partido 
+ *		ganado y 1 punto por partido empatado.
+ *	d - Proyectar la tabla poscate285 luego de ser actualizada.
+ *	e - Deshacer el punto c y confirmar el punto b de la transaccion antes de finalizarla.
+ * 
+ * Debe controlar las salidas por error mostrando un mensaje identificatorio del error. 
+ * No utilizar cursores.
+ *
+ **/
+ CREATE PROCEDURE st1037546
+ AS
+ 	BEGIN TRANSACTION tran
 
-Debe controlar las salidas por error mostrando un mensaje identificatorio del error. 
-No utilizar cursores.
-*/
+ 	COMMIT TRANSACTION tran
+ GO
+
 
 /*
 3 - Definir un desencadenador que se accione cuando se modifica el club al que pertenecen los jugadores.
