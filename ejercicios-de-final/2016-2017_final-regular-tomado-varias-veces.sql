@@ -312,44 +312,10 @@ COMMIT TRAN
  *
  *		No utilizar cursores.
  **/
-CREATE TRIGGER trZona 
+ CREATE TRIGGER trZona 
 ON Clubes
 FOR INSERT, UPDATE
 AS
 BEGIN
-
-	IF UPDATE(Nrozona)
-		BEGIN
-
-			IF ((SELECT COUNT(*) FROM Inserted) > 1)
-				BEGIN
-					PRINT 'No se permite actualizaciones multiples'
-					ROLLBACK TRANSACTION
-				END
-
-			IF ( (SELECT nrozona FROM Deleted) = (SELECT nrozona FROM Inserted) )
-				BEGIN
-					PRINT 'No se permite actualizar a la misma zona'
-					ROLLBACK TRANSACTION
-				END
-
-			IF ( (SELECT NroZona FROM Inserted) NOT IN (1, 2) )
-				BEGIN
-					PRINT 'No se permite una zona distinta de 1 o 2'
-					ROLLBACK TRANSACTION
-				END
-
-			IF ( (SELECT NroZona FROM Inserted) = (SELECT c.nrozona
-												   FROM clubes c
-												   GROUP BY c.nrozona
-												   HAVING COUNT() >= ALL (SELECT COUNT()
-																		   FROM clubes c1
-																		   GROUP BY c1.nrozona)) )
-				BEGIN
-					PRINT 'No se permite actualizar a la zona de mayor cant de clubes'
-					ROLLBACK TRANSACTION
-				End
-
-		END
-
 END
+
