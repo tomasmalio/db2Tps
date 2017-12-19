@@ -286,7 +286,7 @@ BEGIN TRAN
 		End
 
 
-	/* Diferencia y Puntos */
+	-- Diferencia y Puntos
 	UPDATE Poscate285 SET Diferencia = (GolesF - GolesC), Puntos = (Ganados * 3) + (Empatados * 1)
 
 	IF (@@error <> 0)
@@ -302,16 +302,14 @@ COMMIT TRAN
 
 
 /*
-3 - Definir un desencadenador que se accione cuando se modifica el club al que pertenecen los jugadores.
-a - La modificacion del club se interpreta como un intercambio entre clubes, de modo que si los jugadores del club1 se modifican al 
-club2, los jugadores del club2 pasan al club1.
-b - La modificacion se realiza intercambiando la misma cantidad de jugadores entre los dos clubes de la misma zona y en la misma 
-categoria.
-c - Si la cantidad a intercambiar no es posible satisfacerla, se ajusta a la cantidad correcta para realizar el intercambio.
-No utilizar cursores.
-*/
-
-
+ * 3 - Definir un desencadenador que se accione cuando se modifica el club al que pertenecen los jugadores.
+ * 		a - La modificacion del club se interpreta como un intercambio entre clubes, de modo 
+ * 		que si los jugadores del club1 se modifican al club2, los jugadores del club2 pasan al club1.
+ * 		b - La modificacion se realiza intercambiando la misma cantidad de jugadores 
+ * 		entre los dos clubes de la misma zona y en la misma categoria.
+ * 		c - Si la cantidad a intercambiar no es posible satisfacerla, se ajusta a la cantidad correcta para realizar el intercambio.
+ *		No utilizar cursores.
+ **/
 CREATE TRIGGER trZona ON clubes
 FOR INSERT,UPDATE
 AS
