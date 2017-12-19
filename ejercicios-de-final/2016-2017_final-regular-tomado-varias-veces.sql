@@ -166,7 +166,7 @@ AS
 			)
 		RETURN @fechaMinima
 	END
-
+GO
 DECLARE @respuesta int;   
 EXEC @respuesta = fn1037546_fecha_menor_empates
 PRINT @respuesta
@@ -394,10 +394,10 @@ BEGIN
 
 	-- Obtenemos la cantidad de jugadores del otro equipo
 	SET @cant_de_jugadores_int_destino = (
-												SELECT COUNT(*)
-												FROM Updated u
-												WHERE u.Id_Club = @id_club_destino
-											)
+											SELECT COUNT(*)
+											FROM Updated u
+											WHERE u.Id_Club = @id_club_destino
+										)
 	
 	-- a) Validamos que ambos equipos estén intercambiando la misma cantidad de jugadores
 	IF (@cant_de_jugadores_int_proveniente <> @cant_de_jugadores_int_destino)
