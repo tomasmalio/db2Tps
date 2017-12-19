@@ -300,15 +300,12 @@ BEGIN TRAN
 
 COMMIT TRAN
 
-
 /*
- * 3 - Definir un desencadenador que se accione cuando se modifica el club al que pertenecen los jugadores.
- * 		a - La modificacion del club se interpreta como un intercambio entre clubes, de modo 
- * 		que si los jugadores del club1 se modifican al club2, los jugadores del club2 pasan al club1.
- * 		b - La modificacion se realiza intercambiando la misma cantidad de jugadores 
- * 		entre los dos clubes de la misma zona y en la misma categoria.
- * 		c - Si la cantidad a intercambiar no es posible satisfacerla, se ajusta a la cantidad correcta 
- * 		para realizar el intercambio.
+ * 3 - Definir un desencadenador que se accione cuando se inserte o modifique el NroZona de un club
+ * 		a- No debe permitir modificaciones multiples
+ * 		b- Comprobar que no actualice la zona actual
+ * 		c- Comprobar que los valores permitidos para la zona son únicamente 1 o 2
+ * 		d- No Permitir que actualice a la zona con mayor cantidad de clubes 
  *
  *		No utilizar cursores.
  **/
@@ -320,25 +317,28 @@ BEGIN
 
 	IF UPDATE(Nrozona)
 		BEGIN
-
+			-- a) No debe permitir modificaciones multiples
 			IF ((SELECT COUNT(*) FROM Inserted) > 1)
 				BEGIN
 					PRINT 'No se permite actualizaciones multiples'
 					ROLLBACK TRANSACTION
 				END
 
+			-- b) Comprobar que no actualice la zona actual 
 			IF ( (SELECT nrozona FROM Deleted) = (SELECT nrozona FROM Inserted) )
 				BEGIN
 					PRINT 'No se permite actualizar a la misma zona'
 					ROLLBACK TRANSACTION
 				END
 
+			-- c) Comprobar que los valores permitidos para la zona son únicamente 1 o 2
 			IF ( (SELECT NroZona FROM Inserted) NOT IN (1, 2) )
 				BEGIN
 					PRINT 'No se permite una zona distinta de 1 o 2'
 					ROLLBACK TRANSACTION
 				END
 
+			-- d) 
 			IF ( (SELECT NroZona FROM Inserted) = (SELECT c.nrozona
 												   FROM clubes c
 												   GROUP BY c.nrozona
