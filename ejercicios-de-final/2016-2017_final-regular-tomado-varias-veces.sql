@@ -171,6 +171,7 @@ DECLARE @respuesta int;
 EXEC @respuesta = fn1037546_fecha_menor_empates
 PRINT @respuesta
 
+-- Ejercicio b
 BEGIN TRAN
 
 	UPDATE partidos SET GolesV = GolesV + 1 WHERE (NroFecha = DBO.fn1037546_fecha_menor_empates()) AND (Categoria = 85)
@@ -205,8 +206,8 @@ BEGIN TRAN
 									AND Id_ClubL = Poscate285.Id_Club 
 									AND GolesL = GolesV
 								),
-		perdidos = perdidos + (
-								SELECT COUNT(id_clubl) 
+		Perdidos = Perdidos + (
+								SELECT COUNT(Id_ClubL) 
 								FROM Partidos 
 								WHERE 
 									Categoria = 85 
@@ -214,7 +215,7 @@ BEGIN TRAN
 									AND GolesL < GolesV
 								),
 		GolesF = GolesF + (
-							SELECT SUM(golesl) 
+							SELECT SUM(Golesl) 
 							FROM Partidos 
 							WHERE 
 								Categoria = 85 
@@ -236,13 +237,46 @@ BEGIN TRAN
 		End
 
 		
-	/visitantes/
-	UPDATE poscate285 SET 
-		ganados=ganados+(SELECT COUNT(id_clubv) FROM partidos WHERE categoria=85 AND id_clubv=poscate285.id_club AND golesv > golesl),
-		empatados=empatados+(SELECT COUNT(id_clubv) FROM partidos WHERE categoria=85 AND id_clubv=poscate285.id_club AND golesv = golesl),
-		perdidos=perdidos+(SELECT COUNT(id_clubv) FROM partidos WHERE categoria=85 AND id_clubv=poscate285.id_club AND golesv < golesl),
-		golesf=golesf+(SELECT SUM(golesv) FROM partidos WHERE categoria=85 AND id_clubv=poscate285.id_club),
-		golesc=golesc+(SELECT SUM(golesl) FROM partidos WHERE categoria=85 AND id_clubv=poscate285.id_club)
+	-- Visitantes
+	UPDATE Poscate285 SET 
+		Ganados = Ganados + (
+							SELECT COUNT(Id_ClubV) 
+							FROM Partidos 
+							WHERE 
+								Categoria = 85 
+								AND Id_ClubV = Poscate285.Id_Club 
+								AND GolesV > GolesL
+							),
+		Empatados = Empatados + (
+								SELECT COUNT(Id_ClubV) 
+								FROM Partidos 
+								WHERE 
+									Categoria = 85 
+									AND Id_ClubV = Poscate285.Id_Club 
+									AND GolesV = GolesL
+								),
+		Perdidos = Perdidos + (
+								SELECT COUNT(id_clubV) 
+								FROM Partidos 
+								WHERE 
+									Categoria = 85 
+									AND Id_ClubV = Poscate285.Id_Club 
+									AND GolesV < GolesL
+								),
+		GolesF = GolesF + (
+							SELECT SUM(GolesV) 
+							FROM Partidos 
+							WHERE 
+								Categoria = 85 
+								AND Id_ClubV = Poscate285.Id_Club 
+							),
+		GolesC = GolesC + (
+							SELECT SUM(GolesV) 
+							FROM Partidos 
+							WHERE 
+								Categoria = 85 
+								AND Id_ClubV = Poscate285.Id_Club
+							)
 
 	IF (@@error <> 0)
 		Begin
@@ -253,11 +287,11 @@ BEGIN TRAN
 
 
 	/* Diferencia y Puntos */
-	UPDATE poscate285 SET diferencia=(golesf-golesc),puntos=(ganados*3)+(empatados*1)
+	UPDATE Poscate285 SET Diferencia = (GolesF - GolesC), Puntos = (Ganados * 3) + (Empatados * 1)
 
 	IF (@@error <> 0)
 		Begin
-			RAISERROR('Error al actualizar poscate285 Dif y Puntos',16,4)
+			RAISERROR('Error al actualizar poscate285 Dif y Puntos', 16, 4)
 			ROLLBACK TRAN
 			RETURN
 		End
