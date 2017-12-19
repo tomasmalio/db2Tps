@@ -115,7 +115,7 @@ FETCH NEXT FROM cu1037546_b_categorias INTO @Categoria, @cantidad_de_goles_categ
 
 WHILE (@@FETCH_STATUS = 0)
 	BEGIN
-		PRINT 'Categoria ' + convert(varchar(5), @Categoria) + ':' + convert(varchar(5), @cantidad_de_goles_categoria)
+		PRINT 'Categoria ' + convert(varchar(5), @Categoria) + ': ' + convert(varchar(5), @cantidad_de_goles_categoria)
 		FETCH NEXT FROM cu1037546_b_categorias INTO @Categoria, @cantidad_de_goles_categoria
 	END
 
