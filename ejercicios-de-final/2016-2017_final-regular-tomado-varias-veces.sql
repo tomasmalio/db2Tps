@@ -485,13 +485,14 @@ BEGIN
 					-- y así equiparar los equipos
 					IF (@jugador_intercambiar > 0)
 						BEGIN
-							UPDATE Jugadores (Tipodoc, Id_Club) VALUES (@jugador_intercambiar, @id_club_destino)
+							UPDATE Jugadores SET Id_Club = @id_club_destino WHERE Nrodoc = @jugador_intercambiar
 						END
 					ELSE
 						BEGIN	
 							RAISERROR ('No hay jugadores para poder hacer el intercambio', 16, 1)
 							-- Forzamos a que salga del while ya que no hay jugadores
 							@variable_i = @diferencia_de_jugadores
+							ROLLBACK TRANSACTION
 						END
 
 					SET @variable_i = @variable_i + 1
@@ -499,9 +500,4 @@ BEGIN
 
 		END
 END
-
-
-
-
-
 
